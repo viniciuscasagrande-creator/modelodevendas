@@ -119,6 +119,8 @@ export default function App() {
   const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-200';
   const textTitle = theme === 'dark' ? 'text-[#f8fafc]' : 'text-slate-950 font-bold';
   const textSec = theme === 'dark' ? 'text-[#94a3b8]' : 'text-slate-500';
+  const textBody = theme === 'dark' ? 'text-[#cbd5e1]' : 'text-slate-800';
+  const selectThemeText = theme === 'dark' ? 'text-white font-medium' : 'text-slate-900 font-semibold';
   
   const btnSecondary = theme === 'dark' ? 'btn-secondary bg-[#1e293b] text-white hover:bg-[#273449]' : 'btn-light bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200';
 
