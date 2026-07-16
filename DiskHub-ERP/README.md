@@ -14,7 +14,9 @@ DiskHub-ERP/
     ├── 03-ROADMAP.md
     ├── 04-DESIGN-SYSTEM.md
     ├── 05-PERMISSOES.md
-    └── 06-MODULOS.md
+    ├── 06-MODULOS.md
+    ├── 07-MODULO-FINANCEIRO.md
+    └── 08-MODULO-CONTABILIDADE.md
 ```
 
 ## Como Navegar
