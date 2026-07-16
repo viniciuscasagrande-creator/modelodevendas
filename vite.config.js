@@ -7,5 +7,11 @@ export default defineConfig({
   plugins: [react(), viteSingleFile()],
   server: {
     allowedHosts: true
+  },
+  css: {
+    transformer: 'postcss'
+  },
+  build: {
+    cssMinify: false
   }
 })
