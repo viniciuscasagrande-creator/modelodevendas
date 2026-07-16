@@ -884,6 +884,18 @@ export default function App() {
               <Sparkles className="w-5 h-5 shrink-0 text-amber-400 animate-pulse" />
               <span>Planos & Upgrades</span>
             </button>
+
+            <button 
+              onClick={() => setCurrentTab('roadmap')} 
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                currentTab === 'roadmap' 
+                  ? 'bg-indigo-600/15 text-indigo-400 border-indigo-500/30 shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'
+              }`}
+            >
+              <ShieldCheck className="w-5 h-5 shrink-0 text-indigo-400" />
+              <span>Status & Roadmap</span>
+            </button>
           </nav>
         </div>
 
@@ -2177,6 +2189,87 @@ export default function App() {
                   </div>
                   <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-bold rounded-xl transition-all">Assinar Expert</button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= 8. ROADMAP & STATUS VIEW ================= */}
+          {currentTab === 'roadmap' && (
+            <div className="space-y-8 animate-fadeIn">
+              <div>
+                <h2 className="text-2xl font-extrabold text-white tracking-tight">Status & Roadmap do Projeto</h2>
+                <p className="text-sm text-slate-400">Acompanhe as fases de desenvolvimento do novo ecossistema ERP/CRM.</p>
+              </div>
+
+              {/* Progress Summary */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                  <span className="text-indigo-400">Progresso Geral do Protótipo (Fases 1 e 2)</span>
+                  <span className="text-white">100% Concluído</span>
+                </div>
+                <div className="w-full bg-slate-950 rounded-full h-3.5 border border-slate-850 overflow-hidden p-0.5">
+                  <div className="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full rounded-full w-full"></div>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Todas as especificações de navegação simulada, layouts multibanco, gestão de borderôs e comissionamento foram entregues como protótipo interativo e modular.
+                </p>
+              </div>
+
+              {/* Phases Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Phase 1 */}
+                <div className="bg-slate-900 border border-emerald-500/30 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 1: Demonstração</h3>
+                      <span className="bg-emerald-500/10 text-emerald-450 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                    </div>
+                    <ul className="space-y-3 text-xs text-slate-350">
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Níveis de Planos (Standard, Advanced, Expert)</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Fluxo de contratação e upgrade simulados</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Demonstração estática das funcionalidades principais</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Phase 2 */}
+                <div className="bg-slate-900 border border-emerald-500/30 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 2: Protótipo Funcional</h3>
+                      <span className="bg-emerald-500/10 text-emerald-455 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                    </div>
+                    <ul className="space-y-3 text-xs text-slate-350">
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Dashboards interativos com atualizações</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Fluxos realistas: Sangrias de PDV e emissões SEFAZ</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Fechamento real de borderôs com liberação de repasse</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Phase 3 */}
+                <div className="bg-slate-900 border border-indigo-500/30 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 3: Sistema de Produção</h3>
+                      <span className="bg-indigo-500/15 text-indigo-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">Planejado</span>
+                    </div>
+                    <ul className="space-y-3 text-xs text-slate-350">
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" /><span>Migração de rotas estáticas para React + Vite</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-indigo-455 shrink-0 mt-0.5" /><span>Implementação de CSS utilitário com Tailwind CSS</span></li>
+                      <li className="flex items-start space-x-2 text-slate-500"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Banco de dados relacional (Firebase / MySQL)</span></li>
+                      <li className="flex items-start space-x-2 text-slate-500"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>APIs de Open Finance de Produção</span></li>
+                      <li className="flex items-start space-x-2 text-slate-500"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Integrações bancárias (Gateways, Vindi, Vendas Stone)</span></li>
+                      <li className="flex items-start space-x-2 text-slate-500"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Empacotamento de Módulos comercializáveis SaaS</span></li>
+                    </ul>
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
