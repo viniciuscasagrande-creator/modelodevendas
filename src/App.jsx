@@ -855,7 +855,7 @@ export default function App() {
                       <line x1="0" y1="75" x2="500" y2="75" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1"/>
                       <line x1="0" y1="120" x2="500" y2="120" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1"/>
                       <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="url(#indigo-grad)"/>
-                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#6366f1" stroke-width="3" strokeLinecap="round"/>
+                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#6366f1" strokeWidth="3" strokeLinecap="round"/>
                     </svg>
                   </div>
                   <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-semibold">
