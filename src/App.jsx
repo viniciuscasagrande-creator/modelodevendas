@@ -46,9 +46,51 @@ import {
 export default function App() {
   // Navigation & General configuration
   const [currentTab, setCurrentTab] = useState('dashboard');
-  const [financeSubTab, setFinanceSubTab] = useState('contas');
-  const [accountingSubTab, setAccountingSubTab] = useState('bordero');
+  const [financeSubTab, setFinanceSubTab] = useState('dashboard');
+  const [accountingSubTab, setAccountingSubTab] = useState('dashboard');
   const [marketingSubTab, setMarketingSubTab] = useState('campanhas');
+
+  // Phase 2 states
+  const [receivables, setReceivables] = useState([
+    { id: 'rec-1', desc: 'Venda de Ingressos - Lote 1 Inverno', amount: 154000.00, method: 'Cartão', due: '2026-07-20', status: 'Recebido' },
+    { id: 'rec-2', desc: 'Patrocínio Master - Itaú', amount: 150000.00, method: 'PIX', due: '2026-07-22', status: 'Pendente' },
+    { id: 'rec-3', desc: 'Venda de Camarotes - Metal Fest', amount: 25000.00, method: 'Boleto', due: '2026-07-15', status: 'Atrasado' },
+  ]);
+  const [payables, setPayables] = useState([
+    { id: 'pay-1', desc: 'Repasse Produtor - Lote 1 Inverno', amount: 120000.00, due: '2026-07-25', status: 'Agendado', category: 'Repasse', costCenter: 'Eventos' },
+    { id: 'pay-2', desc: 'Aluguel de Palco - Curitiba Arena', amount: 15000.00, due: '2026-07-18', status: 'Pendente', category: 'Infraestrutura', costCenter: 'Operacional' },
+    { id: 'pay-3', desc: 'Impostos Federais DAS Junho', amount: 8400.00, due: '2026-07-10', status: 'Pago', category: 'Impostos', costCenter: 'Administrativo' },
+  ]);
+  const [costCenters, setCostCenters] = useState([
+    { id: 'cc-1', name: 'Eventos', budget: 500000 },
+    { id: 'cc-2', name: 'Marketing', budget: 150000 },
+    { id: 'cc-3', name: 'Operacional', budget: 200000 },
+    { id: 'cc-4', name: 'Logística', budget: 100000 },
+    { id: 'cc-5', name: 'Administrativo', budget: 80000 },
+  ]);
+  const [newReceivable, setNewReceivable] = useState({ desc: '', amount: '', method: 'PIX', due: '2026-07-20' });
+  const [newPayable, setNewPayable] = useState({ desc: '', amount: '', category: 'Fornecedor', due: '2026-07-20', costCenter: 'Eventos' });
+
+  // Contabilidade states
+  const [contabilPlanoContas, setContabilPlanoContas] = useState([
+    { code: '1.1.01', name: 'Caixa e Equivalentes de Caixa', type: 'Ativo', balance: 950000 },
+    { code: '1.1.02', name: 'Clientes a Receber', type: 'Ativo', balance: 179000 },
+    { code: '2.1.01', name: 'Fornecedores a Pagar', type: 'Passivo', balance: 135000 },
+    { code: '2.1.02', name: 'Impostos a Recolher', type: 'Passivo', balance: 8400 },
+    { code: '3.1.01', name: 'Receita com Venda de Ingressos', type: 'Receitas', balance: 2580000 },
+    { code: '4.1.01', name: 'Custos de Eventos / Produção', type: 'Custos', balance: 620000 },
+    { code: '4.1.02', name: 'Despesas com Pessoal / Fixas', type: 'Despesas', balance: 1480000 },
+  ]);
+  const [contabilLancamentos, setContabilLancamentos] = useState([
+    { id: 'cl-1', date: '15/07/2026', debit: '1.1.01', credit: '3.1.01', amount: 45000, desc: 'Reconhecimento de Receita - Festival de Inverno' },
+    { id: 'cl-2', date: '14/07/2026', debit: '4.1.01', credit: '2.1.01', amount: 18000, desc: 'Lançamento de Despesa de Segurança Terceirizada' },
+    { id: 'cl-3', date: '12/07/2026', debit: '4.1.01', credit: '1.1.01', amount: 35000, desc: 'PGTO de Aluguel de LED - Lançamento Automático' },
+  ]);
+  const [contabilAuditorias, setContabilAuditorias] = useState([
+    { id: 'aud-1', type: 'Sucesso', msg: 'Integração Financeira ➔ Contábil realizada para lote de faturamento #982.', date: '15/07/2026' },
+    { id: 'aud-2', type: 'Alerta', msg: 'Lançamento manual de ajuste na conta 1.1.02 sem documento fiscal anexado.', date: '14/07/2026' },
+  ]);
+
   const [plan, setPlan] = useState('standard');
   const [theme, setTheme] = useState('light'); // 'dark' or 'light'
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -1393,162 +1435,182 @@ export default function App() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Gestão Financeira (ERP)</h2>
-                  <p className={`text-xs ${textSec} mb-0`}>Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
+                  <p className={`text-xs ${textSec} mb-0`}>Fluxo de caixa, conciliação contábil, contas a pagar/receber e DRE gerencial.</p>
                 </div>
                 
-                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 overflow-x-auto text-xs`}>
                   <button 
-                    onClick={() => setFinanceSubTab('contas')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      financeSubTab === 'contas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setFinanceSubTab('dashboard')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      financeSubTab === 'dashboard' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    Saldos & Contas
+                    Dashboard Financeiro
                   </button>
                   <button 
-                    onClick={() => setFinanceSubTab('lancamentos')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      financeSubTab === 'lancamentos' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setFinanceSubTab('contasReceber')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      financeSubTab === 'contasReceber' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    Lançamentos
+                    Contas a Receber
+                  </button>
+                  <button 
+                    onClick={() => setFinanceSubTab('contasPagar')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      financeSubTab === 'contasPagar' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    }`}
+                  >
+                    Contas a Pagar
                   </button>
                   <button 
                     onClick={() => setFinanceSubTab('conciliacao')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
                       financeSubTab === 'conciliacao' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    Conciliação
+                    Bancos & Conciliação
                   </button>
                   <button 
-                    onClick={() => setFinanceSubTab('taxas')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      financeSubTab === 'taxas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setFinanceSubTab('dre')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      financeSubTab === 'dre' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    PDVs & Taxas
+                    DRE Gerencial
                   </button>
                 </div>
               </div>
 
-              {/* Sub-Tab 1: Saldos & Contas */}
-              {financeSubTab === 'contas' && (
-                <div className="row animate-fadeIn">
-                  <div className="col-lg-8 mb-3">
-                    <div className="space-y-4">
-                      <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider mb-0`}>Saldo das Contas do Sistema</h3>
-                      <div className="row">
-                        {accounts.map(acc => (
-                          <div key={acc.id} className="col-md-4 mb-3">
-                            <div className={`card ${cardClass} p-4`}>
-                              <span className={`text-[9px] ${textSec} font-semibold uppercase tracking-wider block`}>{acc.type}</span>
-                              <h4 className={`text-xs font-semibold ${textTitle} mt-1 mb-0`}>{acc.name}</h4>
-                              <div className={`mt-3 font-mono font-bold text-md ${textTitle}`}>
-                                R$ {acc.balance.toLocaleString('pt-BR')}
-                              </div>
-                            </div>
+              {/* Sub-Tab 1: Dashboard Financeiro */}
+              {financeSubTab === 'dashboard' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <div className="row">
+                    {accounts.map(acc => (
+                      <div key={acc.id} className="col-md-4 mb-3">
+                        <div className={`card ${cardClass} p-4`}>
+                          <span className={`text-[9px] ${textSec} font-bold uppercase tracking-wider block`}>{acc.type}</span>
+                          <h4 className={`text-xs font-semibold ${textTitle} mt-1 mb-0`}>{acc.name}</h4>
+                          <div className={`mt-3 font-mono font-bold text-md ${textTitle}`}>
+                            R$ {acc.balance.toLocaleString('pt-BR')}
                           </div>
-                        ))}
-                      </div>
-
-                      <div className={`card ${cardClass} p-4 space-y-2`}>
-                        <div className="flex items-center space-x-2">
-                          <TrendingUp className="w-5 h-5 text-[#3B82F6]" />
-                          <h4 className={`text-sm font-semibold ${textTitle} mb-0`}>Resumo Patrimonial Consolidador</h4>
                         </div>
-                        <p className={`text-xs ${textSec} mb-0 leading-relaxed`}>
-                          O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
-                        </p>
                       </div>
-                    </div>
+                    ))}
                   </div>
 
-                  <div className="col-lg-4 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3 mb-3`}>
-                        <ArrowRightLeft className="w-4 h-4 text-[#3B82F6]" />
-                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Transferência entre Contas</h4>
+                  <div className="row">
+                    {/* Cash Flow Line Chart simulation */}
+                    <div className="col-lg-8 mb-3">
+                      <div className={`card ${cardClass} p-4 h-100`}>
+                        <div>
+                          <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Projeção de Fluxo de Caixa</h3>
+                          <p className={`text-xs ${textSec} mb-0`}>Entradas e saídas de caixa previstas para a semana.</p>
+                        </div>
+                        <div className="relative w-full h-48 mt-4">
+                          <svg className="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
+                            <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="rgba(59,130,246,0.1)"/>
+                            <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#3b82f6" strokeWidth="2"/>
+                          </svg>
+                        </div>
                       </div>
+                    </div>
 
-                      <form onSubmit={handleAccountTransfer} className="space-y-3 text-xs">
-                        <div className="form-group mb-2">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Origem</label>
-                          <select 
-                            value={transfer.from} 
-                            onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
-                            className={`form-control form-control-sm ${inputClass}`}
-                          >
-                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
-                          </select>
+                    <div className="col-lg-4 mb-3">
+                      <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                        <div>
+                          <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Transferência Interna</h3>
+                          <form onSubmit={handleAccountTransfer} className="space-y-3 text-xs">
+                            <div className="form-group mb-2">
+                              <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Origem</label>
+                              <select 
+                                value={transfer.from} 
+                                onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
+                                className={`form-control form-control-sm ${inputClass}`}
+                              >
+                                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                              </select>
+                            </div>
+                            <div className="form-group mb-2">
+                              <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Destino</label>
+                              <select 
+                                value={transfer.to} 
+                                onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
+                                className={`form-control form-control-sm ${inputClass}`}
+                              >
+                                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                              </select>
+                            </div>
+                            <div className="form-group mb-2">
+                              <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
+                              <input 
+                                type="number" 
+                                value={transfer.amount} 
+                                onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
+                                placeholder="0,00" 
+                                className={`form-control form-control-sm ${inputClass}`} 
+                              />
+                            </div>
+                            <button type="submit" className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer">
+                              Executar Transferência
+                            </button>
+                          </form>
                         </div>
-
-                        <div className="form-group mb-2">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Destino</label>
-                          <select 
-                            value={transfer.to} 
-                            onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
-                            className={`form-control form-control-sm ${inputClass}`}
-                          >
-                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                          </select>
-                        </div>
-
-                        <div className="form-group mb-3">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
-                          <input 
-                            type="number" 
-                            value={transfer.amount}
-                            onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
-                            placeholder="Ex: 50000"
-                            className={`form-control form-control-sm ${inputClass} font-mono`}
-                            required
-                          />
-                        </div>
-
-                        <button 
-                          type="submit" 
-                          className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded transition-all border-0"
-                        >
-                          Confirmar Transferência
-                        </button>
-                      </form>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Sub-Tab 2: Lançamentos */}
-              {financeSubTab === 'lancamentos' && (
+              {/* Sub-Tab 2: Contas a Receber */}
+              {financeSubTab === 'contasReceber' && (
                 <div className="row animate-fadeIn">
                   <div className="col-lg-8 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Fluxo de Caixa Lançamentos</h3>
+                    <div className={`card ${cardClass} p-4 h-100`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Duplicatas e Receitas Futuras</h3>
                       <div className="table-responsive">
                         <table className={`table table-striped table-hover text-xs ${textBody}`}>
                           <thead>
                             <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
-                              <th className="p-3 border-0">Descrição / Vínculo</th>
-                              <th className="p-3 border-0">Categoria</th>
-                              <th className="p-3 border-0">Centro de Custo</th>
-                              <th className="p-3 border-0">Data</th>
+                              <th className="p-3 border-0">Descrição</th>
+                              <th className="p-3 border-0">Vencimento</th>
+                              <th className="p-3 border-0 text-center">Método</th>
                               <th className="p-3 border-0 text-right">Valor</th>
+                              <th className="p-3 border-0 text-center">Status</th>
+                              <th className="p-3 border-0 text-right">Ação</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {lancamentos.map(lan => (
-                              <tr key={lan.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
-                                <td className="p-3 border-0">
-                                  <div className="flex items-center space-x-2">
-                                    <span className={`w-1.5 h-1.5 rounded-full ${lan.type === 'receita' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'}`} />
-                                    <span className={`font-semibold ${textTitle}`}>{lan.desc}</span>
-                                  </div>
+                            {receivables.map(rec => (
+                              <tr key={rec.id} className={`border-bottom ${borderCol}/40`}>
+                                <td className={`p-3 border-0 font-semibold ${textTitle}`}>{rec.desc}</td>
+                                <td className="p-3 border-0">{rec.due}</td>
+                                <td className="p-3 border-0 text-center font-mono">{rec.method}</td>
+                                <td className="p-3 border-0 text-right font-mono font-bold text-[#22C55E]">R$ {rec.amount.toLocaleString('pt-BR')}</td>
+                                <td className="p-3 border-0 text-center">
+                                  <span className={`badge ${
+                                    rec.status === 'Recebido' 
+                                      ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' 
+                                      : rec.status === 'Pendente' 
+                                      ? 'badge-primary bg-[#3B82F6]/12 text-[#3B82F6]'
+                                      : 'badge-danger bg-[#EF4444]/12 text-[#EF4444]'
+                                  } text-[8px] font-bold px-2 py-0.5 rounded-full`}>
+                                    {rec.status}
+                                  </span>
                                 </td>
-                                <td className={`p-3 border-0 ${textSec}`}>{lan.category}</td>
-                                <td className={`p-3 border-0 font-mono ${textSec}`}>{lan.costCenter}</td>
-                                <td className={`p-3 border-0 font-mono ${textSec}`}>{lan.date}</td>
-                                <td className={`p-3 border-0 text-right font-mono font-semibold ${lan.type === 'receita' ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
-                                  {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
+                                <td className="p-3 border-0 text-right">
+                                  {rec.status !== 'Recebido' && (
+                                    <button 
+                                      onClick={() => {
+                                        setReceivables(prev => prev.map(r => r.id === rec.id ? { ...r, status: 'Recebido' } : r));
+                                        setFinancialStats(stats => ({ ...stats, saldo: stats.saldo + rec.amount }));
+                                        triggerToast("Recebimento Efetuado ✔", `R$ ${rec.amount.toLocaleString('pt-BR')} creditados em conta.`);
+                                      }}
+                                      className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0 cursor-pointer"
+                                    >
+                                      Liquidar
+                                    </button>
+                                  )}
                                 </td>
                               </tr>
                             ))}
@@ -1558,212 +1620,278 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Add Receivable Form */}
                   <div className="col-lg-4 mb-3">
-                    <div className={`card ${cardClass} p-4 h-fit`}>
-                      <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3 mb-3`}>
-                        <Plus className="w-4 h-4 text-[#3B82F6]" />
-                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Lançar Fluxo Manual</h4>
-                      </div>
-
-                      <form onSubmit={handleCreateLancamento} className="space-y-3 text-xs">
-                        <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} p-1 border ${borderCol} rounded mb-3`}>
-                          <button 
-                            type="button"
-                            onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
-                            className={`flex-1 py-1 rounded text-center font-medium transition-all border-0 ${
-                              newLancamento.type === 'receita' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} bg-transparent`
-                            }`}
-                          >
-                            Receita
-                          </button>
-                          <button 
-                            type="button"
-                            onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
-                            className={`flex-1 py-1 rounded text-center font-medium transition-all border-0 ${
-                              newLancamento.type === 'despesa' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} bg-transparent`
-                            }`}
-                          >
-                            Despesa
-                          </button>
-                        </div>
-
-                        <div className="form-group mb-2">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Descrição *</label>
-                          <input 
-                            type="text" 
-                            value={newLancamento.desc}
-                            onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
-                            placeholder="Ex: Contratação Equipe Limpeza"
-                            className={`form-control form-control-sm ${inputClass} text-xs`}
-                            required
-                          />
-                        </div>
-
-                        <div className="row mb-2">
-                          <div className="col-6 form-group">
-                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$) *</label>
+                    <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                      <div>
+                        <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Lançar Nova Receita</h3>
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!newReceivable.desc || !newReceivable.amount) {
+                            triggerToast("Aviso", "Preencha todos os campos do contas a receber.", "warning");
+                            return;
+                          }
+                          const amount = parseFloat(newReceivable.amount);
+                          const item = {
+                            id: `rec-${Date.now()}`,
+                            desc: newReceivable.desc,
+                            amount,
+                            method: newReceivable.method,
+                            due: newReceivable.due,
+                            status: 'Pendente'
+                          };
+                          setReceivables([item, ...receivables]);
+                          setNewReceivable({ desc: '', amount: '', method: 'PIX', due: '2026-07-20' });
+                          triggerToast("Lançamento Adicionado 💰", "Conta a receber cadastrada com sucesso!");
+                        }} className="space-y-3 text-xs">
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Descrição da Receita</label>
                             <input 
-                              type="number" 
-                              value={newLancamento.amount}
-                              onChange={(e) => setNewLancamento(prev => ({ ...prev, amount: e.target.value }))}
-                              placeholder="1200"
-                              className={`form-control form-control-sm ${inputClass} font-mono text-xs`}
-                              required
+                              type="text" 
+                              value={newReceivable.desc}
+                              onChange={(e) => setNewReceivable(prev => ({ ...prev, desc: e.target.value }))}
+                              placeholder="Ex: Patrocínio Lote 2"
+                              className={`form-control form-control-sm ${inputClass}`}
                             />
                           </div>
-                          <div className="col-6 form-group">
-                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Centro</label>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
+                            <input 
+                              type="number" 
+                              value={newReceivable.amount}
+                              onChange={(e) => setNewReceivable(prev => ({ ...prev, amount: e.target.value }))}
+                              placeholder="0,00"
+                              className={`form-control form-control-sm ${inputClass}`}
+                            />
+                          </div>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Método de Cobrança</label>
                             <select 
-                              value={newLancamento.costCenter}
-                              onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
-                              className={`form-control form-control-sm ${inputClass} text-xs font-medium`}
+                              value={newReceivable.method}
+                              onChange={(e) => setNewReceivable(prev => ({ ...prev, method: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass}`}
                             >
-                              <option value="Eventos">Eventos</option>
-                              <option value="Operacional">Operacional</option>
-                              <option value="Comercial">Comercial</option>
-                              <option value="Logística">Logística</option>
-                              <option value="Marketing">Marketing</option>
+                              <option value="PIX">PIX (QR Code)</option>
+                              <option value="Cartão">Cartão de Crédito</option>
+                              <option value="Boleto">Boleto Bancário</option>
                             </select>
                           </div>
-                        </div>
-
-                        <div className="form-group mb-3">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Categoria</label>
-                          <select 
-                            value={newLancamento.category}
-                            onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
-                            className={`form-control form-control-sm ${inputClass} text-xs font-medium`}
-                          >
-                            <option value="Venda Ingressos">Venda Ingressos</option>
-                            <option value="Serviços de Terceiros">Serviços de Terceiros</option>
-                            <option value="Locação Equipamentos">Locação Equipamentos</option>
-                            <option value="Patrocínio">Patrocínio</option>
-                            <option value="Publicidade">Publicidade</option>
-                          </select>
-                        </div>
-
-                        <button 
-                          type="submit" 
-                          className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded transition-all border-0"
-                        >
-                          Registrar Lançamento
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Sub-Tab 3: Conciliação */}
-              {financeSubTab === 'conciliacao' && (
-                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
-                  <div className={`border-bottom ${borderCol} pb-3 mb-3`}>
-                    <div className="flex items-center space-x-2">
-                      <Landmark className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Conciliação Automática Vindi / PagSeguro</h3>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    {conciliationItems.map((item) => (
-                      <div 
-                        key={item.id} 
-                        className={`flex items-center justify-between p-3 rounded border transition-all ${
-                          item.matched 
-                            ? `${theme === 'dark' ? 'bg-[#111827]/40' : 'bg-slate-50/50'} border-transparent opacity-60` 
-                            : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-white'} border-${borderCol}`
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <span className={`p-1.5 rounded ${
-                            item.type === 'in' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#EF4444]/10 text-[#EF4444]'
-                          }`}>
-                            {item.type === 'in' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowRightLeft className="w-4 h-4" />}
-                          </span>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <h4 className={`text-xs font-semibold ${textTitle} mb-0`}>{item.desc}</h4>
-                              <span className={`text-[9px] ${textSec} font-mono`}>{item.date}</span>
-                            </div>
-                            <p className={`text-[10px] ${textSec} font-mono mt-0.5 mb-0`}>Vínculo Contábil: {item.matchInvoice}</p>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Data de Vencimento</label>
+                            <input 
+                              type="date" 
+                              value={newReceivable.due}
+                              onChange={(e) => setNewReceivable(prev => ({ ...prev, due: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass}`}
+                            />
                           </div>
-                        </div>
-
-                        <div className="flex items-center space-x-4">
-                          <span className={`text-xs font-mono font-semibold ${
-                            item.type === 'in' ? 'text-[#22C55E]' : 'text-[#EF4444]'
-                          }`}>
-                            {item.type === 'in' ? '+' : '-'} R$ {item.amount.toLocaleString('pt-BR')}
-                          </span>
-                          
-                          {item.matched ? (
-                            <span className="flex items-center space-x-1 text-[#22C55E] text-[10px] font-bold">
-                              <CheckCircle className="w-3.5 h-3.5" />
-                              <span>Conciliado</span>
-                            </span>
-                          ) : (
-                            <button 
-                              onClick={() => handleReconcile(item.id)}
-                              className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
-                            >
-                              Conciliar
-                            </button>
-                          )}
-                        </div>
+                          <button type="submit" className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer">
+                            Adicionar Lançamento
+                          </button>
+                        </form>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Sub-Tab 4: PDVs & Taxas */}
-              {financeSubTab === 'taxas' && (
+              {/* Sub-Tab 3: Contas a Pagar */}
+              {financeSubTab === 'contasPagar' && (
                 <div className="row animate-fadeIn">
-                  
-                  {/* PDV Control List */}
                   <div className="col-lg-8 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
-                        <div className="flex items-center space-x-2">
-                          <ShoppingBag className="w-5 h-5 text-[#3B82F6]" />
-                          <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Controle de Pontos de Venda Físicos (PDVs)</h3>
-                        </div>
-                        
-                        {isPlanEligible('advanced') ? (
-                          <button 
-                            onClick={() => setShowAddPdvModal(true)}
-                            className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
-                          >
-                            Novo PDV
-                          </button>
-                        ) : (
-                          <span className={`text-[9px] ${textSec} bg-[#111827] px-2 py-1 rounded`}>Requer Plano Advanced</span>
-                        )}
+                    <div className={`card ${cardClass} p-4 h-100`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Contas a Pagar & Despesas Fiscais</h3>
+                      <div className="table-responsive">
+                        <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                          <thead>
+                            <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                              <th className="p-3 border-0">Despesa / Fornecedor</th>
+                              <th className="p-3 border-0">Categoria</th>
+                              <th className="p-3 border-0">Centro de Custo</th>
+                              <th className="p-3 border-0 text-center">Vencimento</th>
+                              <th className="p-3 border-0 text-right">Valor</th>
+                              <th className="p-3 border-0 text-center">Status</th>
+                              <th className="p-3 border-0 text-right">Ação</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {payables.map(pay => (
+                              <tr key={pay.id} className={`border-bottom ${borderCol}/40`}>
+                                <td className={`p-3 border-0 font-semibold ${textTitle}`}>{pay.desc}</td>
+                                <td className="p-3 border-0">{pay.category}</td>
+                                <td className="p-3 border-0 font-semibold">{pay.costCenter}</td>
+                                <td className="p-3 border-0 text-center">{pay.due}</td>
+                                <td className="p-3 border-0 text-right font-mono font-bold text-[#EF4444]">R$ {pay.amount.toLocaleString('pt-BR')}</td>
+                                <td className="p-3 border-0 text-center">
+                                  <span className={`badge ${
+                                    pay.status === 'Pago' 
+                                      ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' 
+                                      : pay.status === 'Pendente' 
+                                      ? 'badge-warning bg-[#F59E0B]/12 text-[#FB923C]'
+                                      : 'badge-primary bg-blue-500/12 text-[#3B82F6]'
+                                  } text-[8px] font-bold px-2 py-0.5 rounded-full`}>
+                                    {pay.status}
+                                  </span>
+                                </td>
+                                <td className="p-3 border-0 text-right">
+                                  {pay.status !== 'Pago' && (
+                                    <button 
+                                      onClick={() => {
+                                        setPayables(prev => prev.map(p => p.id === pay.id ? { ...p, status: 'Pago' } : p));
+                                        setFinancialStats(stats => ({ ...stats, saldo: stats.saldo - pay.amount }));
+                                        triggerToast("Despesa Paga 💸", `R$ ${pay.amount.toLocaleString('pt-BR')} debitados.`);
+                                      }}
+                                      className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0 cursor-pointer"
+                                    >
+                                      Pagar
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
+                    </div>
+                  </div>
 
-                      <div className="space-y-3">
-                        {pdvs.map(pdv => (
-                          <div key={pdv.id} className={`p-3 ${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border ${borderCol} rounded flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
+                  {/* Add Payable Form */}
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                      <div>
+                        <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Lançar Nova Despesa</h3>
+                        <form onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!newPayable.desc || !newPayable.amount) {
+                            triggerToast("Aviso", "Preencha todos os campos do contas a pagar.", "warning");
+                            return;
+                          }
+                          const amount = parseFloat(newPayable.amount);
+                          const item = {
+                            id: `pay-${Date.now()}`,
+                            desc: newPayable.desc,
+                            amount,
+                            category: newPayable.category,
+                            due: newPayable.due,
+                            costCenter: newPayable.costCenter,
+                            status: 'Pendente'
+                          };
+                          setPayables([item, ...payables]);
+                          setNewPayable({ desc: '', amount: '', category: 'Fornecedor', due: '2026-07-20', costCenter: 'Eventos' });
+                          triggerToast("Lançamento Efetuado 💸", "Despesa agendada com sucesso!");
+                        }} className="space-y-3 text-xs">
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Fornecedor / Descrição</label>
+                            <input 
+                              type="text" 
+                              value={newPayable.desc}
+                              onChange={(e) => setNewPayable(prev => ({ ...prev, desc: e.target.value }))}
+                              placeholder="Ex: Fornecedor de Copos"
+                              className={`form-control form-control-sm ${inputClass}`}
+                            />
+                          </div>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
+                            <input 
+                              type="number" 
+                              value={newPayable.amount}
+                              onChange={(e) => setNewPayable(prev => ({ ...prev, amount: e.target.value }))}
+                              placeholder="0,00"
+                              className={`form-control form-control-sm ${inputClass}`}
+                            />
+                          </div>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Categoria</label>
+                            <select 
+                              value={newPayable.category}
+                              onChange={(e) => setNewPayable(prev => ({ ...prev, category: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass}`}
+                            >
+                              <option value="Fornecedor">Fornecedor de Evento</option>
+                              <option value="Infraestrutura">Locação e Estrutura</option>
+                              <option value="Marketing">Tráfego & Anúncios</option>
+                              <option value="Repasse">Repasse de Produtor</option>
+                            </select>
+                          </div>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Centro de Custo</label>
+                            <select 
+                              value={newPayable.costCenter}
+                              onChange={(e) => setNewPayable(prev => ({ ...prev, costCenter: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass}`}
+                            >
+                              {costCenters.map(cc => <option key={cc.id} value={cc.name}>{cc.name}</option>)}
+                            </select>
+                          </div>
+                          <div className="form-group mb-2">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Data de Vencimento</label>
+                            <input 
+                              type="date" 
+                              value={newPayable.due}
+                              onChange={(e) => setNewPayable(prev => ({ ...prev, due: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass}`}
+                            />
+                          </div>
+                          <button type="submit" className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer">
+                            Agendar Despesa
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 4: Bancos & Conciliação */}
+              {financeSubTab === 'conciliacao' && (
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-6 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100`}>
+                      <div className="flex justify-between items-center border-bottom border-light/5 pb-3 mb-3">
+                        <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Importação de Extrato Bancário</h3>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setConciliationItems(prev => prev.map(item => ({ ...item, matched: true })));
+                            triggerToast("Conciliação Realizada 🤝", "Todos os lançamentos foram conciliados com sucesso!");
+                          }}
+                          className="btn btn-primary py-1 px-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded border-0 cursor-pointer"
+                        >
+                          Simular Importação OFX
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        {conciliationItems.map(item => (
+                          <div key={item.id} className={`p-3 rounded border ${borderCol} flex justify-between items-center text-xs ${
+                            item.matched ? 'bg-green-500/5 border-green-500/30' : theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'
+                          }`}>
                             <div>
                               <div className="flex items-center space-x-2">
-                                <h4 className={`text-xs font-semibold ${textTitle} mb-0`}>{pdv.name}</h4>
-                                <span className={`text-[8px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-1.5 rounded ${textSec} uppercase`}>{pdv.type}</span>
+                                <span className={`font-semibold ${textTitle}`}>{item.desc}</span>
+                                <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${
+                                  item.type === 'in' ? 'bg-[#22C55E]/12 text-[#22C55E]' : 'bg-[#EF4444]/12 text-[#EF4444]'
+                                }`}>
+                                  {item.type === 'in' ? 'Entrada' : 'Saída'}
+                                </span>
                               </div>
-                              <p className={`text-[10px] ${textSec} mt-0.5 mb-0`}>Operador Responsável: {pdv.manager}</p>
+                              <span className={`text-[9px] ${textSec} block mt-0.5`}>Sugestão Contábil: {item.matchInvoice}</span>
                             </div>
-
-                            <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-                              <div>
-                                <span className={`text-[9px] ${textSec} uppercase block`}>Saldo Retido</span>
-                                <span className="text-xs font-mono font-semibold text-[#22C55E]">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
-                              </div>
-
-                              {pdv.balance > 0 && isPlanEligible('advanced') && (
+                            
+                            <div className="flex items-center space-x-3">
+                              <span className="font-mono font-bold text-slate-400">R$ {item.amount.toLocaleString('pt-BR')}</span>
+                              {item.matched ? (
+                                <span className="text-[#22C55E] font-bold">✔ Conciliado</span>
+                              ) : (
                                 <button 
-                                  onClick={() => handlePdvBleeding(pdv.id, pdv.balance)}
-                                  className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
+                                  type="button"
+                                  onClick={() => {
+                                    setConciliationItems(prev => prev.map(i => i.id === item.id ? { ...i, matched: true } : i));
+                                    triggerToast("Item Conciliado", "Lançamento contábil integrado automaticamente.");
+                                  }}
+                                  className="btn btn-primary btn-sm px-2 py-1 text-[9px] rounded border-0 cursor-pointer"
                                 >
-                                  Recolher (Sangria)
+                                  Conciliar
                                 </button>
                               )}
                             </div>
@@ -1773,18 +1901,86 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Fee list */}
-                  <div className="col-lg-4 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Gateway & Custos Operacionais</h3>
-                      <div className="space-y-3 text-xs">
-                        {Object.entries(gatewayRates).map(([key, data]) => (
-                          <div key={key} className={`flex justify-between items-center p-2.5 ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol} rounded`}>
-                            <span className={`font-medium ${textBody}`}>{data.name}</span>
-                            <span className="font-mono text-[#3B82F6] font-semibold">{data.rate}% {data.fixed > 0 && `+ R$ ${data.fixed}`}</span>
+                  {/* Bank Accounts Grid list */}
+                  <div className="col-lg-6 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Contas Bancárias Cadastradas</h3>
+                      <div className="space-y-3">
+                        {accounts.map(acc => (
+                          <div key={acc.id} className={`p-3 rounded border ${borderCol} flex justify-between items-center`}>
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-blue-500/10 text-[#3B82F6] font-bold`}>
+                                {acc.name[0]}
+                              </div>
+                              <div>
+                                <span className={`text-xs font-semibold ${textTitle} block`}>{acc.name}</span>
+                                <span className={`text-[9px] ${textSec} block`}>Agência: 0001 / Conta: Ativa</span>
+                              </div>
+                            </div>
+                            <span className="font-mono text-xs font-bold text-[#22C55E]">R$ {acc.balance.toLocaleString('pt-BR')}</span>
                           </div>
                         ))}
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 5: DRE Gerencial */}
+              {financeSubTab === 'dre' && (
+                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
+                  <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-4`}>
+                    <div>
+                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Demonstrativo de Resultado do Exercício (DRE Gerencial)</h3>
+                      <p className={`text-xs ${textSec} mb-0`}>Visão gerencial de faturamento acumulado, deduções e margem.</p>
+                    </div>
+                    <span className={`text-xs ${textSec} font-mono font-bold`}>Período: Julho/2026</span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>Receita Bruta com Eventos (Venda Ingressos)</span>
+                      <span className="font-mono text-[#22C55E]">R$ 2.580.000,00</span>
+                    </div>
+                    
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Taxas de Gateway e Conectividade (1.5%)</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 38.700,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>Receita Líquida do Ecossistema</span>
+                      <span className="font-mono text-[#22C55E]">R$ 2.541.300,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Repasses efetuados a Produtores e Bandas</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 620.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Custos Operacionais locais (LED, Segurança, Insumos Bar)</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 83.400,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>Margem de Contribuição Bruta</span>
+                      <span className="font-mono text-[#22C55E]">R$ 1.837.900,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Despesas Administrativas e Pessoal Fixo</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 48.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Tráfego Pago e Marketing de Atração</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 12.500,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-black text-sm border-top border-slate-500 pt-2">
+                      <span className={textTitle}>LUCRO LÍQUIDO OPERACIONAL (EBITDA)</span>
+                      <span className="font-mono text-[#22C55E]">R$ 1.777.400,00</span>
                     </div>
                   </div>
                 </div>
@@ -1800,278 +1996,271 @@ export default function App() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Contabilidade Disk</h2>
-                  <p className={`text-xs ${textSec} mb-0`}>Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
+                  <p className={`text-xs ${textSec} mb-0`}>Balancetes de verificação, livros diários, plano de contas e DRE contábil oficial.</p>
                 </div>
-
-                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
+                
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 overflow-x-auto text-xs`}>
                   <button 
-                    onClick={() => setAccountingSubTab('bordero')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      accountingSubTab === 'bordero' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setAccountingSubTab('dashboard')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      accountingSubTab === 'dashboard' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    Borderô Eventos
+                    Dashboard & Auditoria
                   </button>
                   <button 
-                    onClick={() => setAccountingSubTab('notas')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      accountingSubTab === 'notas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setAccountingSubTab('lancamentos')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      accountingSubTab === 'lancamentos' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    Notas Fiscais (SEFAZ)
+                    Lançamentos & Livros
                   </button>
                   <button 
-                    onClick={() => setAccountingSubTab('fechamento')}
-                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
-                      accountingSubTab === 'fechamento' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    onClick={() => setAccountingSubTab('balancete')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      accountingSubTab === 'balancete' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
-                    DRE & Fechamento
+                    Plano & Balancetes
+                  </button>
+                  <button 
+                    onClick={() => setAccountingSubTab('dreContabil')}
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 shrink-0 ${
+                      accountingSubTab === 'dreContabil' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
+                    }`}
+                  >
+                    DRE Contábil
                   </button>
                 </div>
               </div>
 
-              {/* Sub-Tab 1: Borderô Eventos */}
-              {accountingSubTab === 'bordero' && (
-                <div className="row animate-fadeIn">
-                  
-                  {/* Event list selector */}
-                  <div className="col-lg-4 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider border-bottom ${borderCol} pb-3 mb-3`}>Selecione o Evento</h3>
-                      <div className="space-y-3">
-                        {borderos.map(b => (
-                          <button 
-                            key={b.id}
-                            onClick={() => setActiveBorderoEvent(b.id)}
-                            className={`w-full text-left p-3 rounded border transition-all ${
-                              activeBorderoEvent === b.id 
-                                ? `bg-transparent border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)] ${textTitle}` 
-                                : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border-transparent hover:border-slate-700 ${textBody}`
-                            }`}
-                          >
-                            <div className="flex justify-between items-start">
-                              <span className="font-semibold text-xs truncate block w-32">{b.name}</span>
-                              <span className={`text-[8px] px-2 py-0.5 rounded font-bold uppercase ${
-                                b.status === 'Aprovado' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : 'bg-[#F59E0B]/12 text-[#FB923C]'
-                              }`}>{b.status}</span>
-                            </div>
-                            <span className={`text-[10px] ${textSec} font-mono mt-1 block`}>Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
-                          </button>
-                        ))}
+              {/* Sub-Tab 1: Dashboard & Auditoria */}
+              {accountingSubTab === 'dashboard' && (
+                <div className="space-y-4 animate-fadeIn">
+                  <div className="row">
+                    <div className="col-md-6 col-lg-4 mb-3">
+                      <div className={`card ${cardClass} p-4`}>
+                        <span className={`text-[9px] ${textSec} font-bold uppercase tracking-wider block`}>Lucro Líquido Fiscal</span>
+                        <h4 className="text-xl font-mono font-bold text-[#22C55E] mt-2 mb-0">R$ 1.777.400,00</h4>
+                      </div>
+                    </div>
+                    <div className="col-md-6 col-lg-4 mb-3">
+                      <div className={`card ${cardClass} p-4`}>
+                        <span className={`text-[9px] ${textSec} font-bold uppercase tracking-wider block`}>EBITDA Projetado</span>
+                        <h4 className="text-xl font-mono font-bold text-[#3B82F6] mt-2 mb-0">R$ 1.837.900,00</h4>
+                      </div>
+                    </div>
+                    <div className="col-md-12 col-lg-4 mb-3">
+                      <div className={`card ${cardClass} p-4`}>
+                        <span className={`text-[9px] ${textSec} font-bold uppercase tracking-wider block`}>Obrigações Fiscais Pendentes</span>
+                        <h4 className="text-xl font-mono font-bold text-[#F59E0B] mt-2 mb-0">0 Pendentes</h4>
                       </div>
                     </div>
                   </div>
 
-                  {/* Borderô details */}
-                  <div className="col-lg-8 mb-3">
-                    {activeEvent && (
-                      <div className={`card ${cardClass} p-4 space-y-4 animate-fadeIn`}>
-                        <div className={`border-bottom ${borderCol} pb-3 flex justify-between items-start`}>
-                          <div>
-                            <h3 className={`text-base font-bold ${textTitle} mb-0`}>{activeEvent.name}</h3>
-                            <p className={`text-xs ${textSec} mb-0`}>{activeEvent.location}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block font-mono`}>Fechamento</span>
-                            <span className={`text-xs font-mono font-semibold ${textBody} block`}>{activeEvent.dateClosed}</span>
-                          </div>
-                        </div>
-
-                        <div className="row">
-                          <div className="col-6 col-sm-3 mb-2">
-                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded`}>
-                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Ingressos</span>
-                              <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>{activeEvent.ticketsSold}</span>
+                  <div className="row">
+                    {/* Audit trail */}
+                    <div className="col-lg-8 mb-3">
+                      <div className={`card ${cardClass} p-4 h-100`}>
+                        <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Trilha de Auditoria Contábil</h3>
+                        <div className="space-y-3">
+                          {contabilAuditorias.map(aud => (
+                            <div key={aud.id} className={`p-3 rounded border ${borderCol} flex justify-between items-start text-xs ${
+                              aud.type === 'Sucesso' ? 'bg-green-500/5 border-green-500/30' : 'bg-warning/5 border-warning/30'
+                            }`}>
+                              <div>
+                                <span className={`font-semibold ${textTitle} block`}>{aud.msg}</span>
+                                <span className={`text-[9px] ${textSec} block mt-0.5`}>Data da auditoria: {aud.date}</span>
+                              </div>
+                              <span className={`badge ${
+                                aud.type === 'Sucesso' ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' : 'badge-warning bg-[#F59E0B]/12 text-[#FB923C]'
+                              } text-[8px] font-bold px-2 py-0.5 rounded-full`}>
+                                {aud.type}
+                              </span>
                             </div>
-                          </div>
-                          <div className="col-6 col-sm-3 mb-2">
-                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
-                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Receita Bruta</span>
-                              <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>R$ {activeEvent.grossRevenue.toLocaleString('pt-BR')}</span>
-                            </div>
-                          </div>
-                          <div className="col-6 col-sm-3 mb-2">
-                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
-                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Gateway (Vindi)</span>
-                              <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.gatewayFee.toLocaleString('pt-BR')}</span>
-                            </div>
-                          </div>
-                          <div className="col-6 col-sm-3 mb-2">
-                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
-                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Comissão Disk</span>
-                              <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.diskFee.toLocaleString('pt-BR')}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className={`p-4 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} rounded flex flex-col sm:flex-row justify-between items-center gap-3`}>
-                          <div>
-                            <span className={`text-xs ${textSec} font-semibold block`}>Repasse Líquido à Produtora:</span>
-                            <span className={`text-xl font-mono font-bold ${textTitle} mt-1 block`}>
-                              R$ {activeEvent.netPayout.toLocaleString('pt-BR')}
-                            </span>
-                          </div>
-                          
-                          {activeEvent.status === 'Aprovado' ? (
-                            <div className="text-center sm:text-right">
-                              <span className={`text-[9px] ${textSec} font-semibold block`}>Autorizado por:</span>
-                              <span className="text-[#22C55E] text-xs font-semibold block">{activeEvent.authorizedBy}</span>
-                            </div>
-                          ) : (
-                            <button 
-                              onClick={() => handleAuthorizeBordero(activeEvent.id)}
-                              className="btn btn-primary py-2 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
-                            >
-                              Liberar Repasse Financeiro
-                            </button>
-                          )}
+                          ))}
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Sub-Tab 2: Notas Fiscais a Emitir */}
-              {accountingSubTab === 'notas' && (
-                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
-                  <div className={`border-bottom ${borderCol} pb-3 mb-3 flex justify-between items-center`}>
-                    <div className="flex items-center space-x-2">
-                      <Receipt className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
                     </div>
-                  </div>
 
-                  <div className="table-responsive">
-                    <table className={`table table-striped table-hover text-xs ${textBody}`}>
-                      <thead>
-                        <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
-                          <th className="p-3 border-0">ID Nota</th>
-                          <th className="p-3 border-0">Razão Social</th>
-                          <th className="p-3 border-0">CNPJ / CPF</th>
-                          <th className="p-3 border-0">Evento Vinculado</th>
-                          <th className="p-3 border-0">Lançamento</th>
-                          <th className="p-3 border-0 text-right">Valor</th>
-                          <th className="p-3 border-0 text-center">Status SEFAZ</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoices.map(inv => (
-                          <tr key={inv.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
-                            <td className={`p-3 border-0 font-mono font-semibold ${textTitle} uppercase`}>{inv.id}</td>
-                            <td className={`p-3 border-0 font-semibold ${textTitle}`}>{inv.client}</td>
-                            <td className={`p-3 border-0 font-mono ${textSec}`}>{inv.doc}</td>
-                            <td className={`p-3 border-0 ${textSec}`}>{inv.event}</td>
-                            <td className={`p-3 border-0 font-mono ${textSec}`}>{inv.date}</td>
-                            <td className="p-3 border-0 text-right font-mono font-semibold text-[#3B82F6]">R$ {inv.amount.toLocaleString('pt-BR')}</td>
-                            <td className="p-3 border-0 text-center">
-                              {inv.status === 'Emitida' && (
-                                <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[9px] font-bold px-2 py-0.5 rounded-full">Autorizada</span>
-                              )}
-                              {inv.status === 'Processando' && (
-                                <span className={`bg-[#1E293B] ${textSec} text-[9px] px-2 py-0.5 rounded font-bold animate-pulse`}>Enviando...</span>
-                              )}
-                              {inv.status === 'Pendente' && (
-                                <button 
-                                  onClick={() => handleEmitNFe(inv.id)}
-                                  className="btn btn-primary btn-sm px-2.5 py-1 text-[9px] font-semibold rounded border-0"
-                                >
-                                  Transmitir
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Sub-Tab 3: DRE & Fechamentos */}
-              {accountingSubTab === 'fechamento' && (
-                <div className="row animate-fadeIn">
-                  <div className="col-lg-8 mb-3">
-                    <div className={`card ${cardClass} p-4`}>
-                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
-                        <div className="flex items-center space-x-2">
-                          <Calculator className="w-5 h-5 text-[#3B82F6]" />
-                          <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Demonstrativo DRE por Competência</h3>
+                    {/* Tax Obligations checklists */}
+                    <div className="col-lg-4 mb-3">
+                      <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                        <div>
+                          <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Obrigações & Declarações</h3>
+                          <div className="space-y-3 text-xs">
+                            <div className="flex justify-between items-center p-2 border-bottom border-light/5">
+                              <span className={textBody}>SPED EFD Contribuições</span>
+                              <span className="text-[#22C55E] font-bold">Transmitido ✔</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 border-bottom border-light/5">
+                              <span className={textBody}>Declaração DCTF Mensal</span>
+                              <span className="text-[#22C55E] font-bold">Transmitido ✔</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 border-bottom border-light/5">
+                              <span className={textBody}>Gia Mensal ICMS/ISS</span>
+                              <span className="text-[#22C55E] font-bold">Transmitido ✔</span>
+                            </div>
+                          </div>
                         </div>
-                        
-                        <select 
-                          value={invoiceMonth}
-                          onChange={(e) => setInvoiceMonth(e.target.value)}
-                          className={`form-control form-control-sm ${inputClass} w-auto text-xs`}
+                        <button 
+                          type="button"
+                          onClick={() => triggerToast("Integração SPED", "Lote fiscal SPED consolidado e pronto para envio.")}
+                          className="btn btn-primary mt-4 w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer"
                         >
-                          <option value="Julho">Julho 2026</option>
-                          <option value="Junho">Junho 2026</option>
-                          <option value="Maio">Maio 2026</option>
-                        </select>
+                          Gerar Exportação SPED
+                        </button>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                      <div className={`space-y-2 font-mono text-xs ${textBody}`}>
-                        <div className="flex justify-between p-2 hover:bg-light/5">
-                          <span className={textSec}>Receitas de Vendas (Bilheteria)</span>
-                          <span className="text-[#22C55E] font-bold">R$ {invoiceMonth === 'Julho' ? '2.580.000' : invoiceMonth === 'Junho' ? '1.920.000' : '1.450.000'}</span>
-                        </div>
-                        <div className="flex justify-between p-2 hover:bg-light/5">
-                          <span className={textSec}>(-) Impostos Fiscais (Simples/NFe)</span>
-                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
-                        </div>
-                        <div className="flex justify-between p-2 hover:bg-light/5">
-                          <span className={textSec}>(-) Spread e Comissões de Lançamento</span>
-                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
-                        </div>
-                        <div className="flex justify-between p-2 hover:bg-light/5">
-                          <span className={textSec}>(-) Custos de Produção & Infraestrutura</span>
-                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
-                        </div>
-                        <div className={`border-top ${borderCol} my-2 pt-2 flex justify-between p-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} rounded font-bold`}>
-                          <span className={textTitle}>Lucro Líquido Final</span>
-                          <span className="text-[#3B82F6]">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
-                        </div>
+              {/* Sub-Tab 2: Lançamentos & Livros */}
+              {accountingSubTab === 'lancamentos' && (
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Partidas Dobradas Lançadas</h3>
+                      <div className="table-responsive">
+                        <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                          <thead>
+                            <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                              <th className="p-3 border-0">Data</th>
+                              <th className="p-3 border-0">Histórico / Descrição</th>
+                              <th className="p-3 border-0">Conta Débito</th>
+                              <th className="p-3 border-0">Conta Crédito</th>
+                              <th className="p-3 border-0 text-right">Valor</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {contabilLancamentos.map(lan => (
+                              <tr key={lan.id} className={`border-bottom ${borderCol}/40`}>
+                                <td className="p-3 border-0">{lan.date}</td>
+                                <td className={`p-3 border-0 font-semibold ${textTitle}`}>{lan.desc}</td>
+                                <td className="p-3 border-0 font-mono text-[#3B82F6]">{lan.debit}</td>
+                                <td className="p-3 border-0 font-mono text-[#F97316]">{lan.credit}</td>
+                                <td className="p-3 border-0 text-right font-mono font-bold text-slate-850 dark:text-white">R$ {lan.amount.toLocaleString('pt-BR')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
 
+                  {/* Books actions */}
                   <div className="col-lg-4 mb-3">
                     <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
-                      <div className="space-y-4">
-                        <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3`}>
-                          <FileText className="w-4 h-4 text-[#3B82F6]" />
-                          <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Relatórios Recebimento</h4>
-                        </div>
+                      <div>
+                        <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Emissão de Livros Contábeis</h3>
                         <p className={`text-xs ${textSec} leading-relaxed`}>
-                          Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
+                          Gere e assine digitalmente os livros oficiais em conformidade com as diretrizes do SPED Contábil.
                         </p>
-
-                        <div className="space-y-2 text-xs">
+                        <div className="space-y-2 mt-4 text-xs">
                           <button 
-                            onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
-                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center transition-all`}
+                            type="button"
+                            onClick={() => triggerToast("Relatório Exportado", "Livro Diário Oficial gerado com sucesso.")}
+                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center cursor-pointer`}
                           >
-                            <span>Recebimento por Pedido</span>
+                            <span>Emitir Livro Diário</span>
                             <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
                           </button>
                           
                           <button 
-                            onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
-                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center transition-all`}
+                            type="button"
+                            onClick={() => triggerToast("Relatório Exportado", "Livro Razão de Fechamento gerado com sucesso.")}
+                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center cursor-pointer`}
                           >
-                            <span>Recebimento por Data</span>
+                            <span>Emitir Livro Razão</span>
                             <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
                           </button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                      <button 
-                        onClick={() => triggerToast("DRE Completa", "Gerando demonstrativo do ano fiscal consolidado...")}
-                        className="btn btn-primary mt-4 w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
-                      >
-                        Exportar DRE Consolidada Anual
-                      </button>
+              {/* Sub-Tab 3: Plano & Balancetes */}
+              {accountingSubTab === 'balancete' && (
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-12 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Balancete de Verificação</h3>
+                      <div className="table-responsive">
+                        <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                          <thead>
+                            <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                              <th className="p-3 border-0">Classificação</th>
+                              <th className="p-3 border-0">Descrição da Conta</th>
+                              <th className="p-3 border-0">Grupo</th>
+                              <th className="p-3 border-0 text-right">Saldo Atual</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {contabilPlanoContas.map(acc => (
+                              <tr key={acc.code} className={`border-bottom ${borderCol}/40`}>
+                                <td className="p-3 border-0 font-mono font-semibold">{acc.code}</td>
+                                <td className={`p-3 border-0 font-semibold ${textTitle}`}>{acc.name}</td>
+                                <td className="p-3 border-0">{acc.type}</td>
+                                <td className="p-3 border-0 text-right font-mono font-bold text-slate-850 dark:text-white">R$ {acc.balance.toLocaleString('pt-BR')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 4: DRE Contábil */}
+              {accountingSubTab === 'dreContabil' && (
+                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
+                  <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-4`}>
+                    <div>
+                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Demonstrativo de Resultado do Exercício (DRE Contábil)</h3>
+                      <p className={`text-xs ${textSec} mb-0`}>Demonstrativo oficial de receitas, despesas contábeis e resultado líquido fiscal.</p>
+                    </div>
+                    <span className={`text-xs ${textSec} font-mono font-bold`}>Exercício: 2026 / Julho</span>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>Receita Bruta com Eventos (Código 3.1.01)</span>
+                      <span className="font-mono text-[#22C55E]">R$ 2.580.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Custos dos Serviços Prestados (Código 4.1.01)</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 620.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>LUCRO BRUTO</span>
+                      <span className="font-mono text-[#22C55E]">R$ 1.960.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Despesas Administrativas e Gerais (Código 4.1.02)</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 148.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-bold border-bottom border-dashed border-slate-700/30 pb-2">
+                      <span className={textTitle}>RESULTADO ANTES DOS IMPOSTOS (LAIR)</span>
+                      <span className="font-mono text-[#22C55E]">R$ 1.812.000,00</span>
+                    </div>
+
+                    <div className="flex justify-between pl-3 text-slate-400">
+                      <span>(-) Provisão Impostos sobre o Lucro (CSSL / IRPJ)</span>
+                      <span className="font-mono text-[#EF4444]">-R$ 34.600,00</span>
+                    </div>
+
+                    <div className="flex justify-between font-black text-sm border-top border-slate-500 pt-2">
+                      <span className={textTitle}>RESULTADO LÍQUIDO DO PERÍODO</span>
+                      <span className="font-mono text-[#22C55E]">R$ 1.777.400,00</span>
                     </div>
                   </div>
                 </div>
