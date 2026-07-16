@@ -81,20 +81,19 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Theme-based class helpers
-  const bgMain = theme === 'dark' ? 'bg-[#0F172A]' : 'bg-[#F1F5F9]';
-  const bgSidebar = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#FFFFFF]';
-  const bgCard = theme === 'dark' ? 'bg-[#131C2D]' : 'bg-[#FFFFFF]';
-  const bgInput = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#FFFFFF]';
-  const bgHeader = theme === 'dark' ? 'bg-[#111827]/60' : 'bg-[#FFFFFF]';
+  // Theme-based class mapping (Limitless CSS styles)
+  const bgMain = theme === 'dark' ? 'bg-[#0f172a] text-[#cbd5e1]' : 'bg-[#f4f6f9] text-[#333333]';
+  const sidebarClass = theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-white border-right border-slate-200';
+  const cardClass = theme === 'dark' ? 'bg-[#131c2d] border border-white/5 shadow-sm' : 'bg-white border border-slate-200 shadow-sm';
+  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/5 bg-[#111827]/40' : 'border-b border-slate-100 bg-[#fafafa]';
+  const inputClass = theme === 'dark' ? 'bg-[#111827] border-white/5 text-white' : 'bg-white border-slate-300 text-slate-900';
+  const headerClass = theme === 'dark' ? 'bg-[#111827] border-b border-white/5' : 'bg-white border-b border-slate-200';
   
-  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-300/80';
+  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-200';
+  const textTitle = theme === 'dark' ? 'text-[#f8fafc]' : 'text-slate-950 font-bold';
+  const textSec = theme === 'dark' ? 'text-[#94a3b8]' : 'text-slate-500';
   
-  const textTitle = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-slate-950';
-  const textBody = theme === 'dark' ? 'text-[#CBD5E1]' : 'text-slate-800';
-  const textSec = theme === 'dark' ? 'text-[#94A3B8]' : 'text-slate-600';
-  const btnSecondary = theme === 'dark' ? 'bg-[#1E293B] hover:bg-[#273449] text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300/40';
-  const selectThemeText = theme === 'dark' ? 'text-white font-medium' : 'text-slate-900 font-semibold';
+  const btnSecondary = theme === 'dark' ? 'btn-secondary bg-[#1e293b] text-white hover:bg-[#273449]' : 'btn-light bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200';
 
   // Commercial App Catalog mapped to Plan Requirements
   const appsCatalog = [
@@ -263,13 +262,6 @@ export default function App() {
   ]);
   const [showAddCouponModal, setShowAddCouponModal] = useState(false);
   const [newCoupon, setNewCoupon] = useState({ code: '', discount: '', event: 'Festival de Inverno Curitiba', status: 'Ativo' });
-
-  // Auto-scroll AI chat to bottom
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages, isTyping]);
 
   // Sync theme class on HTML element for external scripts/components
   useEffect(() => {
@@ -769,19 +761,19 @@ export default function App() {
   };
 
   return (
-    <div className={`page-content flex-1 flex ${bgMain} ${textBody} min-h-screen overflow-hidden transition-colors duration-250`}>
+    <div className={`page-content flex-1 flex ${bgMain} min-h-screen overflow-hidden transition-colors duration-250`}>
       
-      {/* SIDEBAR NAVIGATION */}
-      <aside className={`sidebar ${theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-[#FFFFFF]'} w-64 border-r ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
+      {/* SIDEBAR NAVIGATION - Limitless Sidebar layout */}
+      <aside className={`sidebar ${theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-[#FFFFFF]'} w-64 border-right ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
         <div>
           {/* Logo Area */}
-          <div className={`p-6 border-b ${borderCol} ${bgSidebar}`}>
+          <div className={`p-4 border-bottom ${borderCol}`}>
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-[#2563EB] rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/10">
+              <div className="w-9 h-9 bg-[#2563EB] rounded flex items-center justify-center shadow">
                 <Landmark className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className={`text-lg font-bold tracking-tight ${textTitle} flex items-center`}>
+                <h1 className={`text-md font-bold tracking-tight ${textTitle} flex items-center mb-0`}>
                   DISK<span className="text-[#3B82F6] font-normal ml-0.5">HUB</span>
                 </h1>
                 <span className={`text-[10px] ${textSec} uppercase tracking-wider font-semibold`}>ERP & CRM Cloud</span>
@@ -789,166 +781,167 @@ export default function App() {
             </div>
           </div>
 
-          {/* Nav Links */}
-          <nav className="py-4 space-y-1">
-            <button 
-              onClick={() => setCurrentTab('dashboard')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'dashboard' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <BarChart3 className={`w-4 h-4 shrink-0 ${currentTab === 'dashboard' ? 'text-[#3B82F6]' : textSec}`} />
-              <span>Dashboard</span>
-            </button>
-
-            {/* FINANCEIRO (ERP) */}
-            <button 
-              onClick={() => setCurrentTab('financeiro')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'financeiro' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <CreditCard className={`w-4 h-4 shrink-0 ${currentTab === 'financeiro' ? 'text-[#3B82F6]' : textSec}`} />
-              <span>Financeiro (ERP)</span>
-            </button>
-
-            {/* CONTABILIDADE DISK */}
-            <button 
-              onClick={() => setCurrentTab('contabilidade')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'contabilidade' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <Receipt className={`w-4 h-4 shrink-0 ${currentTab === 'contabilidade' ? 'text-[#3B82F6]' : textSec}`} />
-              <div className="flex items-center justify-between w-full">
-                <span>Contabilidade Disk</span>
-                <span className="bg-[#22C55E]/12 text-[#22C55E] text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  {invoices.filter(inv => inv.status === 'Pendente').length}
-                </span>
+          {/* User Profile / Menu (Limitless user section) */}
+          <div className={`p-3 border-bottom ${borderCol} bg-light/5`}>
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-circle bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shadow">
+                V
               </div>
-            </button>
+              <div>
+                <h4 className={`text-xs font-bold ${textTitle} mb-0`}>Vinicius</h4>
+                <p className={`text-[10px] ${textSec} mb-0 uppercase tracking-widest font-mono`}>
+                  Plano {plan}
+                </p>
+              </div>
+            </div>
+          </div>
 
-            {/* CRM option (only if installed) */}
-            {installedApps.crm === true && (
-              <button 
-                onClick={() => setCurrentTab('crm')} 
-                className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                  currentTab === 'crm' 
-                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-                }`}
-              >
-                <Users className={`w-4 h-4 shrink-0 ${currentTab === 'crm' ? 'text-[#3B82F6]' : textSec}`} />
-                <div className="flex items-center justify-between w-full">
-                  <span>CRM de Vendas</span>
-                  <span className="bg-[#3B82F6]/12 text-[#3B82F6] text-[10px] px-2 py-0.5 rounded-full font-bold">
-                    {leads.filter(l => l.stage !== 'won').length}
+          {/* Nav Links (Limitless nav link class system) */}
+          <div className="card card-sidebar-mobile border-0 bg-transparent shadow-none">
+            <ul className="nav nav-sidebar flex-column py-2 space-y-1">
+              <li className="nav-item-header p-2 text-uppercase font-size-xs text-slate-500 font-semibold">Navegação Principal</li>
+
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('dashboard')} 
+                  className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'dashboard' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <BarChart3 className={`w-4 h-4 shrink-0 ${currentTab === 'dashboard' ? 'text-[#3B82F6]' : textSec}`} />
+                  <span>Dashboard</span>
+                </button>
+              </li>
+
+              {/* FINANCEIRO (ERP) */}
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('financeiro')} 
+                  className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'financeiro' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <CreditCard className={`w-4 h-4 shrink-0 ${currentTab === 'financeiro' ? 'text-[#3B82F6]' : textSec}`} />
+                  <span>Financeiro (ERP)</span>
+                </button>
+              </li>
+
+              {/* CONTABILIDADE DISK */}
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('contabilidade')} 
+                  className={`nav-link w-full text-left flex items-center justify-between px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'contabilidade' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <Receipt className={`w-4 h-4 shrink-0 ${currentTab === 'contabilidade' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Contabilidade Disk</span>
+                  </div>
+                  <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {invoices.filter(inv => inv.status === 'Pendente').length}
                   </span>
-                </div>
-              </button>
-            )}
+                </button>
+              </li>
 
-            {/* Marketing option (only if installed) */}
-            {installedApps.mkt === true && (
-              <button 
-                onClick={() => setCurrentTab('marketing')} 
-                className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                  currentTab === 'marketing' 
-                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-                }`}
-              >
-                <Mail className={`w-4 h-4 shrink-0 ${currentTab === 'marketing' ? 'text-[#3B82F6]' : textSec}`} />
-                <span>Mkt & Campanhas</span>
-              </button>
-            )}
+              {/* CRM option (only if installed) */}
+              {installedApps.crm === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => setCurrentTab('crm')} 
+                    className={`nav-link w-full text-left flex items-center justify-between px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'crm' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Users className={`w-4 h-4 shrink-0 ${currentTab === 'crm' ? 'text-[#3B82F6]' : textSec}`} />
+                      <span>CRM de Vendas</span>
+                    </div>
+                    <span className="badge badge-primary bg-[#3B82F6]/12 text-[#3B82F6] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      {leads.filter(l => l.stage !== 'won').length}
+                    </span>
+                  </button>
+                </li>
+              )}
 
-            {/* GESTÃO DE PDVS (only if installed) */}
-            {installedApps.pdv === true && (
-              <button 
-                onClick={() => {
-                  setCurrentTab('financeiro');
-                  setFinanceSubTab('taxas');
-                  triggerToast("Gestão de PDVs", "Redirecionado para a aba de taxas e sangrias físicas.");
-                }} 
-                className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                  currentTab === 'pdv' 
-                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-                }`}
-              >
-                <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'pdv' ? 'text-[#3B82F6]' : textSec}`} />
-                <span>Gestão de PDVs</span>
-              </button>
-            )}
+              {/* Marketing option (only if installed) */}
+              {installedApps.mkt === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => setCurrentTab('marketing')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'marketing' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <Mail className={`w-4 h-4 shrink-0 ${currentTab === 'marketing' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Mkt & Campanhas</span>
+                  </button>
+                </li>
+              )}
 
-            <div className={`h-px ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-200'} my-2 mx-4`} />
+              <li className="nav-item-header p-2 text-uppercase font-size-xs text-slate-500 font-semibold border-top border-white/5 mt-2">Configurações & Loja</li>
 
-            <button 
-              onClick={() => setCurrentTab('appstore')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'appstore' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'appstore' ? 'text-[#3B82F6]' : textSec}`} />
-              <span>Central de Apps</span>
-            </button>
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('appstore')} 
+                  className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'appstore' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'appstore' ? 'text-[#3B82F6]' : textSec}`} />
+                  <span>Central de Apps</span>
+                </button>
+              </li>
 
-            <button 
-              onClick={() => setCurrentTab('marketplace')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'marketplace' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <Sparkles className={`w-4 h-4 shrink-0 ${currentTab === 'marketplace' ? 'text-[#3B82F6]' : textSec}`} />
-              <span>Planos & Upgrades</span>
-            </button>
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('marketplace')} 
+                  className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'marketplace' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <Sparkles className={`w-4 h-4 shrink-0 ${currentTab === 'marketplace' ? 'text-[#3B82F6]' : textSec}`} />
+                  <span>Planos & Upgrades</span>
+                </button>
+              </li>
 
-            <button 
-              onClick={() => setCurrentTab('roadmap')} 
-              className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
-                currentTab === 'roadmap' 
-                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
-                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
-              }`}
-            >
-              <ShieldCheck className={`w-4 h-4 shrink-0 ${currentTab === 'roadmap' ? 'text-[#3B82F6]' : textSec}`} />
-              <span>Status & Roadmap</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Footer / User profile */}
-        <div className={`p-4 border-t ${borderCol} ${bgSidebar}`}>
-          <div className="flex items-center space-x-3">
-            <div className={`w-9 h-9 rounded-full ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} flex items-center justify-center font-bold ${textTitle} shadow`}>
-              V
-            </div>
-            <div>
-              <h4 className={`text-sm font-medium ${textTitle}`}>Vinicius</h4>
-              <p className={`text-xs ${textSec} font-normal uppercase tracking-wider font-mono`}>
-                Plano {plan}
-              </p>
-            </div>
+              <li className="nav-item w-full">
+                <button 
+                  onClick={() => setCurrentTab('roadmap')} 
+                  className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                    currentTab === 'roadmap' 
+                      ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                      : `${textSec} hover:bg-light/10 border-transparent`
+                  }`}
+                >
+                  <ShieldCheck className={`w-4 h-4 shrink-0 ${currentTab === 'roadmap' ? 'text-[#3B82F6]' : textSec}`} />
+                  <span>Status & Roadmap</span>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT CONTAINER */}
-      <main className={`flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-20 z-10 ${bgMain} transition-colors duration-250`}>
+      {/* MAIN CONTENT AREA - Limitless content-wrapper */}
+      <main className="content-wrapper flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-5 z-10 transition-colors duration-250">
         
-        {/* HEADER */}
-        <header className={`h-16 border-b ${borderCol} ${bgHeader} backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40 transition-colors duration-250`}>
+        {/* HEADER / TOP NAVBAR */}
+        <header className={`navbar navbar-expand-md ${headerClass} px-4 py-3 flex items-center justify-between sticky top-0 z-40 transition-colors duration-250`}>
           <div className="flex items-center space-x-2">
             <span className={`text-xs ${textSec} uppercase tracking-wider font-semibold`}>Espaço de Trabalho</span>
             <span className="text-slate-400">/</span>
@@ -965,14 +958,14 @@ export default function App() {
               <input 
                 type="text" 
                 placeholder="Buscar no ecossistema..." 
-                className={`w-full pl-9 pr-4 py-1.5 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} rounded-lg text-xs ${textBody} focus:outline-none focus:border-[#3B82F6]/50 focus:ring-1 focus:ring-[#3B82F6]/50 transition-all placeholder-[#64748B]`}
+                className={`form-control form-control-sm pl-9 pr-4 py-1 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-white text-slate-900 border-slate-300'} rounded-lg text-xs`}
               />
             </div>
             
             {/* Theme switch button */}
             <button 
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 rounded-lg border transition-all ${
+              className={`p-2 rounded border transition-all ${
                 theme === 'dark' 
                   ? 'text-[#94A3B8] hover:text-white bg-[#1E293B]/40 border-white/5 hover:bg-[#1E293B]' 
                   : 'text-slate-500 hover:text-slate-900 bg-slate-100 border-slate-200 hover:bg-slate-200'
@@ -982,154 +975,166 @@ export default function App() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <button className={`p-2 ${textSec} hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40' : 'bg-slate-100'} rounded-lg border ${borderCol} relative transition-all`}>
+            <button className={`p-2 ${textSec} hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40' : 'bg-slate-100'} rounded border ${borderCol} relative transition-all`}>
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#3B82F6] rounded-full"></span>
               <Bell className="w-4 h-4" />
             </button>
           </div>
         </header>
 
-        {/* VIEWS WRAPPER */}
-        <div className="p-8 max-w-7xl w-full mx-auto space-y-8">
+        {/* CONTENT AREA - Limitless content block */}
+        <div className="content p-4 max-w-7xl w-full mx-auto space-y-4">
             
           {/* ================= 1. DASHBOARD VIEW ================= */}
           {currentTab === 'dashboard' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Visão Geral de Performance</h2>
-                  <p className={`text-sm ${textSec}`}>Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Visão Geral de Performance</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
                 </div>
-                <div className={`flex items-center space-x-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} px-3 py-1.5 rounded-lg text-xs font-medium ${textBody}`}>
+                <div className={`flex items-center space-x-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} px-3 py-1.5 rounded text-xs font-medium`}>
                   <Calendar className={`w-4 h-4 ${textSec}`} />
                   <span>Julho, 2026</span>
                 </div>
               </div>
 
-              {/* KPI Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Receita Total</span>
-                    <div className={`p-1.5 ${textSec} rounded-lg`}>
-                      <DollarSign className="w-4 h-4" />
+              {/* KPI Cards (Limitless layout columns) */}
+              <div className="row row-tile">
+                <div className="col-sm-6 col-xl-3 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-semibold ${textSec} uppercase tracking-wider`}>Receita Total</span>
+                      <div className={`p-1.5 ${textSec} rounded`}>
+                        <DollarSign className="w-4 h-4" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.receita.toLocaleString('pt-BR')}</span>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-semibold text-[#22C55E] flex items-center">
-                        <TrendingUp className="w-3 h-3 mr-0.5" />
-                        14.2%
-                      </span>
-                      <span className={`text-[10px] ${textSec} font-medium`}>vs último mês</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Saldo Disponível</span>
-                    <div className={`p-1.5 ${textSec} rounded-lg`}>
-                      <Landmark className="w-4 h-4" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.saldo.toLocaleString('pt-BR')}</span>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-[10px] text-[#3B82F6] font-semibold bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">Pronto para saque</span>
+                    <div className="mt-2">
+                      <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.receita.toLocaleString('pt-BR')}</span>
+                      <div className="flex items-center space-x-1 mt-2">
+                        <span className="text-xs font-semibold text-[#22C55E] flex items-center">
+                          <TrendingUp className="w-3 h-3 mr-0.5" />
+                          14.2%
+                        </span>
+                        <span className={`text-[10px] ${textSec} font-medium`}>vs último mês</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Repasses Efetuados</span>
-                    <div className={`p-1.5 ${textSec} rounded-lg`}>
-                      <ArrowRightLeft className="w-4 h-4" />
+                <div className="col-sm-6 col-xl-3 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-semibold ${textSec} uppercase tracking-wider`}>Saldo Disponível</span>
+                      <div className={`p-1.5 ${textSec} rounded`}>
+                        <Landmark className="w-4 h-4" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.repasses.toLocaleString('pt-BR')}</span>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <span className={`text-xs font-medium ${textSec}`}>8.3%</span>
-                      <span className={`text-[10px] ${textSec} font-normal`}> / Agendados</span>
+                    <div className="mt-2">
+                      <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.saldo.toLocaleString('pt-BR')}</span>
+                      <div className="flex items-center space-x-1 mt-2">
+                        <span className="text-[10px] text-[#3B82F6] font-semibold bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">Pronto para saque</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Lucro Líquido</span>
-                    <div className={`p-1.5 ${textSec} rounded-lg`}>
-                      <Percent className="w-4 h-4" />
+                <div className="col-sm-6 col-xl-3 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-semibold ${textSec} uppercase tracking-wider`}>Repasses Efetuados</span>
+                      <div className={`p-1.5 ${textSec} rounded`}>
+                        <ArrowRightLeft className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.repasses.toLocaleString('pt-BR')}</span>
+                      <div className="flex items-center space-x-1 mt-2">
+                        <span className={`text-xs font-medium ${textSec}`}>8.3%</span>
+                        <span className={`text-[10px] ${textSec} font-normal`}> / Agendados</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.lucro.toLocaleString('pt-BR')}</span>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-semibold text-[#22C55E] flex items-center">18.6%</span>
-                      <span className={`text-[10px] ${textSec} font-normal`}> / Margem Operacional</span>
+                </div>
+
+                <div className="col-sm-6 col-xl-3 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-semibold ${textSec} uppercase tracking-wider`}>Lucro Líquido</span>
+                      <div className={`p-1.5 ${textSec} rounded`}>
+                        <Percent className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.lucro.toLocaleString('pt-BR')}</span>
+                      <div className="flex items-center space-x-1 mt-2">
+                        <span className="text-xs font-semibold text-[#22C55E] flex items-center">18.6%</span>
+                        <span className={`text-[10px] ${textSec} font-normal`}> / Margem Operacional</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Chart & Featured Events */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 lg:col-span-2 shadow-sm`}>
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className={`text-sm font-semibold ${textTitle}`}>Fluxo de Caixa Mensal</h3>
-                      <p className={`text-xs ${textSec}`}>Projeção e balanço de receitas no período</p>
+              <div className="row">
+                <div className="col-lg-8 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Fluxo de Caixa Mensal</h3>
+                        <p className={`text-xs ${textSec} mb-0`}>Projeção e balanço de receitas no período</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="relative w-full h-48 mt-4">
-                    <svg className="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="indigo-grad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2"/>
-                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
-                        </linearGradient>
-                      </defs>
-                      <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
-                      <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
-                      <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
-                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="url(#indigo-grad)"/>
-                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <div className={`flex justify-between text-[10px] ${textSec} mt-2 font-semibold font-mono`}>
-                    <span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span><span>JUL</span>
+                    
+                    <div className="relative w-full h-48 mt-4">
+                      <svg className="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="indigo-grad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2"/>
+                            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
+                          </linearGradient>
+                        </defs>
+                        <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                        <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                        <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                        <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="url(#indigo-grad)"/>
+                        <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                    <div className={`flex justify-between text-[10px] ${textSec} mt-2 font-semibold font-mono`}>
+                      <span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span><span>JUL</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
-                  <div>
-                    <h3 className={`text-sm font-semibold ${textTitle} mb-4`}>Eventos em Destaque</h3>
-                    <div className="space-y-4">
-                      {borderos.map(b => (
-                        <div key={b.id} className={`flex items-center justify-between p-3 rounded-lg ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol}`}>
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-8 h-8 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} flex items-center justify-center font-bold ${textSec} text-xs`}>
-                              {b.name[0]}
+                <div className="col-lg-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <h3 className={`text-sm font-semibold ${textTitle} mb-3`}>Eventos em Destaque</h3>
+                      <div className="space-y-3">
+                        {borderos.map(b => (
+                          <div key={b.id} className={`flex items-center justify-between p-3 rounded ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol}`}>
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-8 h-8 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} flex items-center justify-center font-bold ${textSec} text-xs`}>
+                                {b.name[0]}
+                              </div>
+                              <div>
+                                <h4 className={`text-xs font-semibold ${textTitle} truncate w-24 mb-0`}>{b.name}</h4>
+                                <p className={`text-[9px] ${textSec} mb-0`}>{b.location}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h4 className={`text-xs font-semibold ${textTitle} truncate w-32`}>{b.name}</h4>
-                              <p className={`text-[9px] ${textSec}`}>{b.location}</p>
-                            </div>
+                            <span className={`text-xs font-semibold ${textTitle}`}>R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
                           </div>
-                          <span className={`text-xs font-semibold ${textTitle}`}>R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className={`mt-6 pt-4 border-t ${borderCol} text-center`}>
-                    <button onClick={() => setCurrentTab('contabilidade')} className="text-xs font-semibold text-[#3B82F6] hover:text-[#60A5FA] inline-flex items-center hover:underline">
-                      Auditar fechamentos contábeis
-                      <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                    </button>
+                    <div className={`mt-4 pt-3 border-top ${borderCol} text-center`}>
+                      <button onClick={() => setCurrentTab('contabilidade')} className="text-xs font-semibold text-[#3B82F6] hover:text-[#60A5FA] inline-flex items-center hover:underline bg-transparent border-0 p-0 cursor-pointer">
+                        Auditar fechamentos contábeis
+                        <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1138,43 +1143,43 @@ export default function App() {
 
           {/* ================= 2. GESTÃO FINANCEIRA (ERP) VIEW ================= */}
           {currentTab === 'financeiro' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Gestão Financeira (ERP)</h2>
-                  <p className={`text-sm ${textSec}`}>Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Gestão Financeira (ERP)</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
                 </div>
                 
-                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
                   <button 
                     onClick={() => setFinanceSubTab('contas')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'contas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      financeSubTab === 'contas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Saldos & Contas
                   </button>
                   <button 
                     onClick={() => setFinanceSubTab('lancamentos')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'lancamentos' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      financeSubTab === 'lancamentos' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Lançamentos
                   </button>
                   <button 
                     onClick={() => setFinanceSubTab('conciliacao')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'conciliacao' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      financeSubTab === 'conciliacao' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Conciliação
                   </button>
                   <button 
                     onClick={() => setFinanceSubTab('taxas')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'taxas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      financeSubTab === 'taxas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     PDVs & Taxas
@@ -1184,223 +1189,233 @@ export default function App() {
 
               {/* Sub-Tab 1: Saldos & Contas */}
               {financeSubTab === 'contas' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className="lg:col-span-2 space-y-6">
-                    <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Saldo das Contas do Sistema</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                      {accounts.map(acc => (
-                        <div key={acc.id} className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
-                          <span className={`text-[9px] ${textSec} font-semibold uppercase tracking-wider block`}>{acc.type}</span>
-                          <h4 className={`text-xs font-semibold ${textTitle} mt-1`}>{acc.name}</h4>
-                          <div className={`mt-4 font-mono font-bold text-lg ${textTitle}`}>
-                            R$ {acc.balance.toLocaleString('pt-BR')}
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-8 mb-3">
+                    <div className="space-y-4">
+                      <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider mb-0`}>Saldo das Contas do Sistema</h3>
+                      <div className="row">
+                        {accounts.map(acc => (
+                          <div key={acc.id} className="col-md-4 mb-3">
+                            <div className={`card ${cardClass} p-4`}>
+                              <span className={`text-[9px] ${textSec} font-semibold uppercase tracking-wider block`}>{acc.type}</span>
+                              <h4 className={`text-xs font-semibold ${textTitle} mt-1 mb-0`}>{acc.name}</h4>
+                              <div className={`mt-3 font-mono font-bold text-md ${textTitle}`}>
+                                R$ {acc.balance.toLocaleString('pt-BR')}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className={`${bgCard} border ${borderCol} rounded-xl p-5 space-y-4`}>
-                      <div className="flex items-center space-x-2">
-                        <TrendingUp className="w-5 h-5 text-[#3B82F6]" />
-                        <h4 className={`text-sm font-semibold ${textTitle}`}>Resumo Patrimonial Consolidador</h4>
+                        ))}
                       </div>
-                      <p className={`text-xs ${textSec} leading-relaxed`}>
-                        O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
-                      </p>
+
+                      <div className={`card ${cardClass} p-4 space-y-2`}>
+                        <div className="flex items-center space-x-2">
+                          <TrendingUp className="w-5 h-5 text-[#3B82F6]" />
+                          <h4 className={`text-sm font-semibold ${textTitle} mb-0`}>Resumo Patrimonial Consolidador</h4>
+                        </div>
+                        <p className={`text-xs ${textSec} mb-0 leading-relaxed`}>
+                          O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm h-fit space-y-4`}>
-                    <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
-                      <ArrowRightLeft className="w-4 h-4 text-[#3B82F6]" />
-                      <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Transferência entre Contas</h4>
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3 mb-3`}>
+                        <ArrowRightLeft className="w-4 h-4 text-[#3B82F6]" />
+                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Transferência entre Contas</h4>
+                      </div>
+
+                      <form onSubmit={handleAccountTransfer} className="space-y-3 text-xs">
+                        <div className="form-group mb-2">
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Origem</label>
+                          <select 
+                            value={transfer.from} 
+                            onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
+                            className={`form-control form-control-sm ${inputClass}`}
+                          >
+                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
+                          </select>
+                        </div>
+
+                        <div className="form-group mb-2">
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Destino</label>
+                          <select 
+                            value={transfer.to} 
+                            onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
+                            className={`form-control form-control-sm ${inputClass}`}
+                          >
+                            {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                          </select>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
+                          <input 
+                            type="number" 
+                            value={transfer.amount}
+                            onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
+                            placeholder="Ex: 50000"
+                            className={`form-control form-control-sm ${inputClass} font-mono`}
+                            required
+                          />
+                        </div>
+
+                        <button 
+                          type="submit" 
+                          className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded transition-all border-0"
+                        >
+                          Confirmar Transferência
+                        </button>
+                      </form>
                     </div>
-
-                    <form onSubmit={handleAccountTransfer} className="space-y-4 text-xs">
-                      <div className="space-y-1">
-                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Origem</label>
-                        <select 
-                          value={transfer.from} 
-                          onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
-                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium ${textTitle}`}
-                        >
-                          {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Destino</label>
-                        <select 
-                          value={transfer.to} 
-                          onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
-                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium ${textTitle}`}
-                        >
-                          {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
-                        <input 
-                          type="number" 
-                          value={transfer.amount}
-                          onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
-                          placeholder="Ex: 50000"
-                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
-                          required
-                        />
-                      </div>
-
-                      <button 
-                        type="submit" 
-                        className="w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg transition-all"
-                      >
-                        Confirmar Transferência
-                      </button>
-                    </form>
                   </div>
                 </div>
               )}
 
               {/* Sub-Tab 2: Lançamentos */}
               {financeSubTab === 'lancamentos' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Fluxo de Caixa Lançamentos</h3>
-                    <div className="overflow-x-auto">
-                      <table className={`w-full text-xs ${textBody} border-collapse`}>
-                        <thead>
-                          <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
-                            <th className="p-3">Descrição / Vínculo</th>
-                            <th className="p-3">Categoria</th>
-                            <th className="p-3">Centro de Custo</th>
-                            <th className="p-3">Data</th>
-                            <th className="p-3 text-right">Valor</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {lancamentos.map(lan => (
-                            <tr key={lan.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
-                              <td className="p-3">
-                                <div className="flex items-center space-x-2">
-                                  <span className={`w-1.5 h-1.5 rounded-full ${lan.type === 'receita' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'}`} />
-                                  <span className={`font-semibold ${textTitle}`}>{lan.desc}</span>
-                                </div>
-                              </td>
-                              <td className={`p-3 ${textSec}`}>{lan.category}</td>
-                              <td className={`p-3 font-mono ${textSec}`}>{lan.costCenter}</td>
-                              <td className={`p-3 font-mono ${textSec}`}>{lan.date}</td>
-                              <td className={`p-3 text-right font-mono font-semibold ${lan.type === 'receita' ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
-                                {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
-                              </td>
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Fluxo de Caixa Lançamentos</h3>
+                      <div className="table-responsive">
+                        <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                          <thead>
+                            <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                              <th className="p-3 border-0">Descrição / Vínculo</th>
+                              <th className="p-3 border-0">Categoria</th>
+                              <th className="p-3 border-0">Centro de Custo</th>
+                              <th className="p-3 border-0">Data</th>
+                              <th className="p-3 border-0 text-right">Valor</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {lancamentos.map(lan => (
+                              <tr key={lan.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
+                                <td className="p-3 border-0">
+                                  <div className="flex items-center space-x-2">
+                                    <span className={`w-1.5 h-1.5 rounded-full ${lan.type === 'receita' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'}`} />
+                                    <span className={`font-semibold ${textTitle}`}>{lan.desc}</span>
+                                  </div>
+                                </td>
+                                <td className={`p-3 border-0 ${textSec}`}>{lan.category}</td>
+                                <td className={`p-3 border-0 font-mono ${textSec}`}>{lan.costCenter}</td>
+                                <td className={`p-3 border-0 font-mono ${textSec}`}>{lan.date}</td>
+                                <td className={`p-3 border-0 text-right font-mono font-semibold ${lan.type === 'receita' ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+                                  {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
 
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm h-fit space-y-4`}>
-                    <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
-                      <Plus className="w-4 h-4 text-[#3B82F6]" />
-                      <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Lançar Fluxo Manual</h4>
-                    </div>
-
-                    <form onSubmit={handleCreateLancamento} className="space-y-4 text-xs">
-                      <div className={`flex ${bgInput} p-1 border ${borderCol} rounded-lg space-x-1`}>
-                        <button 
-                          type="button"
-                          onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
-                          className={`flex-1 py-1.5 rounded text-center font-medium transition-all ${
-                            newLancamento.type === 'receita' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} hover:text-slate-205`
-                          }`}
-                        >
-                          Receita
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
-                          className={`flex-1 py-1.5 rounded text-center font-medium transition-all ${
-                            newLancamento.type === 'despesa' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} hover:text-slate-205`
-                          }`}
-                        >
-                          Despesa
-                        </button>
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4 h-fit`}>
+                      <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3 mb-3`}>
+                        <Plus className="w-4 h-4 text-[#3B82F6]" />
+                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Lançar Fluxo Manual</h4>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Descrição *</label>
-                        <input 
-                          type="text" 
-                          value={newLancamento.desc}
-                          onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
-                          placeholder="Ex: Contratação Equipe Limpeza"
-                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs`}
-                          required
-                        />
-                      </div>
+                      <form onSubmit={handleCreateLancamento} className="space-y-3 text-xs">
+                        <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} p-1 border ${borderCol} rounded mb-3`}>
+                          <button 
+                            type="button"
+                            onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
+                            className={`flex-1 py-1 rounded text-center font-medium transition-all border-0 ${
+                              newLancamento.type === 'receita' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} bg-transparent`
+                            }`}
+                          >
+                            Receita
+                          </button>
+                          <button 
+                            type="button"
+                            onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
+                            className={`flex-1 py-1 rounded text-center font-medium transition-all border-0 ${
+                              newLancamento.type === 'despesa' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} bg-transparent`
+                            }`}
+                          >
+                            Despesa
+                          </button>
+                        </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$) *</label>
+                        <div className="form-group mb-2">
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Descrição *</label>
                           <input 
-                            type="number" 
-                            value={newLancamento.amount}
-                            onChange={(e) => setNewLancamento(prev => ({ ...prev, amount: e.target.value }))}
-                            placeholder="1200"
-                            className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono text-xs`}
+                            type="text" 
+                            value={newLancamento.desc}
+                            onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
+                            placeholder="Ex: Contratação Equipe Limpeza"
+                            className={`form-control form-control-sm ${inputClass} text-xs`}
                             required
                           />
                         </div>
-                        <div className="space-y-1">
-                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Centro de Custo</label>
+
+                        <div className="row mb-2">
+                          <div className="col-6 form-group">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$) *</label>
+                            <input 
+                              type="number" 
+                              value={newLancamento.amount}
+                              onChange={(e) => setNewLancamento(prev => ({ ...prev, amount: e.target.value }))}
+                              placeholder="1200"
+                              className={`form-control form-control-sm ${inputClass} font-mono text-xs`}
+                              required
+                            />
+                          </div>
+                          <div className="col-6 form-group">
+                            <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Centro</label>
+                            <select 
+                              value={newLancamento.costCenter}
+                              onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
+                              className={`form-control form-control-sm ${inputClass} text-xs font-medium`}
+                            >
+                              <option value="Eventos">Eventos</option>
+                              <option value="Operacional">Operacional</option>
+                              <option value="Comercial">Comercial</option>
+                              <option value="Logística">Logística</option>
+                              <option value="Marketing">Marketing</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="form-group mb-3">
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Categoria</label>
                           <select 
-                            value={newLancamento.costCenter}
-                            onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
-                            className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs font-medium`}
+                            value={newLancamento.category}
+                            onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
+                            className={`form-control form-control-sm ${inputClass} text-xs font-medium`}
                           >
-                            <option value="Eventos">Eventos</option>
-                            <option value="Operacional">Operacional</option>
-                            <option value="Comercial">Comercial</option>
-                            <option value="Logística">Logística</option>
-                            <option value="Marketing">Marketing</option>
+                            <option value="Venda Ingressos">Venda Ingressos</option>
+                            <option value="Serviços de Terceiros">Serviços de Terceiros</option>
+                            <option value="Locação Equipamentos">Locação Equipamentos</option>
+                            <option value="Patrocínio">Patrocínio</option>
+                            <option value="Publicidade">Publicidade</option>
                           </select>
                         </div>
-                      </div>
 
-                      <div className="space-y-1">
-                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Categoria</label>
-                        <select 
-                          value={newLancamento.category}
-                          onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
-                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs font-medium`}
+                        <button 
+                          type="submit" 
+                          className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded transition-all border-0"
                         >
-                          <option value="Venda Ingressos">Venda Ingressos</option>
-                          <option value="Serviços de Terceiros">Serviços de Terceiros</option>
-                          <option value="Locação Equipamentos">Locação Equipamentos</option>
-                          <option value="Patrocínio">Patrocínio</option>
-                          <option value="Publicidade">Publicidade</option>
-                        </select>
-                      </div>
-
-                      <button 
-                        type="submit" 
-                        className="w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium rounded-lg transition-all"
-                      >
-                        Registrar Lançamento
-                      </button>
-                    </form>
+                          Registrar Lançamento
+                        </button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* Sub-Tab 3: Conciliação */}
               {financeSubTab === 'conciliacao' && (
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4 animate-fadeIn`}>
-                  <div className={`border-b ${borderCol} pb-3 flex justify-between items-center`}>
+                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
+                  <div className={`border-bottom ${borderCol} pb-3 mb-3`}>
                     <div className="flex items-center space-x-2">
                       <Landmark className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className={`text-sm font-semibold ${textTitle}`}>Conciliação Automática Vindi / PagSeguro</h3>
+                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Conciliação Automática Vindi / PagSeguro</h3>
                     </div>
                   </div>
 
@@ -1408,24 +1423,24 @@ export default function App() {
                     {conciliationItems.map((item) => (
                       <div 
                         key={item.id} 
-                        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                        className={`flex items-center justify-between p-3 rounded border transition-all ${
                           item.matched 
                             ? `${theme === 'dark' ? 'bg-[#111827]/40' : 'bg-slate-50/50'} border-transparent opacity-60` 
-                            : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-white'} border-white/5`
+                            : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-white'} border-${borderCol}`
                         }`}
                       >
                         <div className="flex items-center space-x-3">
-                          <span className={`p-1.5 rounded-md ${
+                          <span className={`p-1.5 rounded ${
                             item.type === 'in' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#EF4444]/10 text-[#EF4444]'
                           }`}>
                             {item.type === 'in' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowRightLeft className="w-4 h-4" />}
                           </span>
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h4 className={`text-xs font-semibold ${textTitle}`}>{item.desc}</h4>
+                              <h4 className={`text-xs font-semibold ${textTitle} mb-0`}>{item.desc}</h4>
                               <span className={`text-[9px] ${textSec} font-mono`}>{item.date}</span>
                             </div>
-                            <p className={`text-[10px] ${textSec} font-mono mt-0.5`}>Vínculo Contábil: {item.matchInvoice}</p>
+                            <p className={`text-[10px] ${textSec} font-mono mt-0.5 mb-0`}>Vínculo Contábil: {item.matchInvoice}</p>
                           </div>
                         </div>
 
@@ -1444,7 +1459,7 @@ export default function App() {
                           ) : (
                             <button 
                               onClick={() => handleReconcile(item.id)}
-                              className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
+                              className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
                             >
                               Conciliar
                             </button>
@@ -1458,70 +1473,73 @@ export default function App() {
 
               {/* Sub-Tab 4: PDVs & Taxas */}
               {financeSubTab === 'taxas' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                <div className="row animate-fadeIn">
                   
                   {/* PDV Control List */}
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
-                      <div className="flex items-center space-x-2">
-                        <ShoppingBag className="w-5 h-5 text-[#3B82F6]" />
-                        <h3 className={`text-sm font-semibold ${textTitle}`}>Controle de Pontos de Venda Físicos (PDVs)</h3>
-                      </div>
-                      
-                      {isPlanEligible('advanced') ? (
-                        <button 
-                          onClick={() => setShowAddPdvModal(true)}
-                          className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
-                        >
-                          Novo PDV
-                        </button>
-                      ) : (
-                        <span className={`text-[9px] ${textSec} bg-[#111827] px-2 py-1 rounded`}>Requer Plano Advanced</span>
-                      )}
-                    </div>
-
-                    <div className="space-y-3">
-                      {pdvs.map(pdv => (
-                        <div key={pdv.id} className={`p-3 ${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border ${borderCol} rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <h4 className={`text-xs font-semibold ${textTitle}`}>{pdv.name}</h4>
-                              <span className={`text-[8px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-1.5 rounded ${textSec} uppercase`}>{pdv.type}</span>
-                            </div>
-                            <p className={`text-[10px] ${textSec} mt-0.5`}>Operador Responsável: {pdv.manager}</p>
-                          </div>
-
-                          <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-                            <div>
-                              <span className={`text-[9px] ${textSec} uppercase block`}>Saldo Retido</span>
-                              <span className="text-xs font-mono font-semibold text-[#22C55E]">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
-                            </div>
-
-                            {pdv.balance > 0 && isPlanEligible('advanced') && (
-                              <button 
-                                onClick={() => handlePdvBleeding(pdv.id, pdv.balance)}
-                                className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
-                                title="Recolher dinheiro do caixa"
-                              >
-                                Recolher (Sangria)
-                              </button>
-                            )}
-                          </div>
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
+                        <div className="flex items-center space-x-2">
+                          <ShoppingBag className="w-5 h-5 text-[#3B82F6]" />
+                          <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Controle de Pontos de Venda Físicos (PDVs)</h3>
                         </div>
-                      ))}
+                        
+                        {isPlanEligible('advanced') ? (
+                          <button 
+                            onClick={() => setShowAddPdvModal(true)}
+                            className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
+                          >
+                            Novo PDV
+                          </button>
+                        ) : (
+                          <span className={`text-[9px] ${textSec} bg-[#111827] px-2 py-1 rounded`}>Requer Plano Advanced</span>
+                        )}
+                      </div>
+
+                      <div className="space-y-3">
+                        {pdvs.map(pdv => (
+                          <div key={pdv.id} className={`p-3 ${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border ${borderCol} rounded flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <h4 className={`text-xs font-semibold ${textTitle} mb-0`}>{pdv.name}</h4>
+                                <span className={`text-[8px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-1.5 rounded ${textSec} uppercase`}>{pdv.type}</span>
+                              </div>
+                              <p className={`text-[10px] ${textSec} mt-0.5 mb-0`}>Operador Responsável: {pdv.manager}</p>
+                            </div>
+
+                            <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
+                              <div>
+                                <span className={`text-[9px] ${textSec} uppercase block`}>Saldo Retido</span>
+                                <span className="text-xs font-mono font-semibold text-[#22C55E]">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
+                              </div>
+
+                              {pdv.balance > 0 && isPlanEligible('advanced') && (
+                                <button 
+                                  onClick={() => handlePdvBleeding(pdv.id, pdv.balance)}
+                                  className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
+                                >
+                                  Recolher (Sangria)
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   {/* Fee list */}
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Gateway & Custos Operacionais</h3>
-                    <div className="space-y-3 text-xs">
-                      {Object.entries(gatewayRates).map(([key, data]) => (
-                        <div key={key} className={`flex justify-between items-center p-2.5 ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol} rounded`}>
-                          <span className={`font-medium ${textBody}`}>{data.name}</span>
-                          <span className="font-mono text-[#3B82F6] font-semibold">{data.rate}% {data.fixed > 0 && `+ R$ ${data.fixed}`}</span>
-                        </div>
-                      ))}
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Gateway & Custos Operacionais</h3>
+                      <div className="space-y-3 text-xs">
+                        {Object.entries(gatewayRates).map(([key, data]) => (
+                          <div key={key} className={`flex justify-between items-center p-2.5 ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol} rounded`}>
+                            <span className={`font-medium ${textBody}`}>{data.name}</span>
+                            <span className="font-mono text-[#3B82F6] font-semibold">{data.rate}% {data.fixed > 0 && `+ R$ ${data.fixed}`}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1532,35 +1550,35 @@ export default function App() {
 
           {/* ================= 3. CONTABILIDADE DISK VIEW ================= */}
           {currentTab === 'contabilidade' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Contabilidade Disk</h2>
-                  <p className={`text-sm ${textSec}`}>Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Contabilidade Disk</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
                 </div>
 
-                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
                   <button 
                     onClick={() => setAccountingSubTab('bordero')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'bordero' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      accountingSubTab === 'bordero' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Borderô Eventos
                   </button>
                   <button 
                     onClick={() => setAccountingSubTab('notas')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'notas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      accountingSubTab === 'notas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Notas Fiscais (SEFAZ)
                   </button>
                   <button 
                     onClick={() => setAccountingSubTab('fechamento')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'fechamento' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      accountingSubTab === 'fechamento' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     DRE & Fechamento
@@ -1570,138 +1588,149 @@ export default function App() {
 
               {/* Sub-Tab 1: Borderô Eventos */}
               {accountingSubTab === 'bordero' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                <div className="row animate-fadeIn">
                   
                   {/* Event list selector */}
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider border-b ${borderCol} pb-3`}>Selecione o Evento</h3>
-                    <div className="space-y-3">
-                      {borderos.map(b => (
-                        <button 
-                          key={b.id}
-                          onClick={() => setActiveBorderoEvent(b.id)}
-                          className={`w-full text-left p-3 rounded-lg border transition-all ${
-                            activeBorderoEvent === b.id 
-                              ? `bg-transparent border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)] ${textTitle}` 
-                              : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border-transparent hover:border-slate-700 ${textBody}`
-                          }`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <span className="font-semibold text-xs truncate block w-40">{b.name}</span>
-                            <span className={`text-[8px] px-2 py-0.5 rounded font-bold uppercase ${
-                              b.status === 'Aprovado' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : 'bg-[#F59E0B]/12 text-[#FB923C]'
-                            }`}>{b.status}</span>
-                          </div>
-                          
-                          <span className={`text-[10px] ${textSec} font-mono mt-1 block`}>Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
-                        </button>
-                      ))}
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider border-bottom ${borderCol} pb-3 mb-3`}>Selecione o Evento</h3>
+                      <div className="space-y-3">
+                        {borderos.map(b => (
+                          <button 
+                            key={b.id}
+                            onClick={() => setActiveBorderoEvent(b.id)}
+                            className={`w-full text-left p-3 rounded border transition-all ${
+                              activeBorderoEvent === b.id 
+                                ? `bg-transparent border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)] ${textTitle}` 
+                                : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border-transparent hover:border-slate-700 ${textBody}`
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <span className="font-semibold text-xs truncate block w-32">{b.name}</span>
+                              <span className={`text-[8px] px-2 py-0.5 rounded font-bold uppercase ${
+                                b.status === 'Aprovado' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : 'bg-[#F59E0B]/12 text-[#FB923C]'
+                              }`}>{b.status}</span>
+                            </div>
+                            <span className={`text-[10px] ${textSec} font-mono mt-1 block`}>Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   {/* Borderô details */}
-                  {activeEvent && (
-                    <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn`}>
-                      <div className={`border-b ${borderCol} pb-4 flex justify-between items-start`}>
-                        <div>
-                          <h3 className={`text-base font-bold ${textTitle}`}>{activeEvent.name}</h3>
-                          <p className={`text-xs ${textSec}`}>{activeEvent.location}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block font-mono`}>Fechamento</span>
-                          <span className={`text-xs font-mono font-semibold ${textBody} block`}>{activeEvent.dateClosed}</span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
-                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Ingressos</span>
-                          <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>{activeEvent.ticketsSold}</span>
-                        </div>
-                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
-                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Receita Bruta</span>
-                          <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>R$ {activeEvent.grossRevenue.toLocaleString('pt-BR')}</span>
-                        </div>
-                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
-                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Gateway (Vindi)</span>
-                          <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.gatewayFee.toLocaleString('pt-BR')}</span>
-                        </div>
-                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
-                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Comissão Disk</span>
-                          <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.diskFee.toLocaleString('pt-BR')}</span>
-                        </div>
-                      </div>
-
-                      <div className={`p-4 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} rounded-xl flex flex-col sm:flex-row justify-between items-center`}>
-                        <div>
-                          <span className={`text-xs ${textSec} font-semibold block`}>Repasse Líquido à Produtora:</span>
-                          <span className={`text-2xl font-mono font-bold ${textTitle} mt-1 block`}>
-                            R$ {activeEvent.netPayout.toLocaleString('pt-BR')}
-                          </span>
-                        </div>
-                        
-                        {activeEvent.status === 'Aprovado' ? (
-                          <div className="text-center sm:text-right mt-3 sm:mt-0">
-                            <span className={`text-[9px] ${textSec} font-semibold block`}>Autorizado por:</span>
-                            <span className="text-[#22C55E] text-xs font-semibold block">{activeEvent.authorizedBy}</span>
+                  <div className="col-lg-8 mb-3">
+                    {activeEvent && (
+                      <div className={`card ${cardClass} p-4 space-y-4 animate-fadeIn`}>
+                        <div className={`border-bottom ${borderCol} pb-3 flex justify-between items-start`}>
+                          <div>
+                            <h3 className={`text-base font-bold ${textTitle} mb-0`}>{activeEvent.name}</h3>
+                            <p className={`text-xs ${textSec} mb-0`}>{activeEvent.location}</p>
                           </div>
-                        ) : (
-                          <button 
-                            onClick={() => handleAuthorizeBordero(activeEvent.id)}
-                            className="mt-3 sm:mt-0 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
-                          >
-                            Liberar Repasse Financeiro
-                          </button>
-                        )}
+                          <div className="text-right">
+                            <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block font-mono`}>Fechamento</span>
+                            <span className={`text-xs font-mono font-semibold ${textBody} block`}>{activeEvent.dateClosed}</span>
+                          </div>
+                        </div>
+
+                        <div className="row">
+                          <div className="col-6 col-sm-3 mb-2">
+                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded`}>
+                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Ingressos</span>
+                              <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>{activeEvent.ticketsSold}</span>
+                            </div>
+                          </div>
+                          <div className="col-6 col-sm-3 mb-2">
+                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
+                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Receita Bruta</span>
+                              <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>R$ {activeEvent.grossRevenue.toLocaleString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          <div className="col-6 col-sm-3 mb-2">
+                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
+                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Gateway (Vindi)</span>
+                              <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.gatewayFee.toLocaleString('pt-BR')}</span>
+                            </div>
+                          </div>
+                          <div className="col-6 col-sm-3 mb-2">
+                            <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded`}>
+                              <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Comissão Disk</span>
+                              <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.diskFee.toLocaleString('pt-BR')}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`p-4 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} rounded flex flex-col sm:flex-row justify-between items-center gap-3`}>
+                          <div>
+                            <span className={`text-xs ${textSec} font-semibold block`}>Repasse Líquido à Produtora:</span>
+                            <span className={`text-xl font-mono font-bold ${textTitle} mt-1 block`}>
+                              R$ {activeEvent.netPayout.toLocaleString('pt-BR')}
+                            </span>
+                          </div>
+                          
+                          {activeEvent.status === 'Aprovado' ? (
+                            <div className="text-center sm:text-right">
+                              <span className={`text-[9px] ${textSec} font-semibold block`}>Autorizado por:</span>
+                              <span className="text-[#22C55E] text-xs font-semibold block">{activeEvent.authorizedBy}</span>
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={() => handleAuthorizeBordero(activeEvent.id)}
+                              className="btn btn-primary py-2 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
+                            >
+                              Liberar Repasse Financeiro
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Sub-Tab 2: Notas Fiscais a Emitir */}
               {accountingSubTab === 'notas' && (
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn`}>
-                  <div className={`border-b ${borderCol} pb-3 flex justify-between items-center`}>
+                <div className={`card ${cardClass} p-4 animate-fadeIn`}>
+                  <div className={`border-bottom ${borderCol} pb-3 mb-3 flex justify-between items-center`}>
                     <div className="flex items-center space-x-2">
                       <Receipt className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className={`text-sm font-semibold ${textTitle}`}>Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
+                      <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto">
-                    <table className={`w-full text-xs ${textBody} border-collapse`}>
+                  <div className="table-responsive">
+                    <table className={`table table-striped table-hover text-xs ${textBody}`}>
                       <thead>
-                        <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
-                          <th className="p-3">ID Nota</th>
-                          <th className="p-3">Razão Social</th>
-                          <th className="p-3">CNPJ / CPF</th>
-                          <th className="p-3">Evento Vinculado</th>
-                          <th className="p-3">Lançamento</th>
-                          <th className="p-3 text-right">Valor</th>
-                          <th className="p-3 text-center">Status SEFAZ</th>
+                        <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                          <th className="p-3 border-0">ID Nota</th>
+                          <th className="p-3 border-0">Razão Social</th>
+                          <th className="p-3 border-0">CNPJ / CPF</th>
+                          <th className="p-3 border-0">Evento Vinculado</th>
+                          <th className="p-3 border-0">Lançamento</th>
+                          <th className="p-3 border-0 text-right">Valor</th>
+                          <th className="p-3 border-0 text-center">Status SEFAZ</th>
                         </tr>
                       </thead>
                       <tbody>
                         {invoices.map(inv => (
-                          <tr key={inv.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
-                            <td className={`p-3 font-mono font-semibold ${textTitle} uppercase`}>{inv.id}</td>
-                            <td className={`p-3 font-semibold ${textTitle}`}>{inv.client}</td>
-                            <td className={`p-3 font-mono ${textSec}`}>{inv.doc}</td>
-                            <td className={`p-3 ${textSec}`}>{inv.event}</td>
-                            <td className={`p-3 font-mono ${textSec}`}>{inv.date}</td>
-                            <td className="p-3 text-right font-mono font-semibold text-[#3B82F6]">R$ {inv.amount.toLocaleString('pt-BR')}</td>
-                            <td className="p-3 text-center">
+                          <tr key={inv.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
+                            <td className={`p-3 border-0 font-mono font-semibold ${textTitle} uppercase`}>{inv.id}</td>
+                            <td className={`p-3 border-0 font-semibold ${textTitle}`}>{inv.client}</td>
+                            <td className={`p-3 border-0 font-mono ${textSec}`}>{inv.doc}</td>
+                            <td className={`p-3 border-0 ${textSec}`}>{inv.event}</td>
+                            <td className={`p-3 border-0 font-mono ${textSec}`}>{inv.date}</td>
+                            <td className="p-3 border-0 text-right font-mono font-semibold text-[#3B82F6]">R$ {inv.amount.toLocaleString('pt-BR')}</td>
+                            <td className="p-3 border-0 text-center">
                               {inv.status === 'Emitida' && (
-                                <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold">Autorizada</span>
+                                <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[9px] font-bold px-2 py-0.5 rounded-full">Autorizada</span>
                               )}
                               {inv.status === 'Processando' && (
-                                <span className={`bg-[#1E293B] ${textSec} text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse`}>Enviando...</span>
+                                <span className={`bg-[#1E293B] ${textSec} text-[9px] px-2 py-0.5 rounded font-bold animate-pulse`}>Enviando...</span>
                               )}
                               {inv.status === 'Pendente' && (
                                 <button 
                                   onClick={() => handleEmitNFe(inv.id)}
-                                  className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[9px] font-semibold rounded"
+                                  className="btn btn-primary btn-sm px-2.5 py-1 text-[9px] font-semibold rounded border-0"
                                 >
                                   Transmitir
                                 </button>
@@ -1717,84 +1746,88 @@ export default function App() {
 
               {/* Sub-Tab 3: DRE & Fechamentos */}
               {accountingSubTab === 'fechamento' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6`}>
-                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
-                      <div className="flex items-center space-x-2">
-                        <Calculator className="w-5 h-5 text-[#3B82F6]" />
-                        <h3 className={`text-sm font-semibold ${textTitle}`}>Demonstrativo DRE por Competência</h3>
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
+                        <div className="flex items-center space-x-2">
+                          <Calculator className="w-5 h-5 text-[#3B82F6]" />
+                          <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Demonstrativo DRE por Competência</h3>
+                        </div>
+                        
+                        <select 
+                          value={invoiceMonth}
+                          onChange={(e) => setInvoiceMonth(e.target.value)}
+                          className={`form-control form-control-sm ${inputClass} w-auto text-xs`}
+                        >
+                          <option value="Julho">Julho 2026</option>
+                          <option value="Junho">Junho 2026</option>
+                          <option value="Maio">Maio 2026</option>
+                        </select>
                       </div>
-                      
-                      <select 
-                        value={invoiceMonth}
-                        onChange={(e) => setInvoiceMonth(e.target.value)}
-                        className={`${bgInput} border ${borderCol} p-1 rounded text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
-                      >
-                        <option value="Julho">Julho 2026</option>
-                        <option value="Junho">Junho 2026</option>
-                        <option value="Maio">Maio 2026</option>
-                      </select>
-                    </div>
 
-                    <div className={`space-y-3 font-mono text-xs ${textBody}`}>
-                      <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className={textSec}>Receitas de Vendas (Bilheteria)</span>
-                        <span className="text-[#22C55E] font-bold">R$ {invoiceMonth === 'Julho' ? '2.580.000' : invoiceMonth === 'Junho' ? '1.920.000' : '1.450.000'}</span>
-                      </div>
-                      <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className={textSec}>(-) Impostos Fiscais (Simples/NFe)</span>
-                        <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
-                      </div>
-                      <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className={textSec}>(-) Spread e Comissões de Lançamento</span>
-                        <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
-                      </div>
-                      <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className={textSec}>(-) Custos de Produção & Infraestrutura</span>
-                        <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
-                      </div>
-                      <div className={`border-t ${borderCol} my-2 pt-2 flex justify-between p-2.5 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} rounded font-bold`}>
-                        <span className={textTitle}>Lucro Líquido Final</span>
-                        <span className="text-[#3B82F6]">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
+                      <div className={`space-y-2 font-mono text-xs ${textBody}`}>
+                        <div className="flex justify-between p-2 hover:bg-light/5">
+                          <span className={textSec}>Receitas de Vendas (Bilheteria)</span>
+                          <span className="text-[#22C55E] font-bold">R$ {invoiceMonth === 'Julho' ? '2.580.000' : invoiceMonth === 'Junho' ? '1.920.000' : '1.450.000'}</span>
+                        </div>
+                        <div className="flex justify-between p-2 hover:bg-light/5">
+                          <span className={textSec}>(-) Impostos Fiscais (Simples/NFe)</span>
+                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
+                        </div>
+                        <div className="flex justify-between p-2 hover:bg-light/5">
+                          <span className={textSec}>(-) Spread e Comissões de Lançamento</span>
+                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
+                        </div>
+                        <div className="flex justify-between p-2 hover:bg-light/5">
+                          <span className={textSec}>(-) Custos de Produção & Infraestrutura</span>
+                          <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
+                        </div>
+                        <div className={`border-top ${borderCol} my-2 pt-2 flex justify-between p-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} rounded font-bold`}>
+                          <span className={textTitle}>Lucro Líquido Final</span>
+                          <span className="text-[#3B82F6]">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
-                    <div className="space-y-4">
-                      <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
-                        <FileText className="w-4 h-4 text-[#3B82F6]" />
-                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Relatórios Recebimento</h4>
-                      </div>
-                      <p className={`text-xs ${textSec} leading-relaxed`}>
-                        Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
-                      </p>
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                      <div className="space-y-4">
+                        <div className={`flex items-center space-x-2 border-bottom ${borderCol} pb-3`}>
+                          <FileText className="w-4 h-4 text-[#3B82F6]" />
+                          <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Relatórios Recebimento</h4>
+                        </div>
+                        <p className={`text-xs ${textSec} leading-relaxed`}>
+                          Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
+                        </p>
 
-                      <div className="space-y-2 pt-2 text-xs">
-                        <button 
-                          onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
-                          className={`w-full text-left p-2.5 ${bgInput} border ${borderCol} hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all ${textTitle}`}
-                        >
-                          <span>Recebimento por Pedido</span>
-                          <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
-                        </button>
-                        
-                        <button 
-                          onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
-                          className={`w-full text-left p-2.5 ${bgInput} border ${borderCol} hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all ${textTitle}`}
-                        >
-                          <span>Recebimento por Data</span>
-                          <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
-                        </button>
+                        <div className="space-y-2 text-xs">
+                          <button 
+                            onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
+                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center transition-all`}
+                          >
+                            <span>Recebimento por Pedido</span>
+                            <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
+                          </button>
+                          
+                          <button 
+                            onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
+                            className={`btn w-full text-left p-2.5 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-800 border-slate-300/40'} font-semibold rounded flex justify-between items-center transition-all`}
+                          >
+                            <span>Recebimento por Data</span>
+                            <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
+                          </button>
+                        </div>
                       </div>
+
+                      <button 
+                        onClick={() => triggerToast("DRE Completa", "Gerando demonstrativo do ano fiscal consolidado...")}
+                        className="btn btn-primary mt-4 w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
+                      >
+                        Exportar DRE Consolidada Anual
+                      </button>
                     </div>
-
-                    <button 
-                      onClick={() => triggerToast("DRE Completa", "Gerando demonstrativo do ano fiscal consolidado...")}
-                      className="mt-6 w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
-                    >
-                      Exportar DRE Consolidada Anual
-                    </button>
                   </div>
                 </div>
               )}
@@ -1804,16 +1837,16 @@ export default function App() {
 
           {/* ================= 4. CRM DE VENDAS VIEW ================= */}
           {currentTab === 'crm' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>CRM de Vendas</h2>
-                  <p className={`text-sm ${textSec}`}>Gerencie leads, prospecção e contatos de novos produtores de eventos.</p>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>CRM de Vendas</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Gerencie leads, prospecção e contatos de novos produtores de eventos.</p>
                 </div>
-                <div className="flex space-x-2">
+                <div>
                   <button 
                     onClick={() => setShowAddLeadModal(true)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-95 text-white rounded-lg text-xs font-semibold transition-all"
+                    className="btn btn-primary flex items-center space-x-1.5 px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-95 text-white rounded text-xs font-semibold transition-all border-0"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Adicionar Lead</span>
@@ -1821,39 +1854,41 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Kanban Pipelines */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Kanban Pipelines (Bootstrap columns mapping) */}
+              <div className="row">
                 {['prospect', 'qualified', 'negotiation', 'won'].map(stage => {
                   const stageLabels = { prospect: 'Prospecção', qualified: 'Qualificado', negotiation: 'Negociação', won: 'Fechado/Ganho' };
                   return (
-                    <div key={stage} className={`bg-slate-800/10 border ${borderCol} rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]`}>
-                      <div className={`flex items-center justify-between border-b ${borderCol} pb-2`}>
-                        <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>{stageLabels[stage]}</span>
-                        <span className={`text-[10px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-2 py-0.5 rounded-full ${textTitle} font-bold font-mono`}>
-                          {leads.filter(l => l.stage === stage).length}
-                        </span>
-                      </div>
-                      <div className="space-y-3 flex-1 overflow-y-auto">
-                        {leads.filter(l => l.stage === stage).map(lead => (
-                          <div key={lead.id} className={`${bgCard} border ${borderCol} hover:border-[#3B82F6]/20 p-3 rounded-lg shadow space-y-2 group transition-all`}>
-                            <span className="text-[8px] bg-blue-500/10 text-[#3B82F6] font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
-                            <div>
-                              <h4 className={`text-xs font-bold ${textTitle}`}>{lead.name}</h4>
-                              <p className={`text-[10px] ${textSec}`}>{lead.company}</p>
+                    <div key={stage} className="col-lg-3 col-sm-6 mb-3">
+                      <div className={`card ${cardClass} p-3 flex flex-col space-y-3 min-h-[350px]`}>
+                        <div className={`flex items-center justify-between border-bottom ${borderCol} pb-2`}>
+                          <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>{stageLabels[stage]}</span>
+                          <span className={`badge ${theme === 'dark' ? 'bg-[#1e293b]' : 'bg-slate-200'} px-2 py-0.5 rounded-full ${textTitle} font-bold font-mono text-[10px]`}>
+                            {leads.filter(l => l.stage === stage).length}
+                          </span>
+                        </div>
+                        <div className="space-y-3 flex-1 overflow-y-auto">
+                          {leads.filter(l => l.stage === stage).map(lead => (
+                            <div key={lead.id} className={`card ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} hover:border-[#3B82F6]/20 p-3 rounded shadow-sm space-y-2 group transition-all`}>
+                              <span className="badge badge-primary bg-blue-500/10 text-[#3B82F6] font-bold px-1.5 py-0.5 rounded uppercase text-[8px] w-fit">{lead.tag}</span>
+                              <div>
+                                <h4 className={`text-xs font-bold ${textTitle} mb-0`}>{lead.name}</h4>
+                                <p className={`text-[10px] ${textSec} mb-0`}>{lead.company}</p>
+                              </div>
+                              <div className={`flex justify-between items-center pt-2 border-top ${borderCol}`}>
+                                <span className={`text-[10px] font-mono font-semibold ${textTitle}`}>R$ {lead.value.toLocaleString()}</span>
+                                {stage !== 'won' && (
+                                  <button 
+                                    onClick={() => moveLeadStage(lead.id, lead.stage)}
+                                    className={`p-1 ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'} hover:bg-[#2563EB] hover:text-white rounded ${textSec} transition-all border-0 cursor-pointer`}
+                                  >
+                                    <ChevronRight className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                            <div className={`flex justify-between items-center pt-2 border-t ${borderCol}`}>
-                              <span className={`text-[10px] font-mono font-semibold ${textTitle}`}>R$ {lead.value.toLocaleString()}</span>
-                              {stage !== 'won' && (
-                                <button 
-                                  onClick={() => moveLeadStage(lead.id, lead.stage)}
-                                  className={`p-1 ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'} hover:bg-[#2563EB] hover:text-white rounded ${textSec} transition-all`}
-                                >
-                                  <ChevronRight className="w-3 h-3" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1864,35 +1899,35 @@ export default function App() {
 
           {/* ================= 5. MARKETING & CAMPANHAS VIEW ================= */}
           {currentTab === 'marketing' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Mkt & Campanhas</h2>
-                  <p className={`text-sm ${textSec}`}>Ative cupons, dispare notificações e analise métricas de conversão.</p>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Mkt & Campanhas</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Ative cupons, dispare notificações e analise métricas de conversão.</p>
                 </div>
                 
-                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
                   <button 
                     onClick={() => setMarketingSubTab('campanhas')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'campanhas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      marketingSubTab === 'campanhas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Disparos & Campanhas
                   </button>
                   <button 
                     onClick={() => setMarketingSubTab('cupons')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'cupons' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      marketingSubTab === 'cupons' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Cupons
                   </button>
                   <button 
                     onClick={() => setMarketingSubTab('performance')}
-                    className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'performance' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
+                    className={`px-3 py-1 rounded font-medium transition-all border-0 ${
+                      marketingSubTab === 'performance' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent`
                     }`}
                   >
                     Métricas & ROI
@@ -1902,98 +1937,101 @@ export default function App() {
 
               {/* Sub-Tab 1: Disparos & Campanhas */}
               {marketingSubTab === 'campanhas' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                <div className="row animate-fadeIn">
                   
                   {/* Campaign List */}
-                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
-                      <h3 className={`text-sm font-semibold ${textTitle}`}>Histórico de Disparos</h3>
-                      <button 
-                        onClick={() => setShowAddCampaignModal(true)}
-                        className="px-2.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
-                      >
-                        Nova Campanha
-                      </button>
-                    </div>
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
+                        <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Histórico de Disparos</h3>
+                        <button 
+                          onClick={() => setShowAddCampaignModal(true)}
+                          className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
+                        >
+                          Nova Campanha
+                        </button>
+                      </div>
 
-                    <div className="overflow-x-auto">
-                      <table className={`w-full text-xs ${textBody} border-collapse`}>
-                        <thead>
-                          <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
-                            <th className="p-3">Nome da Campanha</th>
-                            <th className="p-3">Canal</th>
-                            <th className="p-3">Data</th>
-                            <th className="p-3 text-center">Status</th>
-                            <th className="p-3 text-right">Vendas</th>
-                            <th className="p-3 text-center">Ações</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {campaigns.map(camp => (
-                            <tr key={camp.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
-                              <td className="p-3">
-                                <div>
-                                  <span className={`font-semibold ${textTitle} block`}>{camp.name}</span>
-                                  {camp.sent > 0 && <span className={`text-[10px] ${textSec} font-mono`}>Enviados: {camp.sent.toLocaleString()}</span>}
-                                </div>
-                              </td>
-                              <td className={`p-3 font-mono ${textSec}`}>{camp.channel}</td>
-                              <td className={`p-3 font-mono ${textSec}`}>{camp.date}</td>
-                              <td className="p-3 text-center">
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                                  camp.status === 'Concluída' 
-                                    ? 'bg-[#22C55E]/12 text-[#4ADE80]' 
-                                    : camp.status === 'Disparando' 
-                                    ? `bg-[#1E293B] text-[#3B82F6] animate-pulse`
-                                    : 'bg-[#F59E0B]/12 text-[#FB923C]'
-                                }`}>
-                                  {camp.status}
-                                </span>
-                              </td>
-                              <td className="p-3 text-right font-mono font-semibold text-[#3B82F6]">
-                                R$ {camp.revenue.toLocaleString('pt-BR')}
-                              </td>
-                              <td className="p-3 text-center">
-                                {camp.status === 'Agendada' && (
-                                  <button 
-                                    onClick={() => handleTriggerCampaign(camp.id)}
-                                    className="p-1 bg-[#2563EB] hover:bg-[#1D4ED8] rounded text-white active:scale-95 transition-all"
-                                    title="Disparar campanha agora"
-                                  >
-                                    <Play className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
-                                {camp.status === 'Concluída' && (
-                                  <button 
-                                    onClick={() => triggerToast("Relatório", "Baixando relatório de conversões detalhado...")}
-                                    className="text-[10px] font-semibold text-[#3B82F6] hover:text-[#60A5FA]"
-                                  >
-                                    Relatório
-                                  </button>
-                                )}
-                              </td>
+                      <div className="table-responsive">
+                        <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                          <thead>
+                            <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                              <th className="p-3 border-0">Nome da Campanha</th>
+                              <th className="p-3 border-0">Canal</th>
+                              <th className="p-3 border-0">Data</th>
+                              <th className="p-3 border-0 text-center">Status</th>
+                              <th className="p-3 border-0 text-right">Vendas</th>
+                              <th className="p-3 border-0 text-center">Ações</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {campaigns.map(camp => (
+                              <tr key={camp.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
+                                <td className="p-3 border-0">
+                                  <div>
+                                    <span className={`font-semibold ${textTitle} block`}>{camp.name}</span>
+                                    {camp.sent > 0 && <span className={`text-[10px] ${textSec} font-mono`}>Enviados: {camp.sent.toLocaleString()}</span>}
+                                  </div>
+                                </td>
+                                <td className={`p-3 border-0 font-mono ${textSec}`}>{camp.channel}</td>
+                                <td className={`p-3 border-0 font-mono ${textSec}`}>{camp.date}</td>
+                                <td className="p-3 border-0 text-center">
+                                  <span className={`badge ${
+                                    camp.status === 'Concluída' 
+                                      ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' 
+                                      : camp.status === 'Disparando' 
+                                      ? 'badge-primary bg-[#3B82F6]/12 text-[#3B82F6] animate-pulse'
+                                      : 'badge-warning bg-[#F59E0B]/12 text-[#F59E0B]'
+                                  } text-[9px] font-bold px-2 py-0.5 rounded-full`}>
+                                    {camp.status}
+                                  </span>
+                                </td>
+                                <td className="p-3 border-0 text-right font-mono font-semibold text-[#3B82F6]">
+                                  R$ {camp.revenue.toLocaleString('pt-BR')}
+                                </td>
+                                <td className="p-3 border-0 text-center">
+                                  {camp.status === 'Agendada' && (
+                                    <button 
+                                      onClick={() => handleTriggerCampaign(camp.id)}
+                                      className="btn btn-primary btn-sm p-1 rounded bg-[#2563EB] hover:bg-[#1D4ED8] text-white active:scale-95 transition-all border-0"
+                                    >
+                                      <Play className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                  {camp.status === 'Concluída' && (
+                                    <button 
+                                      onClick={() => triggerToast("Relatório", "Baixando relatório de conversões detalhado...")}
+                                      className="btn bg-transparent border-0 p-0 text-[10px] font-semibold text-[#3B82F6] hover:text-[#60A5FA]"
+                                    >
+                                      Relatório
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
 
                   {/* Campaign tips & performance panel */}
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4 h-fit`}>
-                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Dicas de Conversão</h3>
-                    <p className={`text-xs ${textSec} leading-relaxed`}>
-                      Disparos via WhatsApp possuem uma taxa de clique média de 18.5%, contra 6.4% em campanhas de E-mail de reengajamento.
-                    </p>
-                    
-                    <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} rounded-lg border ${borderCol} space-y-2`}>
-                      <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
-                        <span>Audiência Estimada:</span>
-                        <span className={`${textTitle} font-bold`}>54.000 Compradores</span>
-                      </div>
-                      <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
-                        <span>Média Conversão:</span>
-                        <span className="text-[#22C55E] font-bold">3.2% global</span>
+                  <div className="col-lg-4 mb-3">
+                    <div className={`card ${cardClass} p-4 h-fit space-y-4`}>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-0`}>Dicas de Conversão</h3>
+                      <p className={`text-xs ${textSec} leading-relaxed mb-0`}>
+                        Disparos via WhatsApp possuem uma taxa de clique média de 18.5%, contra 6.4% em campanhas de E-mail de reengajamento.
+                      </p>
+                      
+                      <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} rounded border ${borderCol} space-y-2`}>
+                        <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
+                          <span>Audiência Estimada:</span>
+                          <span className={`${textTitle} font-bold`}>54.000 Compradores</span>
+                        </div>
+                        <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
+                          <span>Média Conversão:</span>
+                          <span className="text-[#22C55E] font-bold">3.2% global</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2003,38 +2041,40 @@ export default function App() {
 
               {/* Sub-Tab 2: Cupons */}
               {marketingSubTab === 'cupons' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
-                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
-                      <h3 className={`text-sm font-semibold ${textTitle}`}>Cupons Ativos</h3>
-                      <button 
-                        onClick={() => setShowAddCouponModal(true)}
-                        className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
-                      >
-                        Novo Cupom
-                      </button>
-                    </div>
+                <div className="row animate-fadeIn">
+                  <div className="col-lg-8 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <div className={`flex justify-between items-center border-bottom ${borderCol} pb-3 mb-3`}>
+                        <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Cupons Ativos</h3>
+                        <button 
+                          onClick={() => setShowAddCouponModal(true)}
+                          className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0"
+                        >
+                          Novo Cupom
+                        </button>
+                      </div>
 
-                    <div className="space-y-3">
-                      {coupons.map(coupon => (
-                        <div key={coupon.id} className={`flex items-center justify-between p-3 rounded-lg ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol}`}>
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-10 h-10 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec} font-bold flex items-center justify-center text-xs`}>
-                              {coupon.discount}%
+                      <div className="space-y-3">
+                        {coupons.map(coupon => (
+                          <div key={coupon.id} className={`flex items-center justify-between p-3 rounded ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol}`}>
+                            <div className="flex items-center space-x-3">
+                              <div className={`w-10 h-10 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec} font-bold flex items-center justify-center text-xs`}>
+                                {coupon.discount}%
+                              </div>
+                              <div>
+                                <span className={`text-xs font-mono font-semibold ${textTitle} tracking-wider block`}>{coupon.code}</span>
+                                <span className={`text-[9px] ${textSec}`}>{coupon.event}</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className={`text-xs font-mono font-semibold ${textTitle} tracking-wider block`}>{coupon.code}</span>
-                              <span className={`text-[9px] ${textSec}`}>{coupon.event}</span>
+                            <div className="flex items-center space-x-4">
+                              <span className={`text-[10px] ${textSec} font-mono`}>Usos: {coupon.usages}</span>
+                              <span className={`badge ${
+                                coupon.status === 'Ativo' ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' : `bg-[#1E293B] ${textSec}`
+                              } text-[10px] font-bold px-2 py-0.5 rounded-full`}>{coupon.status}</span>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-4">
-                            <span className={`text-[10px] ${textSec} font-mono`}>Usos: {coupon.usages}</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                              coupon.status === 'Ativo' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : `bg-[#1E293B] ${textSec}`
-                            }`}>{coupon.status}</span>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2042,18 +2082,24 @@ export default function App() {
 
               {/* Sub-Tab 3: Métricas & ROI */}
               {marketingSubTab === 'performance' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
-                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Faturamento Campanhas</span>
-                    <span className={`text-xl font-mono font-bold ${textTitle} mt-1 block`}>R$ {campaigns.reduce((acc, c) => acc + c.revenue, 0).toLocaleString('pt-BR')}</span>
+                <div className="row animate-fadeIn">
+                  <div className="col-md-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Faturamento Campanhas</span>
+                      <span className={`text-xl font-mono font-bold ${textTitle} mt-1 block`}>R$ {campaigns.reduce((acc, c) => acc + c.revenue, 0).toLocaleString('pt-BR')}</span>
+                    </div>
                   </div>
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
-                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Taxa Média de Abertura</span>
-                    <span className="text-xl font-mono font-bold text-[#3B82F6] mt-1 block">47.6%</span>
+                  <div className="col-md-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Taxa Média de Abertura</span>
+                      <span className="text-xl font-mono font-bold text-[#3B82F6] mt-1 block">47.6%</span>
+                    </div>
                   </div>
-                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
-                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Total Ingressos Vendidos</span>
-                    <span className="text-xl font-mono font-bold text-[#F59E0B] mt-1 block">{campaigns.reduce((acc, c) => acc + c.conversions, 0)}</span>
+                  <div className="col-md-4 mb-3">
+                    <div className={`card ${cardClass} p-4`}>
+                      <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Total Ingressos Vendidos</span>
+                      <span className="text-xl font-mono font-bold text-[#F59E0B] mt-1 block">{campaigns.reduce((acc, c) => acc + c.conversions, 0)}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -2063,13 +2109,13 @@ export default function App() {
 
           {/* ================= 6. CENTRAL DE APLICATIVOS (APP STORE) ================= */}
           {currentTab === 'appstore' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               <div>
-                <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Central de Aplicativos</h2>
-                <p className={`text-sm ${textSec}`}>Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
+                <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Central de Aplicativos</h2>
+                <p className={`text-xs ${textSec} mb-0`}>Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="row">
                 {appsCatalog.map(app => {
                   const IconComponent = app.icon;
                   const eligible = isPlanEligible(app.planRequired);
@@ -2077,77 +2123,72 @@ export default function App() {
                   const installing = installedApps[app.id] === 'installing';
 
                   return (
-                    <div 
-                      key={app.id} 
-                      className={`${bgCard} border rounded-xl p-6 flex flex-col justify-between transition-all duration-200 ${
-                        eligible 
-                          ? `${borderCol} hover:border-[#3B82F6]/25` 
-                          : `${borderCol} opacity-80`
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-start justify-between mb-4">
-                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                            eligible ? 'bg-blue-500/10 text-[#3B82F6]' : `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec}`
-                          }`}>
-                            <IconComponent className="w-6 h-6" />
+                    <div key={app.id} className="col-md-4 mb-3">
+                      <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                        <div>
+                          <div className="flex items-start justify-between mb-3">
+                            <div className={`w-12 h-12 rounded flex items-center justify-center ${
+                              eligible ? 'bg-blue-500/10 text-[#3B82F6]' : `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec}`
+                            }`}>
+                              <IconComponent className="w-6 h-6" />
+                            </div>
+                            
+                            <div className="flex flex-col items-end space-y-1">
+                              {installed ? (
+                                <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
+                              ) : eligible ? (
+                                <span className="badge badge-primary bg-blue-500/10 text-[#3B82F6] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Desbloqueado</span>
+                              ) : (
+                                <span className="badge badge-warning bg-[#F59E0B]/12 text-[#FB923C] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center space-x-1">
+                                  <Lock className="w-2.5 h-2.5" />
+                                  <span>Requer {app.planRequired}</span>
+                                </span>
+                              )}
+                              <span className={`text-[8px] ${textSec} uppercase tracking-widest font-bold font-mono`}>{app.category}</span>
+                            </div>
                           </div>
-                          
-                          <div className="flex flex-col items-end space-y-1">
-                            {installed ? (
-                              <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
-                            ) : eligible ? (
-                              <span className="bg-blue-500/10 text-[#3B82F6] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Desbloqueado</span>
-                            ) : (
-                              <span className="bg-[#F59E0B]/12 text-[#FB923C] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center space-x-1">
-                                <Lock className="w-2.5 h-2.5" />
-                                <span>Requer {app.planRequired}</span>
-                              </span>
-                            )}
-                            <span className={`text-[8px] ${textSec} uppercase tracking-widest font-bold font-mono`}>{app.category}</span>
-                          </div>
+
+                          <h3 className={`text-sm font-bold ${textTitle} mb-1`}>{app.name}</h3>
+                          <p className={`text-xs ${textSec} leading-relaxed mb-0`}>{app.desc}</p>
                         </div>
 
-                        <h3 className={`text-base font-bold ${textTitle}`}>{app.name}</h3>
-                        <p className={`text-xs ${textSec} mt-1.5 leading-relaxed`}>{app.desc}</p>
-                      </div>
-
-                      <div className={`mt-6 pt-4 border-t ${borderCol}`}>
-                        {installed ? (
-                          <button 
-                            disabled 
-                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-[#64748B] text-xs font-semibold rounded-lg cursor-not-allowed flex items-center justify-center space-x-1`}
-                          >
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            <span>Módulo Ativo no Menu</span>
-                          </button>
-                        ) : installing ? (
-                          <button 
-                            disabled 
-                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-slate-400 text-xs font-semibold rounded-lg flex items-center justify-center space-x-2`}
-                          >
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            <span>Instalando...</span>
-                          </button>
-                        ) : eligible ? (
-                          <button 
-                            onClick={() => handleInstallApp(app.id, app.name)}
-                            className="w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] active:scale-[0.98] text-white text-xs font-semibold rounded-lg transition-all"
-                          >
-                            Instalar Módulo
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => {
-                              setCurrentTab('marketplace');
-                              triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
-                            }}
-                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} hover:bg-slate-700 text-[#CBD5E1] text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1`}
-                          >
-                            <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
-                            <span>Fazer Upgrade no Plano</span>
-                          </button>
-                        )}
+                        <div className={`mt-4 pt-3 border-top ${borderCol}`}>
+                          {installed ? (
+                            <button 
+                              disabled 
+                              className={`btn w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-[#64748B] text-xs font-semibold rounded cursor-not-allowed flex items-center justify-center space-x-1 border-0`}
+                            >
+                              <CheckCircle className="w-3.5 h-3.5" />
+                              <span>Módulo Ativo</span>
+                            </button>
+                          ) : installing ? (
+                            <button 
+                              disabled 
+                              className={`btn w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-slate-400 text-xs font-semibold rounded flex items-center justify-center space-x-2 border-0`}
+                            >
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Instalando...</span>
+                            </button>
+                          ) : eligible ? (
+                            <button 
+                              onClick={() => handleInstallApp(app.id, app.name)}
+                              className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
+                            >
+                              Instalar Módulo
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => {
+                                setCurrentTab('marketplace');
+                                triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
+                              }}
+                              className={`btn w-full py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded flex items-center justify-center space-x-1 border-0`}
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
+                              <span>Upgrade de Plano</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -2158,77 +2199,81 @@ export default function App() {
 
           {/* ================= 7. MARKETPLACE VIEW ================= */}
           {currentTab === 'marketplace' && (
-            <div className="space-y-8 animate-fadeIn text-center">
-              <div className="max-w-2xl mx-auto space-y-2">
-                <h2 className={`text-3xl font-bold ${textTitle} tracking-tight`}>Assinaturas & Recursos Contábeis</h2>
-                <p className={`text-sm ${textSec}`}>Liberte o copiloto fiscal e ferramentas de vendas físicas em escala de alta performance.</p>
+            <div className="space-y-4 animate-fadeIn text-center">
+              <div className="max-w-2xl mx-auto space-y-2 mb-4">
+                <h2 className={`text-2xl font-bold ${textTitle} tracking-tight mb-0`}>Assinaturas & Recursos Contábeis</h2>
+                <p className={`text-xs ${textSec} mb-0`}>Liberte o copiloto fiscal e ferramentas de vendas físicas em escala de alta performance.</p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6 max-w-5xl mx-auto text-left">
+              <div className="row justify-content-center max-w-5xl mx-auto text-left">
                 {/* Standard */}
-                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
-                  plan === 'standard' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
-                }`}>
-                  {plan === 'standard' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
-                  <div>
-                    <span className={`text-xs font-bold ${textSec} uppercase tracking-widest block`}>Iniciante</span>
-                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Standard</h3>
-                    <p className={`text-xs ${textSec} mt-2`}>Gestão financeira básica, extratos de contas e conciliação manual.</p>
-                    
-                    <hr className={`${borderCol} my-6`} />
-                    
-                    <ul className={`space-y-4 text-xs ${textBody}`}>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Financeiro ERP Básico</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Borderô Contábil Simples</span></li>
-                      <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV/Bar)</span></li>
-                      <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Módulos Comerciais (CRM/Mkt)</span></li>
-                    </ul>
+                <div className="col-md-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
+                    plan === 'standard' ? 'border-[#3B82F6] shadow-sm' : ''
+                  }`}>
+                    {plan === 'standard' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#22C55E] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
+                    <div>
+                      <span className={`text-[10px] font-bold ${textSec} uppercase tracking-widest block`}>Iniciante</span>
+                      <h3 className={`text-lg font-bold ${textTitle} mt-2 mb-0`}>Standard</h3>
+                      <p className={`text-xs ${textSec} mt-2`}>Gestão financeira básica, extratos de contas e conciliação manual.</p>
+                      
+                      <hr className={`${borderCol} my-3`} />
+                      
+                      <ul className={`space-y-3 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Financeiro ERP Básico</span></li>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Borderô Contábil Simples</span></li>
+                        <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV)</span></li>
+                      </ul>
+                    </div>
+                    <button disabled={plan==='standard'} className={`btn w-full mt-4 py-2.5 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} text-[#64748B] text-xs font-semibold rounded cursor-not-allowed border-0`}>Plano Atual</button>
                   </div>
-                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className={`mt-8 w-full py-3 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} text-[#64748B] text-sm font-semibold rounded-xl cursor-not-allowed`}>Plano Atual</button>
                 </div>
 
                 {/* Advanced */}
-                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
-                  plan === 'advanced' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
-                }`}>
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] px-4 py-1 rounded-full font-semibold tracking-widest shadow-md">RECOMENDADO</div>
-                  {plan === 'advanced' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
-                  <div>
-                    <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-widest block">Profissional</span>
-                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Advanced</h3>
-                    <p className={`text-xs ${textSec} mt-2`}>Libera CRM comercial, campanhas de Marketing e gestão de PDVs externos.</p>
-                    
-                    <hr className={`${borderCol} my-6`} />
-                    
-                    <ul className={`space-y-4 text-xs ${textBody}`}>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Unlocks CRM de Vendas & Mkt</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Unlocks Gestão de PDVs & Logística</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Automação Contábil Completa</span></li>
-                      <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Copiloto de IA</span></li>
-                    </ul>
+                <div className="col-md-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
+                    plan === 'advanced' ? 'border-[#3B82F6] shadow-sm' : ''
+                  }`}>
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[9px] px-4 py-1 rounded-full font-semibold tracking-widest shadow-md">RECOMENDADO</div>
+                    {plan === 'advanced' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#22C55E] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
+                    <div>
+                      <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-widest block">Profissional</span>
+                      <h3 className={`text-lg font-bold ${textTitle} mt-2 mb-0`}>Advanced</h3>
+                      <p className={`text-xs ${textSec} mt-2`}>Libera CRM comercial, campanhas de Marketing e gestão de PDVs externos.</p>
+                      
+                      <hr className={`${borderCol} my-3`} />
+                      
+                      <ul className={`space-y-3 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>CRM de Vendas & Mkt</span></li>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>PDVs & Logística</span></li>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Automação Contábil Completa</span></li>
+                      </ul>
+                    </div>
+                    <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="btn btn-primary w-full mt-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded transition-all border-0">Assinar Advanced</button>
                   </div>
-                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-semibold rounded-xl transition-all">Assinar Advanced</button>
                 </div>
 
                 {/* Expert */}
-                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
-                  plan === 'expert' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
-                }`}>
-                  {plan === 'expert' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
-                  <div>
-                    <span className="text-xs font-bold text-[#F97316] uppercase tracking-widest block">Alta Escala</span>
-                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Expert</h3>
-                    <p className={`text-xs ${textSec} mt-2`}>Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
-                    
-                    <hr className={`${borderCol} my-6`} />
-                    
-                    <ul className={`space-y-4 text-xs ${textBody}`}>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Libera Disk AI Copilot & Open Finance</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Libera Módulos de Bar, Insumos & POS</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Notas fiscais e Borderôs Ilimitados</span></li>
-                    </ul>
+                <div className="col-md-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
+                    plan === 'expert' ? 'border-[#3B82F6] shadow-sm' : ''
+                  }`}>
+                    {plan === 'expert' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#22C55E] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
+                    <div>
+                      <span className="text-xs font-bold text-[#F97316] uppercase tracking-widest block">Alta Escala</span>
+                      <h3 className={`text-lg font-bold ${textTitle} mt-2 mb-0`}>Expert</h3>
+                      <p className={`text-xs ${textSec} mt-2`}>Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
+                      
+                      <hr className={`${borderCol} my-3`} />
+                      
+                      <ul className={`space-y-3 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Disk AI Copilot & Open Finance</span></li>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Módulos de Bar & POS Insumos</span></li>
+                        <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Notas fiscais Ilimitadas</span></li>
+                      </ul>
+                    </div>
+                    <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="btn w-full mt-4 py-2.5 bg-[#F97316] hover:bg-orange-600 text-white text-xs font-semibold rounded transition-all border-0">Assinar Expert</button>
                   </div>
-                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-[#F97316] hover:bg-orange-600 text-white text-sm font-semibold rounded-xl transition-all">Assinar Expert</button>
                 </div>
               </div>
             </div>
@@ -2236,14 +2281,14 @@ export default function App() {
 
           {/* ================= 8. ROADMAP & STATUS VIEW ================= */}
           {currentTab === 'roadmap' && (
-            <div className="space-y-8 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               <div>
-                <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Status & Roadmap do Projeto</h2>
-                <p className={`text-sm ${textSec}`}>Acompanhe as fases de desenvolvimento do novo ecossistema ERP/CRM.</p>
+                <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Status & Roadmap do Projeto</h2>
+                <p className={`text-xs ${textSec} mb-0`}>Acompanhe as fases de desenvolvimento do novo ecossistema ERP/CRM.</p>
               </div>
 
               {/* Progress Summary */}
-              <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-md space-y-4`}>
+              <div className={`card ${cardClass} p-4 space-y-3`}>
                 <div className="flex justify-between items-center text-xs font-semibold uppercase tracking-wider">
                   <span className="text-[#3B82F6]">Progresso Geral do Protótipo (Fases 1 e 2)</span>
                   <span className={textTitle}>100% Concluído</span>
@@ -2251,63 +2296,61 @@ export default function App() {
                 <div className={`w-full ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-200'} rounded-full h-3 border ${borderCol} overflow-hidden p-0.5`}>
                   <div className="bg-[#3B82F6] h-full rounded-full w-full"></div>
                 </div>
-                <p className={`text-xs ${textSec} leading-relaxed`}>
+                <p className={`text-xs ${textSec} leading-relaxed mb-0`}>
                   Todas as especificações de navegação simulada, layouts multibanco, gestão de borderôs e comissionamento foram entregues como protótipo interativo e modular.
                 </p>
               </div>
 
               {/* Phases Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="row">
                 
                 {/* Phase 1 */}
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
-                  <div>
-                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
-                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 1: Demonstração</h3>
-                      <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                <div className="col-lg-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <div className={`flex items-center justify-between mb-3 border-bottom ${borderCol} pb-2`}>
+                        <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Fase 1: Demonstração</h3>
+                        <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[9px] px-2 py-0.5 rounded-full font-bold">Entregue</span>
+                      </div>
+                      <ul className={`space-y-2 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Níveis de Planos e Upgrade simulados</span></li>
+                      </ul>
                     </div>
-                    <ul className={`space-y-3 text-xs ${textBody}`}>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Níveis de Planos (Standard, Advanced, Expert)</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Fluxo de contratação e upgrade simulados</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Demonstração estática das funcionalidades principais</span></li>
-                    </ul>
                   </div>
                 </div>
 
                 {/* Phase 2 */}
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
-                  <div>
-                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
-                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 2: Protótipo Funcional</h3>
-                      <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                <div className="col-lg-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <div className={`flex items-center justify-between mb-3 border-bottom ${borderCol} pb-2`}>
+                        <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Fase 2: Protótipo</h3>
+                        <span className="badge badge-success bg-[#22C55E]/12 text-[#22C55E] text-[9px] px-2 py-0.5 rounded-full font-bold">Entregue</span>
+                      </div>
+                      <ul className={`space-y-2 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Fluxos realistas: Sangrias de PDV e emissões</span></li>
+                      </ul>
                     </div>
-                    <ul className={`space-y-3 text-xs ${textBody}`}>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Dashboards interativos com atualizações</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Fluxos realistas: Sangrias de PDV e emissões SEFAZ</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Fechamento real de borderôs com liberação de repasse</span></li>
-                    </ul>
                   </div>
                 </div>
 
                 {/* Phase 3 */}
-                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
-                  <div>
-                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
-                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 3: Sistema de Produção</h3>
-                      <span className="bg-[#3B82F6]/10 text-[#3B82F6] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">Planejado</span>
+                <div className="col-lg-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <div className={`flex items-center justify-between mb-3 border-bottom ${borderCol} pb-2`}>
+                        <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider mb-0`}>Fase 3: Produção</h3>
+                        <span className="badge badge-primary bg-[#3B82F6]/10 text-[#3B82F6] text-[9px] px-2 py-0.5 rounded font-bold uppercase animate-pulse">Planejado</span>
+                      </div>
+                      <ul className={`space-y-2 text-xs ${textBody} list-unstyled pl-0`}>
+                        <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" /><span>Migração estática React + Vite e Tailwind</span></li>
+                        <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Integrações Open Finance & Bancos de dados</span></li>
+                      </ul>
                     </div>
-                    <ul className={`space-y-3 text-xs ${textBody}`}>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" /><span>Migração de rotas estáticas para React + Vite</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" /><span>Implementação de CSS utilitário com Tailwind CSS</span></li>
-                      <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Banco de dados relacional (Firebase / MySQL)</span></li>
-                      <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>APIs de Open Finance de Produção</span></li>
-                      <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Integrações bancárias (Gateways, Vindi, Vendas Stone)</span></li>
-                      <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Empacotamento de Módulos comercializáveis SaaS</span></li>
-                    </ul>
                   </div>
                 </div>
 
@@ -2319,13 +2362,13 @@ export default function App() {
 
         {/* NOTIFICATION TOAST */}
         {toast.show && (
-          <div className={`fixed bottom-6 left-6 z-50 ${bgCard} border ${borderCol} ${textTitle} px-5 py-4 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 animate-slideUp`}>
-            <div className="p-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded-lg shrink-0">
+          <div className={`fixed bottom-6 left-6 z-50 ${bgCard} border ${borderCol} ${textTitle} px-4 py-3 rounded shadow-2xl flex items-center space-x-3 transition-all duration-300 animate-slideUp`}>
+            <div className="p-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded shrink-0">
               <CheckCircle className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-white">{toast.title}</h4>
-              <p className={`text-[10px] ${textSec} mt-0.5`}>{toast.body}</p>
+              <h4 className="text-xs font-semibold text-white mb-0">{toast.title}</h4>
+              <p className={`text-[10px] ${textSec} mt-0.5 mb-0`}>{toast.body}</p>
             </div>
           </div>
         )}
@@ -2334,41 +2377,41 @@ export default function App() {
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             
           {chatOpen && (
-            <div className={`w-96 max-h-[500px] ${bgCard} border ${borderCol} rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-305 origin-bottom-right`}>
+            <div className={`w-96 max-h-[500px] ${bgCard} border ${borderCol} rounded shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-305 origin-bottom-right`}>
               {/* Chat Header */}
-              <div className={`p-4 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} border-b ${borderCol} flex items-center justify-between`}>
+              <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} border-bottom ${borderCol} flex items-center justify-between`}>
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-lg shadow-blue-500/10">
+                  <div className="w-8 h-8 rounded bg-[#2563EB] flex items-center justify-center text-white shadow">
                     <Brain className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className={`text-xs font-semibold ${textTitle}`}>Disk AI Copilot</h3>
-                    <p className="text-[9px] text-[#22C55E] font-medium flex items-center">
+                    <h3 className={`text-xs font-semibold ${textTitle} mb-0`}>Disk AI Copilot</h3>
+                    <p className="text-[9px] text-[#22C55E] font-medium flex items-center mb-0">
                       <span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full inline-block mr-1"></span>
                       Online & Ativo
                     </p>
                   </div>
                 </div>
-                <button onClick={() => setChatOpen(false)} className={`${textSec} hover:text-white`}>
+                <button onClick={() => setChatOpen(false)} className={`${textSec} hover:text-white bg-transparent border-0 cursor-pointer`}>
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Chat Messages Body */}
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 h-[280px]" id="chat-messages">
+              <div className="flex-1 p-3 overflow-y-auto space-y-3 h-[280px]" id="chat-messages">
                 {chatMessages.map(msg => (
                   <div key={msg.id} className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                     {msg.sender === 'ai' && (
-                      <div className="w-6.5 h-6.5 rounded bg-blue-500/10 border border-white/5 text-[#3B82F6] flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
+                      <div className="w-6 h-6 rounded bg-blue-500/10 border border-white/5 text-[#3B82F6] flex items-center justify-center font-bold text-[9px] p-1 shrink-0">
                         AI
                       </div>
                     )}
-                    <div className={`p-3 rounded-r-xl rounded-bl-xl max-w-[80%] border text-[11px] leading-relaxed ${
+                    <div className={`p-3 rounded max-w-[80%] border text-[11px] leading-relaxed ${
                       msg.sender === 'user' 
-                        ? 'bg-[#2563EB] border-transparent text-white rounded-l-xl rounded-br-none' 
-                        : `${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} ${textBody}`
+                        ? 'bg-[#2563EB] border-transparent text-white' 
+                        : `${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} ${textBody}`
                     }`}>
-                      <p>{msg.text}</p>
+                      <p className="mb-0">{msg.text}</p>
                       {msg.htmlResponse && msg.htmlResponse}
                     </div>
                   </div>
@@ -2376,10 +2419,10 @@ export default function App() {
                 
                 {isTyping && (
                   <div className="flex items-start space-x-2.5">
-                    <div className="w-6.5 h-6.5 rounded bg-blue-500/10 border border-[#1e2533] text-[#3B82F6] flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
+                    <div className="w-6 h-6 rounded bg-blue-500/10 border border-[#1e2533] text-[#3B82F6] flex items-center justify-center font-bold text-[9px] p-1 shrink-0">
                       AI
                     </div>
-                    <div className={`${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} p-3 rounded-r-xl rounded-bl-xl max-w-[80%]`}>
+                    <div className={`${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} p-3 rounded max-w-[80%]`}>
                       <div className="flex space-x-1">
                         <div className="w-1.5 h-1.5 bg-[#94A3B8] rounded-full animate-bounce"></div>
                         <div className="w-1.5 h-1.5 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -2393,34 +2436,42 @@ export default function App() {
               </div>
 
               {/* Quick Actions Grid inside Chat */}
-              <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border-t ${borderCol}`}>
+              <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border-top ${borderCol}`}>
                 <p className={`text-[9px] ${textSec} uppercase tracking-wider font-semibold mb-2`}>Comandos Rápidos</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => triggerAIResponse('conciliacao')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
-                    🔍 Fazer Conciliação
-                  </button>
-                  <button onClick={() => triggerAIResponse('dre')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
-                    📊 Gerar DRE
-                  </button>
-                  <button onClick={() => triggerAIResponse('nfe')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
-                    🧾 Notas Pendentes
-                  </button>
-                  <button onClick={() => triggerAIResponse('borderos')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
-                    📋 Status Borderôs
-                  </button>
+                <div className="row g-2">
+                  <div className="col-6">
+                    <button onClick={() => triggerAIResponse('conciliacao')} className={`btn btn-light w-full text-left truncate text-[10px] p-2 bg-transparent border ${borderCol} ${textTitle}`}>
+                      🔍 Fazer Conciliação
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button onClick={() => triggerAIResponse('dre')} className={`btn btn-light w-full text-left truncate text-[10px] p-2 bg-transparent border ${borderCol} ${textTitle}`}>
+                      📊 Gerar DRE
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button onClick={() => triggerAIResponse('nfe')} className={`btn btn-light w-full text-left truncate text-[10px] p-2 bg-transparent border ${borderCol} ${textTitle}`}>
+                      🧾 Notas Pendentes
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button onClick={() => triggerAIResponse('borderos')} className={`btn btn-light w-full text-left truncate text-[10px] p-2 bg-transparent border ${borderCol} ${textTitle}`}>
+                      📋 Status Borderôs
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Chat Input */}
-              <form onSubmit={handleSendCustomText} className={`p-2.5 ${bgCard} border-t ${borderCol} flex space-x-2`}>
+              <form onSubmit={handleSendCustomText} className={`p-2.5 ${bgCard} border-top ${borderCol} flex space-x-2`}>
                 <input 
                   type="text" 
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Pergunte sobre DRE, borderô, NFe..."
-                  className={`flex-1 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded px-2.5 py-1 text-xs focus:outline-none focus:border-[#3B82F6] ${textBody}`}
+                  placeholder="Pergunte..."
+                  className={`form-control form-control-sm flex-1 ${theme === 'dark' ? 'bg-[#111827] text-white border-white/5' : 'bg-slate-50 text-slate-900 border-slate-300'} text-xs`}
                 />
-                <button type="submit" className="p-1 bg-[#2563EB] hover:bg-[#1D4ED8] rounded text-white active:scale-95 transition-all">
+                <button type="submit" className="btn btn-primary p-1 bg-[#2563EB] hover:bg-[#1D4ED8] rounded text-white active:scale-95 transition-all border-0">
                   <Send className="w-4 h-4" />
                 </button>
               </form>
@@ -2430,7 +2481,7 @@ export default function App() {
           {/* Chat Button Toggle */}
           <button 
             onClick={() => setChatOpen(!chatOpen)} 
-            className="w-14 h-14 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none"
+            className="btn btn-primary w-14 h-14 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-circle flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 border-0"
           >
             <Brain className="w-6 h-6" />
           </button>
@@ -2443,57 +2494,57 @@ export default function App() {
       {/* 1. ADD LEAD MODAL */}
       {showAddLeadModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
-            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className={`text-sm font-semibold ${textTitle}`}>Adicionar Lead ao Funil</h3>
-              <button onClick={() => setShowAddLeadModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
+          <div className={`${bgCard} border ${borderCol} rounded w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-4 border-bottom ${borderCol} flex justify-between items-center ${bgCard}`}>
+              <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Adicionar Lead ao Funil</h3>
+              <button onClick={() => setShowAddLeadModal(false)} className={`bg-transparent border-0 cursor-pointer ${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
-            <form onSubmit={handleCreateLead} className="p-6 space-y-4">
-              <div className="space-y-1">
+            <form onSubmit={handleCreateLead} className="p-4 space-y-3">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome do Lead *</label>
                 <input 
                   type="text" 
                   value={newLead.name}
                   onChange={(e) => setNewLead(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Roberto Alencar"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Produtora / Empresa *</label>
                 <input 
                   type="text" 
                   value={newLead.company}
                   onChange={(e) => setNewLead(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="Ex: Prime Show Eventos"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Valor Estimado (R$) *</label>
+              <div className="row mb-2">
+                <div className="col-6 form-group">
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Valor (R$) *</label>
                   <input 
                     type="number" 
                     value={newLead.value}
                     onChange={(e) => setNewLead(prev => ({ ...prev, value: e.target.value }))}
                     placeholder="Ex: 85000"
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                     required
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="col-6 form-group">
                   <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Fase Inicial *</label>
                   <select 
                     value={newLead.stage}
                     onChange={(e) => setNewLead(prev => ({ ...prev, stage: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="prospect">Prospecção</option>
                     <option value="qualified">Qualificado</option>
@@ -2502,17 +2553,17 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="pt-4 flex space-x-3 justify-end">
+              <div className="pt-3 flex space-x-3 justify-end border-top border-light/5 mt-3">
                 <button 
                   type="button" 
                   onClick={() => setShowAddLeadModal(false)}
-                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
+                  className={`btn ${btnSecondary} text-xs font-semibold rounded py-2 px-3`}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                  className="btn btn-primary text-white text-xs font-semibold rounded py-2 px-3 border-0 bg-[#2563EB] hover:bg-[#1D4ED8]"
                 >
                   Salvar Lead
                 </button>
@@ -2525,62 +2576,62 @@ export default function App() {
       {/* 2. CADASTRAR CLIENTE MODAL */}
       {showAddClientModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
-            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className={`text-sm font-semibold ${textTitle}`}>Cadastrar Cliente Contato</h3>
-              <button onClick={() => setShowAddClientModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
+          <div className={`${bgCard} border ${borderCol} rounded w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-4 border-bottom ${borderCol} flex justify-between items-center ${bgCard}`}>
+              <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Cadastrar Cliente Contato</h3>
+              <button onClick={() => setShowAddClientModal(false)} className={`bg-transparent border-0 cursor-pointer ${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
-            <form onSubmit={handleCreateClient} className="p-6 space-y-4">
-              <div className="space-y-1">
+            <form onSubmit={handleCreateClient} className="p-4 space-y-3">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome Completo *</label>
                 <input 
                   type="text" 
                   value={newClient.name}
                   onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Felipe Silveira"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Empresa *</label>
                 <input 
                   type="text" 
                   value={newClient.company}
                   onChange={(e) => setNewClient(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="Ex: Prime Eventos Ltda"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-3">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>E-mail de Contato *</label>
                 <input 
                   type="email" 
                   value={newClient.email}
                   onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="felipe@empresa.com.br"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   required
                 />
               </div>
 
-              <div className="pt-4 flex space-x-3 justify-end">
+              <div className="pt-3 flex space-x-3 justify-end border-top border-light/5 mt-3">
                 <button 
                   type="button" 
                   onClick={() => setShowAddClientModal(false)}
-                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
+                  className={`btn ${btnSecondary} text-xs font-semibold rounded py-2 px-3`}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                  className="btn btn-primary text-white text-xs font-semibold rounded py-2 px-3 border-0 bg-[#2563EB] hover:bg-[#1D4ED8]"
                 >
                   Cadastrar
                 </button>
@@ -2593,52 +2644,52 @@ export default function App() {
       {/* 3. CREATE COUPON MODAL */}
       {showAddCouponModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
-            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className={`text-sm font-semibold ${textTitle}`}>Criar Cupom de Desconto</h3>
-              <button onClick={() => setShowAddCouponModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
+          <div className={`${bgCard} border ${borderCol} rounded w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-4 border-bottom ${borderCol} flex justify-between items-center ${bgCard}`}>
+              <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Criar Cupom de Desconto</h3>
+              <button onClick={() => setShowAddCouponModal(false)} className={`bg-transparent border-0 cursor-pointer ${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
-            <form onSubmit={handleCreateCoupon} className="p-6 space-y-4">
-              <div className="space-y-1">
+            <form onSubmit={handleCreateCoupon} className="p-4 space-y-3">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Código do Cupom *</label>
                 <input 
                   type="text" 
                   value={newCoupon.code}
                   onChange={(e) => setNewCoupon(prev => ({ ...prev, code: e.target.value }))}
                   placeholder="Ex: PROMO20"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} uppercase tracking-wider font-mono`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} uppercase tracking-wider font-mono`}
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-3">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Percentual de Desconto (%) *</label>
                 <input 
                   type="number" 
                   value={newCoupon.discount}
                   onChange={(e) => setNewCoupon(prev => ({ ...prev, discount: e.target.value }))}
                   placeholder="Ex: 20"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   min="1"
                   max="100"
                   required
                 />
               </div>
 
-              <div className="pt-4 flex space-x-3 justify-end">
+              <div className="pt-3 flex space-x-3 justify-end border-top border-light/5 mt-3">
                 <button 
                   type="button" 
                   onClick={() => setShowAddCouponModal(false)}
-                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
+                  className={`btn ${btnSecondary} text-xs font-semibold rounded py-2 px-3`}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                  className="btn btn-primary text-white text-xs font-semibold rounded py-2 px-3 border-0 bg-[#2563EB] hover:bg-[#1D4ED8]"
                 >
                   Salvar Cupom
                 </button>
@@ -2651,75 +2702,75 @@ export default function App() {
       {/* 4. ADD PDV MODAL */}
       {showAddPdvModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
-            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className={`text-sm font-semibold ${textTitle}`}>Ativar Ponto de Venda (PDV)</h3>
-              <button onClick={() => setShowAddPdvModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
+          <div className={`${bgCard} border ${borderCol} rounded w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-4 border-bottom ${borderCol} flex justify-between items-center ${bgCard}`}>
+              <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Ativar Ponto de Venda (PDV)</h3>
+              <button onClick={() => setShowAddPdvModal(false)} className={`bg-transparent border-0 cursor-pointer ${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
-            <form onSubmit={handleCreatePdv} className="p-6 space-y-4">
-              <div className="space-y-1">
+            <form onSubmit={handleCreatePdv} className="p-4 space-y-3">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome do PDV *</label>
                 <input 
                   type="text" 
                   value={newPdv.name}
                   onChange={(e) => setNewPdv(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Bilheteria Principal - Portão B"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Operador Responsável *</label>
                 <input 
                   type="text" 
                   value={newPdv.manager}
                   onChange={(e) => setNewPdv(prev => ({ ...prev, manager: e.target.value }))}
                   placeholder="Ex: Sandra Costa"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
+              <div className="row mb-3">
+                <div className="col-6 form-group">
                   <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Tipo de PDV</label>
                   <select 
                     value={newPdv.type}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, type: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="Local">Local</option>
                     <option value="Físico Externo">Físico Externo</option>
                     <option value="Teatro">Teatro</option>
                   </select>
                 </div>
-                <div className="space-y-1">
+                <div className="col-6 form-group">
                   <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Saldo Inicial (R$)</label>
                   <input 
                     type="number" 
                     value={newPdv.balance}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, balance: e.target.value }))}
                     placeholder="0"
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   />
                 </div>
               </div>
 
-              <div className="pt-4 flex space-x-3 justify-end">
+              <div className="pt-3 flex space-x-3 justify-end border-top border-light/5 mt-3">
                 <button 
                   type="button" 
                   onClick={() => setShowAddPdvModal(false)}
-                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
+                  className={`btn ${btnSecondary} text-xs font-semibold rounded py-2 px-3`}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                  className="btn btn-primary text-white text-xs font-semibold rounded py-2 px-3 border-0 bg-[#2563EB] hover:bg-[#1D4ED8]"
                 >
                   Ativar PDV
                 </button>
@@ -2732,76 +2783,76 @@ export default function App() {
       {/* 5. ADD CAMPAIGN MODAL */}
       {showAddCampaignModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
-            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className={`text-sm font-semibold ${textTitle}`}>Criar Nova Campanha de Marketing</h3>
-              <button onClick={() => setShowAddCampaignModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
+          <div className={`${bgCard} border ${borderCol} rounded w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-4 border-bottom ${borderCol} flex justify-between items-center ${bgCard}`}>
+              <h3 className={`text-sm font-semibold ${textTitle} mb-0`}>Criar Nova Campanha de Marketing</h3>
+              <button onClick={() => setShowAddCampaignModal(false)} className={`bg-transparent border-0 cursor-pointer ${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
-            <form onSubmit={handleCreateCampaign} className="p-6 space-y-4">
-              <div className="space-y-1">
+            <form onSubmit={handleCreateCampaign} className="p-4 space-y-3">
+              <div className="form-group mb-2">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Campanha *</label>
                 <input 
                   type="text" 
                   value={newCampaign.name}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Pré-venda Festival de Inverno"
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
+              <div className="row mb-2">
+                <div className="col-6 form-group">
                   <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Canal de Disparo</label>
                   <select 
                     value={newCampaign.channel}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, channel: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="E-mail">E-mail</option>
                     <option value="WhatsApp">WhatsApp</option>
                     <option value="SMS">SMS</option>
                   </select>
                 </div>
-                <div className="space-y-1">
+                <div className="col-6 form-group">
                   <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Data de Envio *</label>
                   <input 
                     type="text" 
                     value={newCampaign.date}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, date: e.target.value }))}
                     placeholder="20/07/2026"
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
+                    className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
+              <div className="form-group mb-3">
                 <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Assunto / Conteúdo Notificação *</label>
                 <input 
                   type="text" 
                   value={newCampaign.subject}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, subject: e.target.value }))}
                   placeholder="Ex: Não perca! Lote exclusivo com 20% de desconto..."
-                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
+                  className={`form-control form-control-sm ${bgInput} border ${borderCol} rounded p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
-              <div className="pt-4 flex space-x-3 justify-end">
+              <div className="pt-3 flex space-x-3 justify-end border-top border-light/5 mt-3">
                 <button 
                   type="button" 
                   onClick={() => setShowAddCampaignModal(false)}
-                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
+                  className={`btn ${btnSecondary} text-xs font-semibold rounded py-2 px-3`}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                  className="btn btn-primary text-white text-xs font-semibold rounded py-2 px-3 border-0 bg-[#2563EB] hover:bg-[#1D4ED8]"
                 >
                   Agendar Campanha
                 </button>
