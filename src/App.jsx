@@ -27,13 +27,23 @@ import {
   Sparkles,
   ArrowUpRight,
   Send,
-  Loader2
+  Loader2,
+  Receipt,
+  Calculator,
+  Layers,
+  ShieldCheck,
+  MapPin,
+  Eye
 } from 'lucide-react';
 
 export default function App() {
-  // App states
+  // Navigation & General configuration
   const [currentTab, setCurrentTab] = useState('dashboard');
+  const [financeSubTab, setFinanceSubTab] = useState('contas');
+  const [accountingSubTab, setAccountingSubTab] = useState('bordero');
   const [plan, setPlan] = useState('standard');
+  
+  // App store installation simulation
   const [installedApps, setInstalledApps] = useState({
     financeiro: true,
     contabilidade: true,
@@ -51,41 +61,35 @@ export default function App() {
     {
       id: 1,
       sender: 'ai',
-      text: 'Olá **Vinicius**! 👋 Sou o Disk AI, assistente do seu ecossistema ERP & CRM. Estou pronto para realizar análises financeiras e de vendas. O que deseja fazer?',
-      timestamp: '13:00'
+      text: 'Olá **Vinicius**! 👋 Sou o Disk AI Copilot. Auditor financeiro e contábil do seu ecossistema. Consigo extrair borderôs, emitir NFes, conciliar contas e gerar DREs completas do sistema. O que deseja auditar?',
+      timestamp: '13:45'
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // CRM Lead Data
-  const [leads, setLeads] = useState([
-    // Prospecção
-    { id: 'lead-1', name: 'Roberto Alencar', company: 'Prime Show Eventos', value: 120000, stage: 'prospect', date: '10 Jul', tag: 'VIP' },
-    { id: 'lead-2', name: 'Ana Beatriz Souza', company: 'Festival Sertanejo', value: 85000, stage: 'prospect', date: '12 Jul', tag: 'Quente' },
-    // Qualificado
-    { id: 'lead-3', name: 'Carlos Henrique', company: 'Sunset Lounge Bar', value: 45000, stage: 'qualified', date: '08 Jul', tag: 'Novo' },
-    { id: 'lead-4', name: 'Mariana Costa', company: 'Arena Music Curitiba', value: 150000, stage: 'qualified', date: '14 Jul', tag: 'Corporate' },
-    // Negociação
-    { id: 'lead-5', name: 'Felipe Dias', company: 'Expo Agro 2026', value: 210000, stage: 'negotiation', date: '05 Jul', tag: 'Alta Margem' },
-    // Fechado
-    { id: 'lead-6', name: 'Juliana Vieira', company: 'Embafeste Premium', value: 510000, stage: 'won', date: '01 Jul', tag: 'Fechado' }
-  ]);
-  
-  // CRM Modals / Form
-  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
-  const [newLead, setNewLead] = useState({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
+  // ================= 1. FINANCEIRO (ERP) DATA & STATE =================
+  const [financialStats, setFinancialStats] = useState({
+    receita: 2580000,
+    saldo: 950000,
+    repasses: 620000,
+    lucro: 480000
+  });
 
-  // CRM Contacts/Clients list
-  const [clients, setClients] = useState([
-    { id: 'c-1', name: 'Juliana Vieira', company: 'Embafeste Premium', email: 'juliana@embafeste.com', phone: '(41) 99888-7766', spend: 510000, status: 'Ativo' },
-    { id: 'c-2', name: 'Roberto Alencar', company: 'Prime Show Eventos', email: 'roberto@primeshow.com.br', phone: '(41) 98765-4321', spend: 120000, status: 'Em Negociação' },
-    { id: 'c-3', name: 'Mariana Costa', company: 'Arena Music Curitiba', email: 'mariana@arenamusic.com', phone: '(41) 99111-2222', spend: 150000, status: 'Ativo' }
+  const [accounts, setAccounts] = useState([
+    { id: 'acc-1', name: 'Banco Itaú - Conta Corrente', type: 'Bancária', balance: 420000, color: 'border-orange-500' },
+    { id: 'acc-2', name: 'Disk Digital - Antecipações', type: 'Digital', balance: 380000, color: 'border-indigo-500' },
+    { id: 'acc-3', name: 'Caixa Geral (PDV Físico)', type: 'Caixa', balance: 150000, color: 'border-emerald-500' }
   ]);
-  const [showAddClientModal, setShowAddClientModal] = useState(false);
-  const [newClient, setNewClient] = useState({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
 
-  // Bank Conciliation Data
+  const [lancamentos, setLancamentos] = useState([
+    { id: 'lan-1', type: 'receita', desc: 'Ingressos - Festival de Inverno L1', amount: 45000, category: 'Venda Ingressos', costCenter: 'Eventos', date: '15/07/2026', status: 'Recebido' },
+    { id: 'lan-2', type: 'despesa', desc: 'Segurança Executiva e Grades', amount: 18000, category: 'Serviços de Terceiros', costCenter: 'Operacional', date: '15/07/2026', status: 'Pago' },
+    { id: 'lan-3', type: 'receita', desc: 'Patrocínio Master - Itaú', amount: 150000, category: 'Patrocínio', costCenter: 'Comercial', date: '14/07/2026', status: 'Recebido' },
+    { id: 'lan-4', type: 'despesa', desc: 'Locação de Painéis de LED', amount: 35000, category: 'Locação Equipamentos', costCenter: 'Logística', date: '12/07/2026', status: 'Pendente' },
+    { id: 'lan-5', type: 'despesa', desc: 'Mídia e Impulsionamento Social', amount: 12500, category: 'Publicidade', costCenter: 'Marketing', date: '10/07/2026', status: 'Pago' }
+  ]);
+
   const [conciliationItems, setConciliationItems] = useState([
     { id: 'conc-1', date: '15/07/2026', desc: 'PIX Recebido - Ingressos Lote 1', type: 'in', amount: 45000, matched: false, matchInvoice: 'NF-8921 (Festival Inverno)' },
     { id: 'conc-2', date: '15/07/2026', desc: 'TED Recebida - Patrocínio Master', type: 'in', amount: 150000, matched: false, matchInvoice: 'NF-8919 (Prime Show)' },
@@ -94,18 +98,93 @@ export default function App() {
     { id: 'conc-5', date: '12/07/2026', desc: 'TED Recebida - Venda PDV Físico', type: 'in', amount: 82000, matched: false, matchInvoice: 'NF-8915 (Embafeste)' }
   ]);
 
-  // Financial Stats / Balance
-  const [financialStats, setFinancialStats] = useState({
-    receita: 2580000,
-    saldo: 950000,
-    repasses: 620000,
-    lucro: 480000
-  });
+  // Transfer state
+  const [transfer, setTransfer] = useState({ from: 'acc-2', to: 'acc-1', amount: '' });
+  // Manual post state
+  const [newLancamento, setNewLancamento] = useState({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
 
-  // Financial DRE Month Filter
-  const [dreMonth, setDreMonth] = useState('Julho');
+  // Gateway transaction fee configurations
+  const gatewayRates = {
+    pix: { name: 'PIX Direto', rate: 0.8, fixed: 0.0 },
+    cartao_vista: { name: 'Cartão à Vista', rate: 2.3, fixed: 0.4 },
+    cartao_parcelado: { name: 'Cartão Parcelado (até 12x)', rate: 4.8, fixed: 0.4 },
+    boleto: { name: 'Boleto Bancário', rate: 0.0, fixed: 2.50 }
+  };
 
-  // Marketing Coupons
+  // ================= 2. CONTABILIDADE DISK DATA & STATE =================
+  const [invoiceMonth, setInvoiceMonth] = useState('Julho');
+  const [activeBorderoEvent, setActiveBorderoEvent] = useState('event-1');
+
+  const [borderos, setBorderos] = useState([
+    {
+      id: 'event-1',
+      name: 'Festival de Inverno Curitiba',
+      location: 'Parque Jaime Lerner',
+      ticketsSold: 12500,
+      grossRevenue: 1250000,
+      gatewayFee: 37500,
+      diskFee: 125000,
+      netPayout: 1087500,
+      status: 'Aprovado',
+      authorizedBy: 'Vinicius (Finanças)',
+      dateClosed: '14/07/2026'
+    },
+    {
+      id: 'event-2',
+      name: 'Metal Fest 2026',
+      location: 'Video Promo e Live Show',
+      ticketsSold: 8200,
+      grossRevenue: 820000,
+      gatewayFee: 24600,
+      diskFee: 82000,
+      netPayout: 713400,
+      status: 'Em Fechamento',
+      authorizedBy: 'Aguardando Aprovação',
+      dateClosed: 'Pendente'
+    },
+    {
+      id: 'event-3',
+      name: 'Embafeste Premium',
+      location: 'Showroom Comercial',
+      ticketsSold: 5100,
+      grossRevenue: 510000,
+      gatewayFee: 15300,
+      diskFee: 51000,
+      netPayout: 443700,
+      status: 'Pendente',
+      authorizedBy: 'Sem Autorização',
+      dateClosed: 'Pendente'
+    }
+  ]);
+
+  const [invoices, setInvoices] = useState([
+    { id: 'nf-8921', client: 'Associação Festival Inverno', doc: '12.345.678/0001-90', event: 'Festival de Inverno Curitiba', amount: 45000, type: 'Emissão Serviço', status: 'Emitida', date: '15/07/2026' },
+    { id: 'nf-8920', client: 'Metal Show Produções', doc: '98.765.432/0001-10', event: 'Metal Fest 2026', amount: 82000, type: 'Emissão Bilheteria', status: 'Emitida', date: '15/07/2026' },
+    { id: 'nf-8922', client: 'Prime Show Eventos Ltda', doc: '44.555.666/0001-22', event: 'Prime Show Eventos', amount: 150000, type: 'Patrocínio', status: 'Pendente', date: '14/07/2026' },
+    { id: 'nf-8923', client: 'Arena Music Curitiba', doc: '33.222.111/0001-44', event: 'Arena Music', amount: 12500, type: 'Taxa Serviço', status: 'Pendente', date: '13/07/2026' }
+  ]);
+
+  // ================= 3. CRM DE VENDAS DATA & STATE =================
+  const [leads, setLeads] = useState([
+    { id: 'lead-1', name: 'Roberto Alencar', company: 'Prime Show Eventos', value: 120000, stage: 'prospect', date: '10 Jul', tag: 'VIP' },
+    { id: 'lead-2', name: 'Ana Beatriz Souza', company: 'Festival Sertanejo', value: 85000, stage: 'prospect', date: '12 Jul', tag: 'Quente' },
+    { id: 'lead-3', name: 'Carlos Henrique', company: 'Sunset Lounge Bar', value: 45000, stage: 'qualified', date: '08 Jul', tag: 'Novo' },
+    { id: 'lead-4', name: 'Mariana Costa', company: 'Arena Music Curitiba', value: 150000, stage: 'qualified', date: '14 Jul', tag: 'Corporate' },
+    { id: 'lead-5', name: 'Felipe Dias', company: 'Expo Agro 2026', value: 210000, stage: 'negotiation', date: '05 Jul', tag: 'Alta Margem' },
+    { id: 'lead-6', name: 'Juliana Vieira', company: 'Embafeste Premium', value: 510000, stage: 'won', date: '01 Jul', tag: 'Fechado' }
+  ]);
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [newLead, setNewLead] = useState({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
+
+  const [clients, setClients] = useState([
+    { id: 'c-1', name: 'Juliana Vieira', company: 'Embafeste Premium', email: 'juliana@embafeste.com', phone: '(41) 99888-7766', spend: 510000, status: 'Ativo' },
+    { id: 'c-2', name: 'Roberto Alencar', company: 'Prime Show Eventos', email: 'roberto@primeshow.com.br', phone: '(41) 98765-4321', spend: 120000, status: 'Em Negociação' },
+    { id: 'c-3', name: 'Mariana Costa', company: 'Arena Music Curitiba', email: 'mariana@arenamusic.com', phone: '(41) 99111-2222', spend: 150000, status: 'Ativo' }
+  ]);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClient, setNewClient] = useState({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
+
+  // ================= 4. MARKETING COUPONS =================
   const [coupons, setCoupons] = useState([
     { id: 'coup-1', code: 'INVERNO15', discount: 15, event: 'Festival de Inverno Curitiba', status: 'Ativo', usages: 342 },
     { id: 'coup-2', code: 'METAL20', discount: 20, event: 'Metal Fest 2026', status: 'Ativo', usages: 198 },
@@ -151,71 +230,125 @@ export default function App() {
     );
   };
 
-  // CRM Kanban state transitions
-  const moveLeadStage = (leadId, currentStage) => {
-    const stages = ['prospect', 'qualified', 'negotiation', 'won'];
-    const currentIndex = stages.indexOf(currentStage);
-    if (currentIndex < stages.length - 1) {
-      const nextStage = stages[currentIndex + 1];
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: nextStage } : l));
-      
-      // If won, add to clients list
-      if (nextStage === 'won') {
-        const lead = leads.find(l => l.id === leadId);
-        if (lead) {
-          const newClientItem = {
-            id: `c-${Date.now()}`,
-            name: lead.name,
-            company: lead.company,
-            email: `${lead.name.toLowerCase().replace(' ', '.')}@${lead.company.toLowerCase().replace(' ', '')}.com`,
-            phone: '(41) 99999-0000',
-            spend: lead.value,
-            status: 'Ativo'
-          };
-          setClients(prev => [...prev, newClientItem]);
-          triggerToast(
-            "Lead Ganho! 🏆",
-            `${lead.name} da ${lead.company} foi convertido em cliente ativo!`
-          );
-        }
-      } else {
-        triggerToast("Progresso de Venda", "Lead avançado para a próxima etapa do funil.");
-      }
-    }
-  };
-
-  const deleteLead = (leadId) => {
-    setLeads(prev => prev.filter(l => l.id !== leadId));
-    triggerToast("Lead Removido", "Lead deletado do funil de vendas.", "warning");
-  };
-
-  const handleCreateLead = (e) => {
+  // ================= CONTROLLER SIMULATION LÓGICA =================
+  
+  // 1. Transferência entre Contas (Financeiro)
+  const handleAccountTransfer = (e) => {
     e.preventDefault();
-    if (!newLead.name || !newLead.company || !newLead.value) {
+    const amountVal = parseFloat(transfer.amount);
+    if (!amountVal || amountVal <= 0) {
+      triggerToast("Erro", "Preencha um valor válido.", "warning");
+      return;
+    }
+
+    const sourceAcc = accounts.find(a => a.id === transfer.from);
+    if (sourceAcc.balance < amountVal) {
+      triggerToast("Saldo Insuficiente", `A conta ${sourceAcc.name} não possui saldo suficiente para esta transferência.`, "warning");
+      return;
+    }
+
+    setAccounts(prev => prev.map(a => {
+      if (a.id === transfer.from) return { ...a, balance: a.balance - amountVal };
+      if (a.id === transfer.to) return { ...a, balance: a.balance + amountVal };
+      return a;
+    }));
+
+    // Add entry
+    const entry = {
+      id: `lan-${Date.now()}`,
+      type: 'despesa',
+      desc: `Transf. de ${accounts.find(a=>a.id === transfer.from).name} para ${accounts.find(a=>a.id === transfer.to).name}`,
+      amount: amountVal,
+      category: 'Transferência',
+      costCenter: 'Interno',
+      date: 'Hoje',
+      status: 'Pago'
+    };
+    setLancamentos(prev => [entry, ...prev]);
+    setTransfer(prev => ({ ...prev, amount: '' }));
+    triggerToast("Transferência Efetuada", `R$ ${amountVal.toLocaleString('pt-BR')} transferidos com sucesso.`);
+  };
+
+  // 2. Lançamento Financeiro Manual (Financeiro)
+  const handleCreateLancamento = (e) => {
+    e.preventDefault();
+    const amountVal = parseFloat(newLancamento.amount);
+    if (!newLancamento.desc || !amountVal) {
       triggerToast("Erro", "Preencha todos os campos obrigatórios.", "warning");
       return;
     }
-    const val = parseFloat(newLead.value);
-    const addedLead = {
-      id: `lead-${Date.now()}`,
-      name: newLead.name,
-      company: newLead.company,
-      value: val,
-      stage: newLead.stage,
-      date: 'Hoje',
-      tag: newLead.tag
+
+    const added = {
+      id: `lan-${Date.now()}`,
+      ...newLancamento,
+      amount: amountVal,
+      status: newLancamento.type === 'receita' ? 'Recebido' : 'Pendente'
     };
-    setLeads(prev => [...prev, addedLead]);
-    setShowAddLeadModal(false);
-    setNewLead({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
-    triggerToast("Sucesso", "Novo lead adicionado ao funil de vendas.");
+
+    setLancamentos(prev => [added, ...prev]);
+
+    // Update global balance
+    setFinancialStats(prev => {
+      const isInc = added.type === 'receita';
+      return {
+        ...prev,
+        receita: isInc ? prev.receita + amountVal : prev.receita,
+        saldo: isInc ? prev.saldo + amountVal : prev.saldo - amountVal,
+        lucro: isInc ? prev.lucro + amountVal : prev.lucro - amountVal
+      };
+    });
+
+    setNewLancamento({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
+    triggerToast("Lançamento Registrado", `Entrada de ${added.desc} gravada com sucesso.`);
+  };
+
+  // 3. Efetuar Fechamento de Caixa / Borderô (Contabilidade)
+  const handleAuthorizeBordero = (borderoId) => {
+    setBorderos(prev => prev.map(b => {
+      if (b.id === borderoId) {
+        setFinancialStats(stats => ({
+          ...stats,
+          repasses: stats.repasses + b.netPayout,
+          saldo: stats.saldo - b.netPayout
+        }));
+        return { 
+          ...b, 
+          status: 'Aprovado', 
+          authorizedBy: 'Vinicius (Finanças)', 
+          dateClosed: new Date().toLocaleDateString('pt-BR') 
+        };
+      }
+      return b;
+    }));
+    triggerToast("Repasse Autorizado", "Borderô de evento fechado e fundos liberados para pagamento.");
+  };
+
+  // 4. Emissão de NFe Individual (Contabilidade)
+  const handleEmitNFe = (invoiceId) => {
+    setInvoices(prev => prev.map(inv => {
+      if (inv.id === invoiceId) {
+        return { ...inv, status: 'Processando' };
+      }
+      return inv;
+    }));
+
+    triggerToast("Solicitação de Emissão", "Enviando dados da nota à SEFAZ...");
+
+    setTimeout(() => {
+      setInvoices(prev => prev.map(inv => {
+        if (inv.id === invoiceId) {
+          return { ...inv, status: 'Emitida' };
+        }
+        return inv;
+      }));
+      triggerToast("NFe Autorizada! 🧾", `Nota fiscal do evento emitida com sucesso na SEFAZ.`);
+    }, 1800);
   };
 
   // Reconcile item
   const handleReconcile = (itemId) => {
     setConciliationItems(prev => prev.map(item => {
       if (item.id === itemId) {
-        // Adjust financial stats based on conciliation
         setFinancialStats(stats => {
           const isIncoming = item.type === 'in';
           const val = item.amount;
@@ -231,13 +364,56 @@ export default function App() {
     triggerToast("Conciliação Confirmada", "Transação bancária vinculada com sucesso à nota fiscal.");
   };
 
-  // Create client
+  // CRM Kanban lead progression
+  const moveLeadStage = (leadId, currentStage) => {
+    const stages = ['prospect', 'qualified', 'negotiation', 'won'];
+    const currentIndex = stages.indexOf(currentStage);
+    if (currentIndex < stages.length - 1) {
+      const nextStage = stages[currentIndex + 1];
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: nextStage } : l));
+      
+      if (nextStage === 'won') {
+        const lead = leads.find(l => l.id === leadId);
+        if (lead) {
+          const newClientItem = {
+            id: `c-${Date.now()}`,
+            name: lead.name,
+            company: lead.company,
+            email: `${lead.name.toLowerCase().replace(' ', '.')}@${lead.company.toLowerCase().replace(' ', '')}.com`,
+            phone: '(41) 99999-0000',
+            spend: lead.value,
+            status: 'Ativo'
+          };
+          setClients(prev => [...prev, newClientItem]);
+          triggerToast("Lead Ganho! 🏆", `${lead.name} convertido em cliente ativo!`);
+        }
+      } else {
+        triggerToast("Progresso de Venda", "Lead avançado no pipeline.");
+      }
+    }
+  };
+
+  const handleCreateLead = (e) => {
+    e.preventDefault();
+    if (!newLead.name || !newLead.company || !newLead.value) return;
+    const addedLead = {
+      id: `lead-${Date.now()}`,
+      name: newLead.name,
+      company: newLead.company,
+      value: parseFloat(newLead.value),
+      stage: newLead.stage,
+      date: 'Hoje',
+      tag: newLead.tag
+    };
+    setLeads(prev => [...prev, addedLead]);
+    setShowAddLeadModal(false);
+    setNewLead({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
+    triggerToast("Sucesso", "Novo lead adicionado ao CRM.");
+  };
+
   const handleCreateClient = (e) => {
     e.preventDefault();
-    if (!newClient.name || !newClient.company || !newClient.email) {
-      triggerToast("Erro", "Preencha os campos obrigatórios.", "warning");
-      return;
-    }
+    if (!newClient.name || !newClient.company || !newClient.email) return;
     const addedClient = {
       id: `c-${Date.now()}`,
       name: newClient.name,
@@ -250,16 +426,12 @@ export default function App() {
     setClients(prev => [addedClient, ...prev]);
     setShowAddClientModal(false);
     setNewClient({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
-    triggerToast("Sucesso", "Novo cliente cadastrado com sucesso.");
+    triggerToast("Sucesso", "Novo cliente cadastrado.");
   };
 
-  // Create Coupon
   const handleCreateCoupon = (e) => {
     e.preventDefault();
-    if (!newCoupon.code || !newCoupon.discount) {
-      triggerToast("Erro", "Preencha todos os campos obrigatórios.", "warning");
-      return;
-    }
+    if (!newCoupon.code || !newCoupon.discount) return;
     const addedCoupon = {
       id: `coup-${Date.now()}`,
       code: newCoupon.code.toUpperCase(),
@@ -271,36 +443,23 @@ export default function App() {
     setCoupons(prev => [addedCoupon, ...prev]);
     setShowAddCouponModal(false);
     setNewCoupon({ code: '', discount: '', event: 'Festival de Inverno Curitiba', status: 'Ativo' });
-    triggerToast("Sucesso", "Novo cupom promocional gerado.");
-  };
-
-  // Toggle Coupon Status
-  const toggleCouponStatus = (couponId) => {
-    setCoupons(prev => prev.map(c => {
-      if (c.id === couponId) {
-        const nextStatus = c.status === 'Ativo' ? 'Inativo' : 'Ativo';
-        triggerToast("Cupom Atualizado", `O cupom ${c.code} foi marcado como ${nextStatus}.`);
-        return { ...c, status: nextStatus };
-      }
-      return c;
-    }));
+    triggerToast("Sucesso", "Cupom promocional gerado.");
   };
 
   // AI Chat simulation response
   const triggerAIResponse = (scenario) => {
-    // Command labels
     const prompts = {
       conciliacao: "🔍 Fazer Conciliação Automática",
       dre: "📊 Gerar DRE de Julho",
       spread: "💸 Calcular Spread dos Gateway",
       fluxo: "📉 Simular Fluxo de Caixa 45 dias",
       relatorio: "📋 Criar Relatório de Vendas",
-      eventos: "🎫 Maior Lucro Recente"
+      eventos: "🎫 Maior Lucro Recente",
+      nfe: "🧾 Checar Notas Fiscais Pendentes",
+      borderos: "📋 Listar Status dos Borderôs"
     };
 
     const userMessage = prompts[scenario] || scenario;
-    
-    // Add user message
     const userMsgObj = {
       id: Date.now(),
       sender: 'user',
@@ -311,111 +470,82 @@ export default function App() {
     setChatMessages(prev => [...prev, userMsgObj]);
     setIsTyping(true);
 
-    // Simulate API delay
     setTimeout(() => {
       setIsTyping(false);
       let aiText = '';
       let html = null;
 
-      switch(scenario) {
-        case 'conciliacao':
-          aiText = 'Varredura contábil automática concluída. Verifiquei as faturas do sistema contra a conta de recebíveis.';
-          html = (
-            <div className="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-[10px] space-y-1 font-mono">
-              <p className="text-emerald-400">✓ 5 transações localizadas no extrato bancário</p>
-              <p className="text-emerald-400">✓ 5 Notas Fiscais correspondentes vinculadas no ERP</p>
-              <button 
-                onClick={() => {
-                  setConciliationItems(prev => prev.map(item => ({ ...item, matched: true })));
-                  triggerToast("Sucesso", "Todas as transações foram conciliadas automaticamente!");
-                }}
-                className="w-full mt-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-bold transition-all"
-              >
-                Efetuar Conciliação de Todos os Lotes
-              </button>
-            </div>
-          );
-          break;
-        case 'dre':
-          aiText = `A Demonstração do Resultado do Exercício (DRE) consolidada para **Julho/2026** foi computada pelo módulo de contabilidade.`;
-          html = (
-            <div className="mt-2 overflow-x-auto border border-slate-800 rounded-lg">
-              <table className="w-full text-[10px] text-slate-300 font-mono">
-                <thead>
-                  <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-semibold"><th className="p-1.5 text-left">Item DRE</th><th className="p-1.5 text-right">Valor</th></tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-900"><td className="p-1.5">Receita Bruta</td><td className="p-1.5 text-right text-emerald-400">R$ 2.580.000</td></tr>
-                  <tr className="border-b border-slate-900"><td className="p-1.5">(-) Impostos & Gateway</td><td className="p-1.5 text-right text-pink-400">-R$ 387.000</td></tr>
-                  <tr className="border-b border-slate-900"><td className="p-1.5">(-) Custos de Evento</td><td className="p-1.5 text-right text-pink-400">-R$ 1.713.000</td></tr>
-                  <tr className="bg-indigo-950/20 font-bold"><td className="p-1.5 text-white">Lucro Líquido</td><td className="p-1.5 text-right text-indigo-300">R$ 480.000</td></tr>
-                </tbody>
-              </table>
-            </div>
-          );
-          break;
-        case 'spread':
-          aiText = 'Auditoria de Spread dos Recebíveis (Disk Business One) concluída. Veja a economia estimada com a antecipação inteligente:';
-          html = (
-            <div className="mt-2 p-3 bg-slate-950 border border-slate-800 rounded-lg text-[10px] space-y-1.5 text-slate-300">
-              <p>• Taxa Média de Mercado: <strong className="text-pink-400">2.1% a.m.</strong></p>
-              <p>• Taxa Especial Disk Digital: <strong className="text-emerald-400">1.4% a.m.</strong></p>
-              <hr className="border-slate-800 my-1" />
-              <p className="text-emerald-400 font-bold">✓ Redução de custo financeiro: Economia de R$ 18.240,00 neste ciclo.</p>
-            </div>
-          );
-          break;
-        case 'fluxo':
-          aiText = 'Simulação e projeção de fluxo de caixa acumulado baseada nas vendas de ingressos para os próximos meses:';
-          html = (
-            <div className="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-[10px] text-indigo-300 font-mono space-y-1">
-              <p>Julho (Histórico): R$ 950.000</p>
-              <p>Agosto (Forecast): R$ 1.120.000 (+17.8%)</p>
-              <p>Setembro (Previsão): R$ 1.450.000 (+29.4%)</p>
-            </div>
-          );
-          break;
-        case 'relatorio':
-          aiText = 'Relatório executivo compilado. O arquivo contém a evolução das vendas do CRM e o balanço financeiro.';
-          html = (
-            <div className="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <FileText className="w-6 h-6 text-indigo-400" />
-                <span className="text-[10px] text-slate-300 font-mono">relatorio_executivo_crm.pdf</span>
+      const q = userMessage.toLowerCase();
+
+      if (scenario === 'conciliacao') {
+        aiText = 'Auditoria automática de extratos concluída. Encontrei lançamentos prontos para conciliar.';
+        html = (
+          <div className="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-[10px] space-y-1 font-mono">
+            <p className="text-emerald-400">✓ 5 lançamentos mapeados no banco Itaú/Disk</p>
+            <p className="text-indigo-400">❖ Status: Prontos para liquidação</p>
+            <button 
+              onClick={() => {
+                setConciliationItems(prev => prev.map(item => ({ ...item, matched: true })));
+                triggerToast("Sucesso", "Todas as conciliações foram efetuadas.");
+              }}
+              className="w-full mt-2 py-1 bg-indigo-650 hover:bg-indigo-600 text-white rounded text-[10px] font-bold"
+            >
+              Liquidar Conciliações Pendentes
+            </button>
+          </div>
+        );
+      } else if (scenario === 'dre') {
+        aiText = 'DRE consolidada calculada pelo módulo fiscal. Margem líquida do trimestre está em 18.6%.';
+        html = (
+          <div className="mt-2 border border-slate-800 rounded-lg overflow-hidden">
+            <table className="w-full text-[10px] text-slate-350 font-mono">
+              <tr className="bg-slate-950"><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-emerald-400">R$ 2.580.000</td></tr>
+              <tr className="border-t border-slate-900"><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-pink-400">-R$ 387.000</td></tr>
+              <tr className="border-t border-slate-900"><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-pink-400">-R$ 1.713.000</td></tr>
+              <tr className="border-t border-slate-900 bg-indigo-950/20 font-bold"><td className="p-1 text-white">Lucro Líquido</td><td className="p-1 text-right text-indigo-300">R$ 480.000</td></tr>
+            </table>
+          </div>
+        );
+      } else if (scenario === 'nfe') {
+        const count = invoices.filter(inv => inv.status === 'Pendente').length;
+        aiText = `Varredura fiscal: Existem **${count} notas fiscais** pendentes de emissão.`;
+        html = (
+          <div className="mt-2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-[10px] space-y-1">
+            {invoices.filter(inv => inv.status === 'Pendente').map(inv => (
+              <div key={inv.id} className="flex justify-between items-center text-slate-300 font-mono">
+                <span>{inv.client} (R$ {inv.amount})</span>
+                <button onClick={() => handleEmitNFe(inv.id)} className="bg-indigo-600 hover:bg-indigo-500 text-white text-[8px] px-1.5 py-0.5 rounded">Emitir</button>
               </div>
-              <button 
-                className="bg-indigo-600 hover:bg-indigo-500 text-white text-[9px] px-2 py-1 rounded font-semibold transition-all"
-                onClick={() => triggerToast('Download Iniciado', 'Arquivo baixado com sucesso!')}
-              >
-                Baixar
-              </button>
-            </div>
-          );
-          break;
-        case 'eventos':
-          aiText = 'Listei os eventos de maior relevância financeira baseados no total faturado no último trimestre:';
-          html = (
-            <ol className="mt-2 space-y-1 text-[10px] text-slate-300 list-decimal list-inside">
-              <li><strong>Festival de Inverno Curitiba</strong> - Margem: 34% (Faturamento: R$ 1.25M)</li>
-              <li><strong>Metal Fest 2026</strong> - Margem: 28% (Faturamento: R$ 820k)</li>
-              <li><strong>Embafeste VIP Show</strong> - Margem: 22% (Faturamento: R$ 510k)</li>
-            </ol>
-          );
-          break;
-        default:
-          // Keyword parsing for custom user text
-          const query = userMessage.toLowerCase();
-          if (query.includes('receita') || query.includes('faturamento') || query.includes('lucro')) {
-            aiText = `A receita consolidada de julho de 2026 é de **R$ 2.580.000**, com lucro líquido final de **R$ 480.000** (margem de 18.6%).`;
-          } else if (query.includes('lead') || query.includes('crm') || query.includes('venda')) {
-            const count = leads.length;
-            const totalVal = leads.reduce((acc, curr) => acc + curr.value, 0);
-            aiText = `O funil do CRM de vendas possui atualmente **${count} contatos** no pipeline, somando um valor potencial de **R$ ${totalVal.toLocaleString('pt-BR')}** sob negociação.`;
-          } else if (query.includes('plano') || query.includes('upgrade') || query.includes('preço')) {
-            aiText = `Você está atualmente no plano **${plan.toUpperCase()}**. Oferecemos os planos *Advanced* (ideal para automatizações e DRE) e *Expert* (inclui Disk AI Copilot integrado e conciliação multibanco). Acesse a aba **Planos & Upgrades** para saber mais.`;
-          } else {
-            aiText = `Compreendi a sua pergunta sobre "${userMessage}". Como copiloto financeiro, recomendo conferir a aba de **Gestão Financeira (ERP)** para conciliar os lançamentos ou rodar o comando 📊 **Gerar DRE** para verificar os lucros.`;
-          }
+            ))}
+          </div>
+        );
+      } else if (scenario === 'borderos') {
+        aiText = 'Listagem de fechamento financeiro de eventos do produtor:';
+        html = (
+          <div className="mt-2 space-y-1.5 text-[10px]">
+            {borderos.map(b => (
+              <div key={b.id} className="flex justify-between items-center p-1.5 bg-slate-950 border border-slate-850 rounded">
+                <div>
+                  <span className="font-bold text-white block">{b.name}</span>
+                  <span className="text-slate-500">Repasse Líquido: R$ {b.netPayout.toLocaleString('pt-BR')}</span>
+                </div>
+                <span className={`px-1.5 py-0.5 rounded font-bold uppercase text-[8px] ${
+                  b.status === 'Aprovado' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                }`}>{b.status}</span>
+              </div>
+            ))}
+          </div>
+        );
+      } else if (q.includes('saldo') || q.includes('conta') || q.includes('banco')) {
+        const total = accounts.reduce((acc, curr) => acc + curr.balance, 0);
+        aiText = `O total disponível consolidado nas contas financeiras é de **R$ ${total.toLocaleString('pt-BR')}**. Mapeado nas seguintes contas:
+        - Banco Itaú: R$ 420.000
+        - Conta Digital Disk: R$ 380.000
+        - Caixa Geral (PDV): R$ 150.000`;
+      } else if (q.includes('repass') || q.includes('bordero') || q.includes('fechamento')) {
+        aiText = 'Atualmente, o maior repasse pendente de fechamento é do evento **Metal Fest 2026** (Repasse líquido: R$ 713.400). Você pode aprovar ou auditar esses dados diretamente na aba de **Contabilidade Disk** > **Borderô**.';
+      } else {
+        aiText = `Recebi sua mensagem sobre "${userMessage}". Como copiloto contábil, estou à disposição para emitir NFes, gerar DRE ou analisar os borderôs de vendas. Escolha um comando rápido ou faça outra pergunta.`;
       }
 
       const aiMsgObj = {
@@ -472,6 +602,7 @@ export default function App() {
               <span>Dashboard</span>
             </button>
 
+            {/* FINANCEIRO (ERP) */}
             <button 
               onClick={() => setCurrentTab('financeiro')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
@@ -481,15 +612,28 @@ export default function App() {
               }`}
             >
               <CreditCard className="w-5 h-5 shrink-0" />
+              <span>Financeiro (ERP)</span>
+            </button>
+
+            {/* CONTABILIDADE DISK */}
+            <button 
+              onClick={() => setCurrentTab('contabilidade')} 
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                currentTab === 'contabilidade' 
+                  ? 'bg-indigo-600/15 text-indigo-400 border-indigo-500/30 shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'
+              }`}
+            >
+              <Receipt className="w-5 h-5 shrink-0 text-emerald-450" />
               <div className="flex items-center justify-between w-full">
-                <span>Financeiro (ERP)</span>
-                <span className="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  {conciliationItems.filter(i => !i.matched).length}
+                <span>Contabilidade Disk</span>
+                <span className="bg-emerald-500/20 text-emerald-350 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  {invoices.filter(inv => inv.status === 'Pendente').length}
                 </span>
               </div>
             </button>
 
-            {/* Dynamic CRM option */}
+            {/* CRM option (only if installed) */}
             {installedApps.crm === true && (
               <button 
                 onClick={() => setCurrentTab('crm')} 
@@ -509,7 +653,7 @@ export default function App() {
               </button>
             )}
 
-            {/* Dynamic Marketing option */}
+            {/* Marketing option (only if installed) */}
             {installedApps.mkt === true && (
               <button 
                 onClick={() => setCurrentTab('marketing')} 
@@ -533,12 +677,7 @@ export default function App() {
               }`}
             >
               <ShoppingBag className="w-5 h-5 shrink-0" />
-              <div className="flex items-center justify-between w-full">
-                <span>Central de Apps</span>
-                <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  {Object.values(installedApps).filter(val => val === false).length}
-                </span>
-              </div>
+              <span>Central de Apps</span>
             </button>
 
             <button 
@@ -579,13 +718,12 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <span className="text-xs text-slate-500 uppercase tracking-wider">Espaço de Trabalho</span>
             <span className="text-slate-600">/</span>
-            <span className="text-sm font-semibold text-slate-250 capitalize">
-              {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab}
+            <span className="text-sm font-semibold text-slate-200 capitalize">
+              {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
             </span>
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Search */}
             <div className="relative w-64">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-slate-500" />
@@ -597,7 +735,6 @@ export default function App() {
               />
             </div>
             
-            {/* Notification Bell */}
             <button className="p-2 text-slate-400 hover:text-slate-200 bg-slate-800/40 rounded-lg border border-slate-800/80 hover:bg-slate-800 relative transition-all">
               <span className="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full animate-ping"></span>
               <span className="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full"></span>
@@ -609,14 +746,13 @@ export default function App() {
         {/* VIEWS WRAPPER */}
         <div className="p-8 max-w-7xl w-full mx-auto space-y-8">
             
-          {/* 1. DASHBOARD VIEW */}
+          {/* ================= 1. DASHBOARD VIEW ================= */}
           {currentTab === 'dashboard' && (
             <div className="space-y-8 animate-fadeIn">
-              {/* Intro Title & Date */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-extrabold text-white tracking-tight">Visão Geral de Performance</h2>
-                  <p class="text-sm text-slate-400">Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
+                  <p className="text-sm text-slate-400">Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
                 </div>
                 <div className="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-350">
                   <Calendar className="w-4 h-4 text-indigo-400" />
@@ -626,7 +762,6 @@ export default function App() {
 
               {/* KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Receita */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-indigo-500/20 transition-all duration-300">
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
@@ -647,7 +782,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Saldo */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-indigo-500/20 transition-all duration-300">
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
@@ -664,7 +798,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Repasses */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-indigo-500/20 transition-all duration-300">
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
@@ -682,7 +815,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Lucro */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-indigo-500/20 transition-all duration-300">
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
@@ -701,23 +833,16 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Graphs & Analytics Section */}
+              {/* Chart & Featured Events */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Fluxo de Caixa (SVG Chart) */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 lg:col-span-2 shadow-md">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h3 className="text-sm font-bold text-slate-200">Fluxo de Caixa Mensal</h3>
                       <p className="text-xs text-slate-400">Projeção e balanço de receitas no período</p>
                     </div>
-                    <div className="flex items-center space-x-4 text-[10px] font-semibold">
-                      <span className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 bg-indigo-500 rounded-full inline-block"></span><span className="text-slate-400">Receita</span></span>
-                      <span className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 bg-pink-500 rounded-full inline-block"></span><span className="text-slate-400">Repasses</span></span>
-                    </div>
                   </div>
                   
-                  {/* Simple High-Fidelity Inline SVG Line Graph to avoid script overhead */}
                   <div className="relative w-full h-48 mt-4">
                     <svg className="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
                       <defs>
@@ -725,84 +850,42 @@ export default function App() {
                           <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3"/>
                           <stop offset="100%" stopColor="#6366f1" stopOpacity="0"/>
                         </linearGradient>
-                        <linearGradient id="pink-grad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#ec4899" stopOpacity="0.2"/>
-                          <stop offset="100%" stopColor="#ec4899" stopOpacity="0"/>
-                        </linearGradient>
                       </defs>
-                      {/* Grid Lines */}
                       <line x1="0" y1="30" x2="500" y2="30" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1"/>
                       <line x1="0" y1="75" x2="500" y2="75" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1"/>
                       <line x1="0" y1="120" x2="500" y2="120" stroke="#1e293b" strokeDasharray="4,4" strokeWidth="1"/>
-                      
-                      {/* Area Indigo */}
                       <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="url(#indigo-grad)"/>
-                      {/* Line Indigo */}
-                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#6366f1" strokeWidth="3" strokeLinecap="round"/>
-                      
-                      {/* Area Pink */}
-                      <path d="M 0 150 Q 120 120, 240 130 T 420 80 L 500 110 L 500 150 L 0 150 Z" fill="url(#pink-grad)"/>
-                      {/* Line Pink */}
-                      <path d="M 0 150 Q 120 120, 240 130 T 420 80 L 500 110" fill="none" stroke="#ec4899" strokeWidth="2.5" strokeLinecap="round"/>
+                      <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#6366f1" stroke-width="3" strokeLinecap="round"/>
                     </svg>
                   </div>
                   <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-semibold">
-                    <span>JAN</span>
-                    <span>FEV</span>
-                    <span>MAR</span>
-                    <span>ABR</span>
-                    <span>MAI</span>
-                    <span>JUN</span>
-                    <span>JUL</span>
+                    <span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span><span>JUL</span>
                   </div>
                 </div>
 
-                {/* Eventos com Maior Margem */}
                 <div className="bg-slate-900 border border-slate-800/80 rounded-xl p-6 shadow-md flex flex-col justify-between">
                   <div>
                     <h3 className="text-sm font-bold text-slate-200 mb-4">Eventos em Destaque</h3>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/50 border border-slate-850">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-400 text-xs">
-                            F
+                      {borderos.map(b => (
+                        <div key={b.id} className="flex items-center justify-between p-2 rounded-lg bg-slate-950/50 border border-slate-850">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-400 text-xs">
+                              {b.name[0]}
+                            </div>
+                            <div>
+                              <h4 className="text-xs font-semibold text-slate-200 truncate w-32">{b.name}</h4>
+                              <p className="text-[9px] text-slate-500">{b.location}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-xs font-semibold text-slate-200">Festival de Inverno Curitiba</h4>
-                            <p className="text-[10px] text-slate-500">Parque Jaime Lerner</p>
-                          </div>
+                          <span className="text-xs font-bold text-indigo-450">R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
                         </div>
-                        <span className="text-xs font-bold text-indigo-400">R$ 1.250M</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/50 border border-slate-850">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded bg-pink-500/10 flex items-center justify-center font-bold text-pink-400 text-xs">
-                            M
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-semibold text-slate-200">Metal Fest 2026</h4>
-                            <p className="text-[10px] text-slate-500">Video Promo e Live Show</p>
-                          </div>
-                        </div>
-                        <span className="text-xs font-bold text-pink-400">R$ 820k</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/50 border border-slate-850">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded bg-purple-500/10 flex items-center justify-center font-bold text-purple-400 text-xs">
-                            E
-                          </div>
-                          <div>
-                            <h4 className="text-xs font-semibold text-slate-200">Embafeste Premium</h4>
-                            <p className="text-[10px] text-slate-500">Showroom Comercial</p>
-                          </div>
-                        </div>
-                        <span className="text-xs font-bold text-purple-400">R$ 510k</span>
-                      </div>
+                      ))}
                     </div>
                   </div>
                   <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-                    <button onClick={() => setCurrentTab('marketplace')} className="text-xs font-bold text-indigo-400 hover:text-indigo-300 inline-flex items-center hover:underline">
-                      Expandir módulos de inteligência
+                    <button onClick={() => setCurrentTab('contabilidade')} className="text-xs font-bold text-indigo-400 hover:text-indigo-300 inline-flex items-center hover:underline">
+                      Auditar fechamentos contábeis
                       <ChevronRight className="w-3.5 h-3.5 ml-1" />
                     </button>
                   </div>
@@ -811,41 +894,280 @@ export default function App() {
             </div>
           )}
 
-          {/* 2. GESTÃO FINANCEIRA (ERP) VIEW */}
+          {/* ================= 2. GESTÃO FINANCEIRA (ERP) VIEW ================= */}
           {currentTab === 'financeiro' && (
             <div className="space-y-8 animate-fadeIn">
+              
+              {/* Top Summary Bar & Sub-Tabs */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Gestão Financeira & Conciliação</h2>
-                  <p class="text-sm text-slate-400">Valide os lançamentos contábeis, emita demonstrativos (DRE) e audite extratos bancários.</p>
+                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Gestão Financeira (ERP)</h2>
+                  <p className="text-sm text-slate-400">Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
                 </div>
-                <div className="flex space-x-2">
+                
+                {/* Finance sub-navigation */}
+                <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg space-x-1 text-xs">
                   <button 
-                    onClick={() => {
-                      setConciliationItems(prev => prev.map(item => ({ ...item, matched: false })));
-                      triggerToast("Filtros Limpos", "Todas as conciliações foram resetadas para teste.");
-                    }}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 rounded-lg text-xs font-bold transition-all"
+                    onClick={() => setFinanceSubTab('contas')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      financeSubTab === 'contas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Resetar Teste</span>
+                    Saldos & Transferências
+                  </button>
+                  <button 
+                    onClick={() => setFinanceSubTab('lancamentos')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      financeSubTab === 'lancamentos' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Lançamentos
+                  </button>
+                  <button 
+                    onClick={() => setFinanceSubTab('conciliacao')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      financeSubTab === 'conciliacao' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Conciliação
+                  </button>
+                  <button 
+                    onClick={() => setFinanceSubTab('taxas')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      financeSubTab === 'taxas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Gateway & Taxas
                   </button>
                 </div>
               </div>
 
-              {/* Sub-grid: Conciliation Table & DRE */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Conciliation Table */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 lg:col-span-2 shadow-md space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div className="flex items-center space-x-2">
-                      <Landmark className="w-4 h-4 text-indigo-400" />
-                      <h3 className="text-sm font-bold text-slate-200">Conciliação de Extrato Bancário</h3>
+              {/* Sub-Tab 1: Saldos & Contas */}
+              {financeSubTab === 'contas' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  
+                  {/* Account list */}
+                  <div className="lg:col-span-2 space-y-6">
+                    <h3 className="text-sm font-bold text-slate-350 uppercase tracking-wider">Saldo das Contas do Sistema</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      {accounts.map(acc => (
+                        <div key={acc.id} className={`bg-slate-900 border-l-4 ${acc.color} border border-slate-800 rounded-xl p-5 shadow-sm`}>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">{acc.type}</span>
+                          <h4 className="text-xs font-bold text-slate-250 mt-1">{acc.name}</h4>
+                          <div className="mt-4 font-mono font-extrabold text-lg text-white">
+                            R$ {acc.balance.toLocaleString('pt-BR')}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <span className="text-[10px] bg-indigo-500/10 text-indigo-300 font-bold px-2 py-0.5 rounded-full">
-                      {conciliationItems.filter(i => !i.matched).length} pendentes
-                    </span>
+
+                    <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <TrendingUp className="w-5 h-5 text-indigo-400" />
+                        <h4 className="text-sm font-bold text-white">Resumo Patrimonial Consolidador</h4>
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Transfer Form */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md h-fit space-y-4">
+                    <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+                      <ArrowRightLeft className="w-4 h-4 text-indigo-400" />
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">Transferência entre Contas</h4>
+                    </div>
+
+                    <form onSubmit={handleAccountTransfer} className="space-y-4 text-xs">
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Origem</label>
+                        <select 
+                          value={transfer.from} 
+                          onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 font-semibold text-slate-350"
+                        >
+                          {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Destino</label>
+                        <select 
+                          value={transfer.to} 
+                          onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 font-semibold text-slate-350"
+                        >
+                          {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Valor (R$)</label>
+                        <input 
+                          type="number" 
+                          value={transfer.amount}
+                          onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
+                          placeholder="Ex: 50000"
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-300 font-mono"
+                          required
+                        />
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold rounded-lg transition-all"
+                      >
+                        Confirmar Transferência
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 2: Lançamentos */}
+              {financeSubTab === 'lancamentos' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  
+                  {/* Table list */}
+                  <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Fluxo de Caixa Lançamentos</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-slate-350 border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-bold text-[10px] uppercase text-left">
+                            <th className="p-3">Descrição / Vínculo</th>
+                            <th className="p-3">Categoria</th>
+                            <th className="p-3">Centro de Custo</th>
+                            <th className="p-3">Data</th>
+                            <th className="p-3 text-right">Valor</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {lancamentos.map(lan => (
+                            <tr key={lan.id} className="border-b border-slate-850 hover:bg-slate-950/20">
+                              <td className="p-3">
+                                <div className="flex items-center space-x-2">
+                                  <span className={`w-2 h-2 rounded-full ${lan.type === 'receita' ? 'bg-emerald-500' : 'bg-pink-500'}`} />
+                                  <span className="font-semibold text-white">{lan.desc}</span>
+                                </div>
+                              </td>
+                              <td className="p-3">{lan.category}</td>
+                              <td className="p-3 font-mono">{lan.costCenter}</td>
+                              <td className="p-3 font-mono">{lan.date}</td>
+                              <td className={`p-3 text-right font-mono font-bold ${lan.type === 'receita' ? 'text-emerald-400' : 'text-pink-400'}`}>
+                                {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Launch Form */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md h-fit space-y-4">
+                    <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+                      <Plus className="w-4 h-4 text-indigo-400" />
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">Lançar Fluxo Manual</h4>
+                    </div>
+
+                    <form onSubmit={handleCreateLancamento} className="space-y-4 text-xs">
+                      <div className="flex bg-slate-950 p-1 border border-slate-850 rounded-lg space-x-1">
+                        <button 
+                          type="button"
+                          onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
+                          className={`flex-1 py-1.5 rounded text-center font-bold transition-all ${
+                            newLancamento.type === 'receita' ? 'bg-emerald-600/20 text-emerald-455' : 'text-slate-500 hover:text-slate-300'
+                          }`}
+                        >
+                          Receita
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
+                          className={`flex-1 py-1.5 rounded text-center font-bold transition-all ${
+                            newLancamento.type === 'despesa' ? 'bg-pink-600/20 text-pink-455' : 'text-slate-500 hover:text-slate-300'
+                          }`}
+                        >
+                          Despesa
+                        </button>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Descrição *</label>
+                        <input 
+                          type="text" 
+                          value={newLancamento.desc}
+                          onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
+                          placeholder="Ex: Contratação Equipe Limpeza"
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-300"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">Valor (R$) *</label>
+                          <input 
+                            type="number" 
+                            value={newLancamento.amount}
+                            onChange={(e) => setNewLancamento(prev => ({ ...prev, amount: e.target.value }))}
+                            placeholder="1200"
+                            className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-300 font-mono"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] text-slate-500 font-bold uppercase">Centro de Custo</label>
+                          <select 
+                            value={newLancamento.costCenter}
+                            onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
+                          >
+                            <option value="Eventos">Eventos</option>
+                            <option value="Operacional">Operacional</option>
+                            <option value="Comercial">Comercial</option>
+                            <option value="Logística">Logística</option>
+                            <option value="Marketing">Marketing</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase">Categoria</label>
+                        <select 
+                          value={newLancamento.category}
+                          onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
+                        >
+                          <option value="Venda Ingressos">Venda Ingressos</option>
+                          <option value="Serviços de Terceiros">Serviços de Terceiros</option>
+                          <option value="Locação Equipamentos">Locação Equipamentos</option>
+                          <option value="Patrocínio">Patrocínio</option>
+                          <option value="Publicidade">Publicidade</option>
+                        </select>
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="w-full py-2 bg-indigo-650 hover:bg-indigo-600 text-white font-bold rounded-lg transition-all"
+                      >
+                        Registrar Lançamento
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 3: Conciliação */}
+              {financeSubTab === 'conciliacao' && (
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4 animate-fadeIn">
+                  <div className="border-b border-slate-800 pb-3 flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <Landmark className="w-5 h-5 text-indigo-400" />
+                      <h3 className="text-sm font-bold text-slate-200">Conciliação Automática Vindi / PagSeguro</h3>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
@@ -853,23 +1175,21 @@ export default function App() {
                       <div 
                         key={item.id} 
                         className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                          item.matched 
-                            ? 'bg-slate-950/20 border-slate-850/60 opacity-60' 
-                            : 'bg-slate-950/50 border-slate-800 hover:border-slate-700'
+                          item.matched ? 'bg-slate-950/20 border-slate-850/60 opacity-60' : 'bg-slate-950/50 border-slate-800'
                         }`}
                       >
                         <div className="flex items-center space-x-3">
-                          <div className={`p-1.5 rounded-md ${
+                          <span className={`p-1.5 rounded-md ${
                             item.type === 'in' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-pink-500/10 text-pink-400'
                           }`}>
                             {item.type === 'in' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowRightLeft className="w-4 h-4" />}
-                          </div>
+                          </span>
                           <div>
                             <div className="flex items-center space-x-2">
                               <h4 className="text-xs font-semibold text-slate-200">{item.desc}</h4>
                               <span className="text-[9px] text-slate-500 font-mono">{item.date}</span>
                             </div>
-                            <p className="text-[10px] text-indigo-400/80 font-mono mt-0.5">Vínculo: {item.matchInvoice}</p>
+                            <p className="text-[10px] text-indigo-450 font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
                           </div>
                         </div>
 
@@ -881,14 +1201,14 @@ export default function App() {
                           </span>
                           
                           {item.matched ? (
-                            <div className="flex items-center space-x-1 text-emerald-400 text-[10px] font-bold">
+                            <span className="flex items-center space-x-1 text-emerald-400 text-[10px] font-bold">
                               <CheckCircle className="w-3.5 h-3.5" />
                               <span>Conciliado</span>
-                            </div>
+                            </span>
                           ) : (
                             <button 
                               onClick={() => handleReconcile(item.id)}
-                              className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-[10px] font-bold rounded transition-all"
+                              className="px-2.5 py-1 bg-indigo-650 hover:bg-indigo-600 text-white text-[10px] font-bold rounded"
                             >
                               Conciliar
                             </button>
@@ -898,20 +1218,271 @@ export default function App() {
                     ))}
                   </div>
                 </div>
+              )}
 
-                {/* Interactive DRE Panel */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              {/* Sub-Tab 4: Taxas e Gateway */}
+              {financeSubTab === 'taxas' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+                  
+                  {/* Gateway rates */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Taxas Contratuais do Gateway Disk</h3>
+                    <div className="space-y-4">
+                      {Object.entries(gatewayRates).map(([key, data]) => (
+                        <div key={key} className="flex justify-between items-center p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-200">{data.name}</h4>
+                            <p className="text-[9px] text-slate-500">Mapeado via API - Liquidável D+1</p>
+                          </div>
+                          <div className="text-right font-mono text-xs">
+                            <span className="text-indigo-400 font-bold">{data.rate > 0 ? `${data.rate}%` : 'Isento'}</span>
+                            {data.fixed > 0 && <span className="text-slate-500 text-[10px] ml-1">+ R$ {data.fixed.toFixed(2)}</span>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Seat/Invoicing details */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Consulta Seats e Bilheteria</h3>
+                      <p className="text-xs text-slate-400">
+                        O monitoramento de assentos e ingressos digitais gerencia em tempo real o spread retido pelos gateways de pagamento conveniados.
+                      </p>
+                      
+                      <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 space-y-2">
+                        <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                          <span>Gateway Spread Médio:</span>
+                          <span className="text-white font-bold">1.4%</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                          <span>Contratos Antecipados:</span>
+                          <span className="text-emerald-400 font-bold">D+1 Ativo</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => triggerToast("Consulta Seats", "Exportando logs de vendas em cartões do terminal...")}
+                      className="mt-6 w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-bold rounded-lg"
+                    >
+                      Exportar Logs de Vendas em Cartões
+                    </button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* ================= 2. CONTABILIDADE DISK VIEW ================= */}
+          {currentTab === 'contabilidade' && (
+            <div className="space-y-8 animate-fadeIn">
+              
+              {/* Top Selector & sub navigation */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Contabilidade Disk</h2>
+                  <p className="text-sm text-slate-400">Borderôs oficiais, emissão de NFes, auditorias e fechamento de eventos.</p>
+                </div>
+
+                <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg space-x-1 text-xs">
+                  <button 
+                    onClick={() => setAccountingSubTab('bordero')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      accountingSubTab === 'bordero' ? 'bg-indigo-650 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Borderô Eventos
+                  </button>
+                  <button 
+                    onClick={() => setAccountingSubTab('notas')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      accountingSubTab === 'notas' ? 'bg-indigo-650 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Notas Fiscais (SEFAZ)
+                  </button>
+                  <button 
+                    onClick={() => setAccountingSubTab('fechamento')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      accountingSubTab === 'fechamento' ? 'bg-indigo-650 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    DRE & Fechamento
+                  </button>
+                </div>
+              </div>
+
+              {/* Sub-Tab 1: Borderô Eventos */}
+              {accountingSubTab === 'bordero' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  
+                  {/* Event Selector List */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Selecione o Evento</h3>
+                    <div className="space-y-3">
+                      {borderos.map(b => (
+                        <button 
+                          key={b.id}
+                          onClick={() => setActiveBorderoEvent(b.id)}
+                          className={`w-full text-left p-3 rounded-lg border transition-all ${
+                            activeBorderoEvent === b.id 
+                              ? 'bg-indigo-600/10 border-indigo-500 text-indigo-300' 
+                              : 'bg-slate-950/40 border-slate-850 hover:border-slate-750 text-slate-350'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <span className="font-bold text-xs truncate block w-40">{b.name}</span>
+                            <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
+                              b.status === 'Aprovado' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                            }`}>{b.status}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-mono mt-1 block">Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Borderô Sheet Details */}
+                  {(() => {
+                    const event = borderos.find(b => b.id === activeBorderoEvent);
+                    if (!event) return null;
+                    return (
+                      <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-6 animate-fadeIn">
+                        <div className="border-b border-slate-800 pb-4 flex justify-between items-start">
+                          <div>
+                            <h3 className="text-base font-bold text-white">{event.name}</h3>
+                            <p className="text-xs text-slate-400">{event.location}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Fechamento Borderô</span>
+                            <span className="text-xs font-mono font-bold text-slate-300 block">{event.dateClosed}</span>
+                          </div>
+                        </div>
+
+                        {/* Calculations */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                          <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Ingressos</span>
+                            <span className="text-sm font-mono font-bold text-white mt-1 block">{event.ticketsSold}</span>
+                          </div>
+                          <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Receita Bruta</span>
+                            <span className="text-sm font-mono font-bold text-white mt-1 block">R$ {event.grossRevenue.toLocaleString('pt-BR')}</span>
+                          </div>
+                          <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Gateway (Vindi)</span>
+                            <span className="text-sm font-mono font-bold text-pink-400 mt-1 block">- R$ {event.gatewayFee.toLocaleString('pt-BR')}</span>
+                          </div>
+                          <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Comissão Disk</span>
+                            <span className="text-sm font-mono font-bold text-pink-400 mt-1 block">- R$ {event.diskFee.toLocaleString('pt-BR')}</span>
+                          </div>
+                        </div>
+
+                        {/* Net payout result */}
+                        <div className="p-4 bg-indigo-950/20 border border-indigo-900/35 rounded-xl flex flex-col sm:flex-row justify-between items-center">
+                          <div>
+                            <span className="text-xs text-indigo-400 font-bold block">Repasse Líquido à Produtora:</span>
+                            <span className="text-2xl font-mono font-extrabold text-white mt-1 block">
+                              R$ {event.netPayout.toLocaleString('pt-BR')}
+                            </span>
+                          </div>
+                          
+                          {event.status === 'Aprovado' ? (
+                            <div className="text-center sm:text-right mt-3 sm:mt-0">
+                              <span className="text-[9px] text-slate-500 font-bold block">Autorizado por:</span>
+                              <span className="text-emerald-450 text-xs font-semibold block">{event.authorizedBy}</span>
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={() => handleAuthorizeBordero(event.id)}
+                              className="mt-3 sm:mt-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold rounded-lg transition-all"
+                            >
+                              Liberar Repasse Financeiro
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* Sub-Tab 2: Notas Fiscais a Emitir */}
+              {accountingSubTab === 'notas' && (
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-6 animate-fadeIn">
+                  <div className="border-b border-slate-800 pb-3 flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <Receipt className="w-5 h-5 text-indigo-400" />
+                      <h3 className="text-sm font-bold text-slate-200">Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-slate-350 border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-slate-400 font-bold text-[10px] uppercase text-left">
+                          <th className="p-3">ID Nota</th>
+                          <th className="p-3">Cliente / Razão Social</th>
+                          <th className="p-3">CNPJ / CPF</th>
+                          <th className="p-3">Evento Vinculado</th>
+                          <th className="p-3">Data Lançamento</th>
+                          <th className="p-3 text-right">Valor</th>
+                          <th className="p-3 text-center">Status SEFAZ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoices.map(inv => (
+                          <tr key={inv.id} className="border-b border-slate-850 hover:bg-slate-950/20">
+                            <td className="p-3 font-mono font-bold text-white uppercase">{inv.id}</td>
+                            <td className="p-3 font-semibold">{inv.client}</td>
+                            <td className="p-3 font-mono">{inv.doc}</td>
+                            <td className="p-3">{inv.event}</td>
+                            <td className="p-3 font-mono">{inv.date}</td>
+                            <td className="p-3 text-right font-mono font-semibold text-indigo-300">R$ {inv.amount.toLocaleString('pt-BR')}</td>
+                            <td className="p-3 text-center">
+                              {inv.status === 'Emitida' && (
+                                <span className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold">Autorizada</span>
+                              )}
+                              {inv.status === 'Processando' && (
+                                <span className="bg-slate-800 text-slate-400 text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse">Enviando...</span>
+                              )}
+                              {inv.status === 'Pendente' && (
+                                <button 
+                                  onClick={() => handleEmitNFe(inv.id)}
+                                  className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[9px] font-bold rounded"
+                                >
+                                  Transmitir
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Sub-Tab 3: DRE & Fechamentos */}
+              {accountingSubTab === 'fechamento' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  
+                  {/* Financial Report Generators */}
+                  <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-6">
+                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
                       <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-indigo-400" />
-                        <h3 className="text-sm font-bold text-slate-200">Emissão de DRE</h3>
+                        <Calculator className="w-5 h-5 text-indigo-400" />
+                        <h3 className="text-sm font-bold text-white">Demonstrativo DRE por Competência</h3>
                       </div>
                       
                       <select 
-                        value={dreMonth} 
-                        onChange={(e) => setDreMonth(e.target.value)}
-                        className="bg-slate-950 border border-slate-800 rounded text-[10px] font-semibold text-slate-350 p-1 focus:outline-none focus:border-indigo-500"
+                        value={invoiceMonth}
+                        onChange={(e) => setInvoiceMonth(e.target.value)}
+                        className="bg-slate-950 border border-slate-850 p-1 rounded text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
                       >
                         <option value="Julho">Julho 2026</option>
                         <option value="Junho">Junho 2026</option>
@@ -919,556 +1490,235 @@ export default function App() {
                       </select>
                     </div>
 
-                    {/* DRE calculation simulation */}
                     <div className="space-y-3 font-mono text-xs">
-                      <div className="flex justify-between p-1.5 rounded hover:bg-slate-950/30">
-                        <span className="text-slate-400">Receita Bruta</span>
-                        <span className="text-emerald-400 font-semibold">
-                          R$ {dreMonth === 'Julho' ? '2.580.000' : dreMonth === 'Junho' ? '1.920.000' : '1.450.000'}
-                        </span>
+                      <div className="flex justify-between p-2 hover:bg-slate-950/20">
+                        <span className="text-slate-400">Receitas de Vendas (Bilheteria)</span>
+                        <span className="text-emerald-400 font-bold">R$ {invoiceMonth === 'Julho' ? '2.580.000' : invoiceMonth === 'Junho' ? '1.920.000' : '1.450.000'}</span>
                       </div>
-                      <div className="flex justify-between p-1.5 rounded hover:bg-slate-950/30">
-                        <span className="text-slate-400">(-) Impostos & Gateway</span>
-                        <span className="text-pink-400">
-                          -R$ {dreMonth === 'Julho' ? '387.000' : dreMonth === 'Junho' ? '288.000' : '217.500'}
-                        </span>
+                      <div className="flex justify-between p-2 hover:bg-slate-950/20">
+                        <span className="text-slate-400">(-) Impostos Fiscais (Simples/NFe)</span>
+                        <span className="text-pink-400">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
                       </div>
-                      <div className="flex justify-between p-1.5 rounded hover:bg-slate-950/30">
-                        <span className="text-slate-400">(-) Custos Operacionais</span>
-                        <span className="text-pink-400">
-                          -R$ {dreMonth === 'Julho' ? '1.713.000' : dreMonth === 'Junho' ? '1.272.000' : '960.000'}
-                        </span>
+                      <div className="flex justify-between p-2 hover:bg-slate-950/20">
+                        <span className="text-slate-400">(-) Spread e Comissões de Lançamento</span>
+                        <span className="text-pink-400">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
                       </div>
-                      <div className="border-t border-slate-800 my-2 pt-2 flex justify-between p-1.5 bg-indigo-950/20 rounded">
-                        <span className="font-bold text-white">Lucro Líquido</span>
-                        <span className="font-bold text-indigo-300">
-                          R$ {dreMonth === 'Julho' ? '480.000' : dreMonth === 'Junho' ? '360.000' : '272.500'}
-                        </span>
+                      <div className="flex justify-between p-2 hover:bg-slate-950/20">
+                        <span className="text-slate-400">(-) Custos de Produção & Infraestrutura</span>
+                        <span className="text-pink-400">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
+                      </div>
+                      <div className="border-t border-slate-800 my-2 pt-2 flex justify-between p-2 bg-indigo-950/20 rounded font-bold">
+                        <span className="text-white">Lucro Líquido Final</span>
+                        <span className="text-indigo-300">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-800">
+                  {/* Reports export */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+                        <FileText className="w-4 h-4 text-indigo-400" />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">Relatórios Recebimento</h4>
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
+                      </p>
+
+                      <div className="space-y-2 pt-2">
+                        <button 
+                          onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
+                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 text-xs font-semibold rounded flex justify-between items-center transition-all"
+                        >
+                          <span>Recebimento por Pedido</span>
+                          <Download className="w-3.5 h-3.5 text-indigo-400" />
+                        </button>
+                        
+                        <button 
+                          onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
+                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 text-xs font-semibold rounded flex justify-between items-center transition-all"
+                        >
+                          <span>Recebimento por Data</span>
+                          <Download className="w-3.5 h-3.5 text-indigo-400" />
+                        </button>
+                      </div>
+                    </div>
+
                     <button 
-                      onClick={() => triggerToast("Relatório Pronto", `A DRE de ${dreMonth} de 2026 foi exportada para planilha de auditoria.`)}
-                      className="w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2"
+                      onClick={() => triggerToast("DRE Completa", "Gerando demonstrativo do ano fiscal consolidado...")}
+                      className="mt-6 w-full py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-all"
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Exportar Planilha DRE</span>
+                      Exportar DRE Consolidada Anual
                     </button>
                   </div>
                 </div>
-              </div>
+              )}
+
             </div>
           )}
 
-          {/* 3. CRM DE VENDAS VIEW */}
+          {/* ================= 3. CRM DE VENDAS VIEW ================= */}
           {currentTab === 'crm' && (
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-extrabold text-white tracking-tight">CRM de Vendas</h2>
-                  <p class="text-sm text-slate-400">Gerencie contatos de produtores, qualifique leads e acompanhe o pipeline de vendas.</p>
+                  <p className="text-sm text-slate-400">Gerencie leads, prospecção e contatos de novos produtores de eventos.</p>
                 </div>
                 <div className="flex space-x-2">
                   <button 
                     onClick={() => setShowAddLeadModal(true)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-600/10"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-lg text-xs font-bold transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Adicionar Lead</span>
                   </button>
-                  
-                  <button 
-                    onClick={() => setShowAddClientModal(true)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-350 rounded-lg text-xs font-bold transition-all"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Cadastrar Cliente</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Kanban Pipeline Board */}
+              {/* Kanban Pipelines */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                
-                {/* Stage 1: Prospect */}
-                <div className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[400px]">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Prospecção</span>
-                    <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">
-                      {leads.filter(l => l.stage === 'prospect').length}
-                    </span>
-                  </div>
-                  <div className="space-y-3 flex-1 overflow-y-auto">
-                    {leads.filter(l => l.stage === 'prospect').map(lead => (
-                      <div key={lead.id} className="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 p-3 rounded-lg shadow space-y-2 group transition-all">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-indigo-500/20 text-indigo-300 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
-                          <button onClick={() => deleteLead(lead.id)} className="text-slate-500 hover:text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white">{lead.name}</h4>
-                          <p className="text-[10px] text-slate-400">{lead.company}</p>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-slate-850">
-                          <span className="text-[10px] font-mono font-bold text-slate-300">R$ {lead.value.toLocaleString('pt-BR')}</span>
-                          <button 
-                            onClick={() => moveLeadStage(lead.id, lead.stage)}
-                            className="p-1 bg-slate-850 hover:bg-indigo-650 hover:text-white rounded text-slate-400 transition-all"
-                            title="Avançar no funil"
-                          >
-                            <ChevronRight className="w-3 h-3" />
-                          </button>
-                        </div>
+                {['prospect', 'qualified', 'negotiation', 'won'].map(stage => {
+                  const stageLabels = { prospect: 'Prospecção', qualified: 'Qualificado', negotiation: 'Negociação', won: 'Fechado/Ganho' };
+                  return (
+                    <div key={stage} className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stageLabels[stage]}</span>
+                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-350 font-bold">
+                          {leads.filter(l => l.stage === stage).length}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stage 2: Qualified */}
-                <div className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[400px]">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Qualificado</span>
-                    <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">
-                      {leads.filter(l => l.stage === 'qualified').length}
-                    </span>
-                  </div>
-                  <div className="space-y-3 flex-1 overflow-y-auto">
-                    {leads.filter(l => l.stage === 'qualified').map(lead => (
-                      <div key={lead.id} className="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 p-3 rounded-lg shadow space-y-2 group transition-all">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-indigo-500/20 text-indigo-300 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
-                          <button onClick={() => deleteLead(lead.id)} className="text-slate-500 hover:text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white">{lead.name}</h4>
-                          <p className="text-[10px] text-slate-400">{lead.company}</p>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-slate-850">
-                          <span className="text-[10px] font-mono font-bold text-slate-300">R$ {lead.value.toLocaleString('pt-BR')}</span>
-                          <button 
-                            onClick={() => moveLeadStage(lead.id, lead.stage)}
-                            className="p-1 bg-slate-850 hover:bg-indigo-650 hover:text-white rounded text-slate-400 transition-all"
-                          >
-                            <ChevronRight className="w-3 h-3" />
-                          </button>
-                        </div>
+                      <div className="space-y-3 flex-1 overflow-y-auto">
+                        {leads.filter(l => l.stage === stage).map(lead => (
+                          <div key={lead.id} className="bg-slate-900 border border-slate-800 hover:border-indigo-500/20 p-3 rounded-lg shadow space-y-2 group transition-all">
+                            <span className="text-[8px] bg-indigo-550/20 text-indigo-350 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
+                            <div>
+                              <h4 className="text-xs font-bold text-white">{lead.name}</h4>
+                              <p className="text-[10px] text-slate-500">{lead.company}</p>
+                            </div>
+                            <div className="flex justify-between items-center pt-2 border-t border-slate-850">
+                              <span className="text-[10px] font-mono font-bold text-slate-300">R$ {lead.value.toLocaleString()}</span>
+                              {stage !== 'won' && (
+                                <button 
+                                  onClick={() => moveLeadStage(lead.id, lead.stage)}
+                                  className="p-1 bg-slate-850 hover:bg-indigo-650 hover:text-white rounded text-slate-400 transition-all"
+                                >
+                                  <ChevronRight className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stage 3: Negotiation */}
-                <div className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[400px]">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Negociação</span>
-                    <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">
-                      {leads.filter(l => l.stage === 'negotiation').length}
-                    </span>
-                  </div>
-                  <div className="space-y-3 flex-1 overflow-y-auto">
-                    {leads.filter(l => l.stage === 'negotiation').map(lead => (
-                      <div key={lead.id} className="bg-slate-900 border border-slate-800 hover:border-indigo-500/30 p-3 rounded-lg shadow space-y-2 group transition-all">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-indigo-500/20 text-indigo-300 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
-                          <button onClick={() => deleteLead(lead.id)} className="text-slate-500 hover:text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-white">{lead.name}</h4>
-                          <p className="text-[10px] text-slate-400">{lead.company}</p>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-slate-850">
-                          <span className="text-[10px] font-mono font-bold text-slate-300">R$ {lead.value.toLocaleString('pt-BR')}</span>
-                          <button 
-                            onClick={() => moveLeadStage(lead.id, lead.stage)}
-                            className="p-1 bg-emerald-650 hover:bg-emerald-500 text-white rounded transition-all"
-                            title="Fechar negócio"
-                          >
-                            <CheckCircle className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stage 4: Won */}
-                <div className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[400px]">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Fechado / Ganho</span>
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">
-                      {leads.filter(l => l.stage === 'won').length}
-                    </span>
-                  </div>
-                  <div className="space-y-3 flex-1 overflow-y-auto">
-                    {leads.filter(l => l.stage === 'won').map(lead => (
-                      <div key={lead.id} className="bg-emerald-950/20 border border-emerald-500/20 p-3 rounded-lg shadow space-y-2 transition-all">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded uppercase">Convertido</span>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-105">{lead.name}</h4>
-                          <p className="text-[10px] text-slate-400">{lead.company}</p>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-emerald-900/30">
-                          <span className="text-[10px] font-mono font-bold text-emerald-400">R$ {lead.value.toLocaleString('pt-BR')}</span>
-                          <span className="text-[9px] text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded">Ganho</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Client List Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
-                <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-200">Lista Completa de Clientes / Contatos</h3>
-                  <span className="text-xs text-slate-400">{clients.length} cadastrados</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs text-slate-350 border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 text-[10px] uppercase font-bold text-left">
-                        <th className="p-3">Nome / Contato</th>
-                        <th className="p-3">Empresa</th>
-                        <th className="p-3">E-mail</th>
-                        <th className="p-3">Telefone</th>
-                        <th className="p-3 text-right">Volume Negociado</th>
-                        <th className="p-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {clients.map(client => (
-                        <tr key={client.id} className="border-b border-slate-850 hover:bg-slate-950/20 transition-all">
-                          <td className="p-3 font-semibold text-white">{client.name}</td>
-                          <td className="p-3">{client.company}</td>
-                          <td className="p-3 font-mono text-[10px]">{client.email}</td>
-                          <td className="p-3 font-mono">{client.phone}</td>
-                          <td className="p-3 text-right font-mono font-semibold text-indigo-300">
-                            {client.spend > 0 ? `R$ ${client.spend.toLocaleString('pt-BR')}` : '-'}
-                          </td>
-                          <td className="p-3 text-center">
-                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                              client.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                            }`}>
-                              {client.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
-          {/* 4. MARKETING & CUPONS VIEW */}
+          {/* ================= 4. MARKETING VIEW ================= */}
           {currentTab === 'marketing' && (
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Marketing & Cupons Promocionais</h2>
-                  <p class="text-sm text-slate-400">Gere cupons promocionais para seus eventos e dispare campanhas integradas.</p>
+                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Marketing & Cupons</h2>
+                  <p className="text-sm text-slate-400">Ative descontos e engaje seus clientes com campanhas integradas.</p>
                 </div>
-                <div>
-                  <button 
-                    onClick={() => setShowAddCouponModal(true)}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-600/10"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Gerar Novo Cupom</span>
-                  </button>
-                </div>
+                <button 
+                  onClick={() => setShowAddCouponModal(true)}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Novo Cupom</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Coupons Manager */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 lg:col-span-2 shadow-md space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 className="text-sm font-bold text-slate-200">Cupons de Desconto Criados</h3>
-                    <span className="text-[10px] text-slate-400">{coupons.length} cupons</span>
-                  </div>
-
+                  <h3 className="text-sm font-bold text-slate-200">Cupons Ativos</h3>
                   <div className="space-y-3">
                     {coupons.map(coupon => (
-                      <div key={coupon.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-750 transition-all">
+                      <div key={coupon.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 rounded bg-indigo-600/10 text-indigo-400 font-bold flex items-center justify-center text-xs">
                             {coupon.discount}%
                           </div>
                           <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs font-mono font-bold text-white tracking-wider">{coupon.code}</span>
-                              <span className="text-[9px] text-slate-500">{coupon.event}</span>
-                            </div>
-                            <p className="text-[9px] text-slate-400 mt-0.5">{coupon.usages} utilizações registradas</p>
+                            <span className="text-xs font-mono font-bold text-white tracking-wider block">{coupon.code}</span>
+                            <span className="text-[9px] text-slate-500">{coupon.event}</span>
                           </div>
                         </div>
-
-                        <div className="flex items-center space-x-4">
-                          <span className={`text-[9px] font-bold px-2.5 py-0.5 rounded-full ${
-                            coupon.status === 'Ativo' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-800 text-slate-500'
-                          }`}>
-                            {coupon.status}
-                          </span>
-                          <button 
-                            onClick={() => toggleCouponStatus(coupon.id)}
-                            className={`px-2 py-1 text-[10px] font-semibold rounded border transition-all ${
-                              coupon.status === 'Ativo'
-                                ? 'border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white'
-                                : 'bg-indigo-600 hover:bg-indigo-500 text-white border-transparent'
-                            }`}
-                          >
-                            {coupon.status === 'Ativo' ? 'Pausar' : 'Reativar'}
-                          </button>
-                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                          coupon.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'
+                        }`}>{coupon.status}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-
-                {/* Campaigns Summary Panel */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                      <h3 className="text-sm font-bold text-slate-200">Campanhas Ativas</h3>
-                      <span className="text-[9px] bg-indigo-500/20 text-indigo-300 font-bold px-2 py-0.5 rounded">E-mail</span>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="p-3 rounded-lg bg-slate-950/40 border border-slate-850/60">
-                        <h4 className="text-xs font-bold text-white">Festival Inverno - Pré-Venda VIP</h4>
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 mt-2">
-                          <span>Aberturas: 82%</span>
-                          <span>Cliques: 24%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-                          <div className="bg-indigo-500 h-full rounded-full" style={{ width: '82%' }}></div>
-                        </div>
-                      </div>
-
-                      <div className="p-3 rounded-lg bg-slate-950/40 border border-slate-850/60">
-                        <h4 className="text-xs font-bold text-white">Metal Fest - Lote 1 Prorrogado</h4>
-                        <div className="flex justify-between items-center text-[10px] text-slate-400 mt-2">
-                          <span>Aberturas: 54%</span>
-                          <span>Cliques: 12%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-                          <div className="bg-pink-500 h-full rounded-full" style={{ width: '54%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button 
-                    onClick={() => triggerToast("Envio Programado", "Campanha de e-mail marketing agendada para às 19:00.")}
-                    className="mt-6 w-full py-2 bg-indigo-650 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all"
-                  >
-                    Novo Disparo em Massa
-                  </button>
-                </div>
-
               </div>
             </div>
           )}
 
-          {/* 5. APP STORE VIEW (CENTRAL DE APLICATIVOS) */}
+          {/* ================= 5. CENTRAL DE APP STORE ================= */}
           {currentTab === 'appstore' && (
             <div className="space-y-8 animate-fadeIn">
               <div>
                 <h2 className="text-2xl font-extrabold text-white tracking-tight">Central de Aplicativos</h2>
-                <p class="text-sm text-slate-400">Gerencie e ative novos módulos de produtividade integrados ao seu ecossistema.</p>
+                <p className="text-sm text-slate-400">Adicione ou ative ferramentas integradas contábeis ou comerciais.</p>
               </div>
 
-              {/* Grid of Apps */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
-                {/* Financeiro */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-750 transition-all duration-300">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
                   <div>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-400">
-                        <CreditCard className="w-6 h-6" />
-                      </div>
-                      <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Instalado</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">Financeiro</h3>
-                    <p class="text-xs text-slate-400 mt-1">Gestão de caixa, fluxo financeiro, conciliações e pagamentos.</p>
-                  </div>
-                  <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center justify-center">
-                    Ativo no Menu
-                  </button>
-                </div>
-
-                {/* Contabilidade */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-750 transition-all duration-300">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400">
-                        <Landmark className="w-6 h-6" />
-                      </div>
-                      <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Instalado</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">Contabilidade</h3>
-                    <p class="text-xs text-slate-400 mt-1">Emissão automática de notas, escrituração fiscal e integração bancária.</p>
-                  </div>
-                  <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center justify-center">
-                    Ativo no Menu
-                  </button>
-                </div>
-
-                {/* CRM */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all duration-300 group">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform duration-200">
+                      <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center text-pink-400">
                         <Users className="w-6 h-6" />
                       </div>
-                      <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                        installedApps.crm === true 
-                          ? 'bg-emerald-500/10 text-emerald-400' 
-                          : 'bg-indigo-500/10 text-indigo-400'
-                      }`}>
-                        {installedApps.crm === true ? 'Instalado' : 'Disponível'}
-                      </span>
+                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">Disponível</span>
                     </div>
                     <h3 className="text-base font-bold text-slate-200">CRM de Vendas</h3>
-                    <p class="text-xs text-slate-400 mt-1">Gerencie leads, campanhas de pré-venda e histórico de compras dos produtores.</p>
+                    <p className="text-xs text-slate-400 mt-1">Negociações, cadastro de novos contatos e funil de prospecção.</p>
                   </div>
-                  
                   {installedApps.crm === true ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center justify-center">
-                      Módulo Habilitado
-                    </button>
+                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">Habilitado</button>
                   ) : installedApps.crm === 'installing' ? (
                     <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-400 text-xs font-bold rounded-lg flex items-center justify-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Instalando...</span>
+                      <Loader2 className="w-4 h-4 animate-spin" /><span>Instalando...</span>
                     </button>
                   ) : (
                     <button 
                       onClick={() => handleInstallApp('crm', 'CRM de Vendas')} 
-                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center"
+                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg"
                     >
                       Instalar Módulo
                     </button>
                   )}
                 </div>
 
-                {/* Marketing */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all duration-300 group">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
                   <div>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-sky-500/10 rounded-lg flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform duration-200">
+                      <div className="w-12 h-12 bg-sky-500/10 rounded-lg flex items-center justify-center text-sky-400">
                         <Mail className="w-6 h-6" />
                       </div>
-                      <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                        installedApps.mkt === true 
-                          ? 'bg-emerald-500/10 text-emerald-400' 
-                          : 'bg-indigo-500/10 text-indigo-400'
-                      }`}>
-                        {installedApps.mkt === true ? 'Instalado' : 'Disponível'}
-                      </span>
+                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">Disponível</span>
                     </div>
                     <h3 className="text-base font-bold text-slate-200">Marketing Automação</h3>
-                    <p class="text-xs text-slate-400 mt-1">Automação de e-mails, campanhas promocionais e cupons customizados.</p>
+                    <p className="text-xs text-slate-400 mt-1">Disparo de e-mails em massa e gerador de cupons de descontos.</p>
                   </div>
-                  
                   {installedApps.mkt === true ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center justify-center">
-                      Módulo Habilitado
-                    </button>
+                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">Habilitado</button>
                   ) : installedApps.mkt === 'installing' ? (
                     <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-400 text-xs font-bold rounded-lg flex items-center justify-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Instalando...</span>
+                      <Loader2 className="w-4 h-4 animate-spin" /><span>Instalando...</span>
                     </button>
                   ) : (
                     <button 
                       onClick={() => handleInstallApp('mkt', 'Marketing Automação')} 
-                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center"
+                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg"
                     >
                       Instalar Módulo
-                    </button>
-                  )}
-                </div>
-
-                {/* Inteligência Artificial */}
-                <div className="bg-slate-900 border border-indigo-500/30 rounded-xl p-6 flex flex-col justify-between hover:border-indigo-500 transition-all duration-300 relative shadow-lg shadow-indigo-500/5 group">
-                  <div className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-[9px] px-3 py-0.5 rounded-full font-extrabold uppercase tracking-widest shadow-md">
-                    RECOMENDADO
-                  </div>
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform duration-200">
-                        <Brain className="w-6 h-6 animate-pulse" />
-                      </div>
-                      <span className="bg-indigo-500/20 text-indigo-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Premium (Expert)</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">Disk AI Copilot</h3>
-                    <p class="text-xs text-slate-400 mt-1">Copiloto financeiro de inteligência artificial. Gera DRE, relatórios complexos, e faz previsões.</p>
-                  </div>
-                  
-                  {plan === 'expert' ? (
-                    <button 
-                      onClick={() => {
-                        setChatOpen(true);
-                        triggerToast("Copiloto Online", "O Disk AI Copilot foi ativado no canto inferior direito.");
-                      }}
-                      className="mt-6 w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center"
-                    >
-                      Abrir AI Copilot
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => {
-                        setCurrentTab('marketplace');
-                        triggerToast("Módulo Bloqueado", "Adquira o Plano Expert para liberar a inteligência artificial.", "warning");
-                      }}
-                      className="mt-6 w-full py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center shadow-md shadow-indigo-600/20"
-                    >
-                      Liberar no Plano Expert
-                    </button>
-                  )}
-                </div>
-
-                {/* Open Finance */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all duration-300 group">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-violet-500/10 rounded-lg flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform duration-200">
-                        <Landmark className="w-6 h-6" />
-                      </div>
-                      <span className="bg-violet-500/20 text-violet-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Premium (Expert)</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">Open Finance Integrado</h3>
-                    <p class="text-xs text-slate-400 mt-1">Conecte contas bancárias simultaneamente e gerencie o spread financeiro com segurança.</p>
-                  </div>
-                  
-                  {plan === 'expert' ? (
-                    <button 
-                      onClick={() => triggerToast("Open Finance Conectado", "Varredura contábil multibanco integrada ao ERP.")}
-                      className="mt-6 w-full py-2 bg-emerald-650 text-white text-xs font-bold rounded-lg flex items-center justify-center"
-                    >
-                      Sincronizar Contas
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => setCurrentTab('marketplace')} 
-                      className="mt-6 w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-350 hover:text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center"
-                    >
-                      Ver Planos de Upgrade
                     </button>
                   )}
                 </div>
@@ -1476,156 +1726,53 @@ export default function App() {
             </div>
           )}
 
-          {/* 6. MARKETPLACE VIEW (PLANS & UPGRADES) */}
+          {/* ================= 6. MARKETPLACE VIEW ================= */}
           {currentTab === 'marketplace' && (
-            <div className="space-y-8 animate-fadeIn">
-              <div className="text-center max-w-2xl mx-auto space-y-2">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Potencialize seu Negócio</h2>
-                <p class="text-sm text-slate-400">Selecione o plano ideal para gerenciar, automatizar e aplicar inteligência avançada sobre seus resultados.</p>
+            <div className="space-y-8 animate-fadeIn text-center">
+              <div className="max-w-2xl mx-auto space-y-2">
+                <h2 className="text-3xl font-extrabold text-white tracking-tight">Assinaturas & Recursos Contábeis</h2>
+                <p className="text-sm text-slate-400">Liberte o copiloto fiscal e ferramentas multibancos em escala de alta performance.</p>
               </div>
 
-              {/* Pricing Cards Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6 max-w-5xl mx-auto">
-                
-                {/* Standard (Current) */}
+                {/* Standard */}
                 <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
                   plan === 'standard' ? 'border-indigo-500' : 'border-slate-800'
                 }`}>
-                  {plan === 'standard' && (
-                    <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold tracking-wider">ATIVO</div>
-                  )}
+                  {plan === 'standard' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
                     <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Iniciante</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Standard</h3>
-                    <p class="text-xs text-slate-400 mt-2">O essencial para vendas de ingressos rápidas e conciliação básica.</p>
-                    
-                    <hr className="border-slate-800 my-6" />
-                    
-                    <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Venda de Ingressos Integrada</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Dashboard de Performance Básico</span>
-                      </li>
-                      <li className="flex items-center space-x-3 text-slate-500">
-                        <X className="w-4 h-4 text-slate-750 shrink-0" />
-                        <span>Sem Automações Avançadas</span>
-                      </li>
-                      <li className="flex items-center space-x-3 text-slate-500">
-                        <X className="w-4 h-4 text-slate-750 shrink-0" />
-                        <span>Sem Copiloto de IA</span>
-                      </li>
-                    </ul>
+                    <p className="text-xs text-slate-400 mt-2">Fechamento de eventos simples e dashboard geral.</p>
                   </div>
-                  <button 
-                    onClick={() => handleUpgradePlan('standard', 'Standard')}
-                    disabled={plan === 'standard'} 
-                    className={`mt-8 w-full py-3 text-sm font-bold rounded-xl transition-all ${
-                      plan === 'standard' 
-                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-500 text-white'
-                    }`}
-                  >
-                    {plan === 'standard' ? 'Plano Atual' : 'Selecionar Standard'}
-                  </button>
+                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className="mt-8 w-full py-3 bg-slate-800 text-slate-500 text-sm font-bold rounded-xl">Plano Atual</button>
                 </div>
 
                 {/* Advanced */}
-                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-indigo-500 transition-all shadow-xl ${
-                  plan === 'advanced' ? 'border-indigo-500' : 'border-indigo-500/30'
+                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-indigo-500 transition-all ${
+                  plan === 'advanced' ? 'border-indigo-500' : 'border-indigo-500/20'
                 }`}>
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-[10px] px-4 py-1 rounded-full font-bold tracking-widest shadow-md">RECOMENDADO</div>
-                  {plan === 'advanced' && (
-                    <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold tracking-wider">ATIVO</div>
-                  )}
+                  {plan === 'advanced' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
                     <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Profissional</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Advanced</h3>
-                    <p class="text-xs text-slate-400 mt-2">Perfeito para organizadores que precisam automatizar o financeiro e garantir DRE ágil.</p>
-                    
-                    <hr className="border-slate-800/80 my-6" />
-                    
-                    <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Módulo de Automações Completo</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Conciliação Automatizada</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Geração Simplificada de DRE</span>
-                      </li>
-                      <li className="flex items-center space-x-3 text-slate-500">
-                        <X className="w-4 h-4 text-slate-750 shrink-0" />
-                        <span>Sem Copiloto de IA</span>
-                      </li>
-                    </ul>
+                    <p className="text-xs text-slate-400 mt-2">Conciliação automática e DREs por competência mensais.</p>
                   </div>
-                  <button 
-                    onClick={() => handleUpgradePlan('advanced', 'Advanced')}
-                    disabled={plan === 'advanced'}
-                    className={`mt-8 w-full py-3 text-sm font-bold rounded-xl transition-all ${
-                      plan === 'advanced' 
-                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-650/10'
-                    }`}
-                  >
-                    {plan === 'advanced' ? 'Plano Atual' : 'Assinar Advanced'}
-                  </button>
+                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-indigo-650 text-white text-sm font-bold rounded-xl">Assinar Advanced</button>
                 </div>
 
                 {/* Expert */}
-                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
-                  plan === 'expert' ? 'border-indigo-500' : 'border-slate-800'
+                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-indigo-500 transition-all ${
+                  plan === 'expert' ? 'border-indigo-550' : 'border-slate-800'
                 }`}>
-                  {plan === 'expert' && (
-                    <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold tracking-wider">ATIVO</div>
-                  )}
+                  {plan === 'expert' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
                     <span className="text-xs font-bold text-violet-400 uppercase tracking-widest">Alta Escala</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Expert</h3>
-                    <p class="text-xs text-slate-400 mt-2">Para produtoras de alta performance que exigem IA de ponta, BI e auditoria de spread.</p>
-                    
-                    <hr className="border-slate-800 my-6" />
-                    
-                    <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span className="font-semibold text-indigo-300">Disk AI Copilot Integrado</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Auditoria de Spread & Split de Notas</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>BI, Forecast de Venda e Inteligência Contábil</span>
-                      </li>
-                      <li className="flex items-center space-x-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>Open Finance com Conciliação Multibanco</span>
-                      </li>
-                    </ul>
+                    <p className="text-xs text-slate-400 mt-2">Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
                   </div>
-                  <button 
-                    onClick={() => handleUpgradePlan('expert', 'Expert')}
-                    disabled={plan === 'expert'}
-                    className={`mt-8 w-full py-3 text-sm font-bold rounded-xl transition-all ${
-                      plan === 'expert' 
-                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-600/10'
-                    }`}
-                  >
-                    {plan === 'expert' ? 'Plano Atual' : 'Assinar Expert'}
-                  </button>
+                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-bold rounded-xl">Assinar Expert</button>
                 </div>
-
               </div>
             </div>
           )}
@@ -1648,7 +1795,6 @@ export default function App() {
         {/* DISK AI WIDGET (COPILOT) */}
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             
-          {/* Chat Window */}
           {chatOpen && (
             <div className="w-96 max-h-[500px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-300 origin-bottom-right">
               {/* Chat Header */}
@@ -1673,10 +1819,7 @@ export default function App() {
               {/* Chat Messages Body */}
               <div className="flex-1 p-4 overflow-y-auto space-y-4 h-[280px]" id="chat-messages">
                 {chatMessages.map(msg => (
-                  <div 
-                    key={msg.id} 
-                    className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : ''}`}
-                  >
+                  <div key={msg.id} className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                     {msg.sender === 'ai' && (
                       <div className="w-6.5 h-6.5 rounded bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
                         AI
@@ -1693,7 +1836,6 @@ export default function App() {
                   </div>
                 ))}
                 
-                {/* Typing indicator */}
                 {isTyping && (
                   <div className="flex items-start space-x-2.5">
                     <div className="w-6.5 h-6.5 rounded bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
@@ -1722,11 +1864,11 @@ export default function App() {
                   <button onClick={() => triggerAIResponse('dre')} className="px-2 py-1.5 text-[10px] font-medium bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:bg-indigo-600/5 text-slate-300 rounded text-left truncate transition-all">
                     📊 Gerar DRE
                   </button>
-                  <button onClick={() => triggerAIResponse('spread')} className="px-2 py-1.5 text-[10px] font-medium bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:bg-indigo-600/5 text-slate-300 rounded text-left truncate transition-all">
-                    💸 Calcular Spread
+                  <button onClick={() => triggerAIResponse('nfe')} className="px-2 py-1.5 text-[10px] font-medium bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:bg-indigo-600/5 text-slate-300 rounded text-left truncate transition-all">
+                    🧾 Notas Pendentes
                   </button>
-                  <button onClick={() => triggerAIResponse('fluxo')} className="px-2 py-1.5 text-[10px] font-medium bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:bg-indigo-600/5 text-slate-300 rounded text-left truncate transition-all">
-                    📉 Simular Fluxo
+                  <button onClick={() => triggerAIResponse('borderos')} className="px-2 py-1.5 text-[10px] font-medium bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:bg-indigo-600/5 text-slate-300 rounded text-left truncate transition-all">
+                    📋 Status Borderôs
                   </button>
                 </div>
               </div>
@@ -1737,10 +1879,10 @@ export default function App() {
                   type="text" 
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Pergunte sobre receitas, vendas ou CRM..."
+                  placeholder="Pergunte sobre DRE, borderô, NFe..."
                   className="flex-1 bg-slate-950 border border-slate-850 rounded px-2.5 py-1 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
                 />
-                <button type="submit" className="p-1 bg-indigo-600 hover:bg-indigo-500 rounded text-white active:scale-95 transition-all">
+                <button type="submit" className="p-1 bg-indigo-650 hover:bg-indigo-600 rounded text-white active:scale-95 transition-all">
                   <Send className="w-4 h-4" />
                 </button>
               </form>
@@ -1778,7 +1920,7 @@ export default function App() {
                   type="text" 
                   value={newLead.name}
                   onChange={(e) => setNewLead(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ex: Vinícius Nogueira"
+                  placeholder="Ex: Roberto Alencar"
                   className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
                   required
                 />
@@ -1790,7 +1932,7 @@ export default function App() {
                   type="text" 
                   value={newLead.company}
                   onChange={(e) => setNewLead(prev => ({ ...prev, company: e.target.value }))}
-                  placeholder="Ex: Curitiba Show Eventos"
+                  placeholder="Ex: Prime Show Eventos"
                   className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
                   required
                 />
@@ -1822,21 +1964,6 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">Tag de Classificação</label>
-                <select 
-                  value={newLead.tag}
-                  onChange={(e) => setNewLead(prev => ({ ...prev, tag: e.target.value }))}
-                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
-                >
-                  <option value="Novo">Novo</option>
-                  <option value="VIP">VIP</option>
-                  <option value="Quente">Quente</option>
-                  <option value="Frio">Frio</option>
-                  <option value="Alta Margem">Alta Margem</option>
-                </select>
-              </div>
-
               <div className="pt-4 flex space-x-3 justify-end">
                 <button 
                   type="button" 
@@ -1847,7 +1974,7 @@ export default function App() {
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all"
                 >
                   Salvar Lead
                 </button>
@@ -1905,31 +2032,6 @@ export default function App() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase">Telefone</label>
-                  <input 
-                    type="text" 
-                    value={newClient.phone}
-                    onChange={(e) => setNewClient(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="(41) 99888-0000"
-                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase">Status Inicial</label>
-                  <select 
-                    value={newClient.status}
-                    onChange={(e) => setNewClient(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
-                  >
-                    <option value="Ativo">Ativo</option>
-                    <option value="Em Negociação">Em Negociação</option>
-                    <option value="Pendente">Pendente</option>
-                  </select>
-                </div>
-              </div>
-
               <div className="pt-4 flex space-x-3 justify-end">
                 <button 
                   type="button" 
@@ -1940,7 +2042,7 @@ export default function App() {
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all"
                 >
                   Cadastrar
                 </button>
@@ -1986,31 +2088,6 @@ export default function App() {
                   max="100"
                   required
                 />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">Vincular ao Evento *</label>
-                <select 
-                  value={newCoupon.event}
-                  onChange={(e) => setNewCoupon(prev => ({ ...prev, event: e.target.value }))}
-                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
-                >
-                  <option value="Festival de Inverno Curitiba">Festival de Inverno Curitiba</option>
-                  <option value="Metal Fest 2026">Metal Fest 2026</option>
-                  <option value="Embafeste Premium">Embafeste Premium</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase">Status Inicial</label>
-                <select 
-                  value={newCoupon.status}
-                  onChange={(e) => setNewCoupon(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
-                >
-                  <option value="Ativo">Ativo</option>
-                  <option value="Inativo">Inativo</option>
-                </select>
               </div>
 
               <div className="pt-4 flex space-x-3 justify-end">
