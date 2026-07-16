@@ -82,17 +82,19 @@ export default function App() {
   const messagesEndRef = useRef(null);
 
   // Theme-based class helpers
-  const bgMain = theme === 'dark' ? 'bg-[#0F172A]' : 'bg-[#F8FAFC]';
+  const bgMain = theme === 'dark' ? 'bg-[#0F172A]' : 'bg-[#F1F5F9]';
   const bgSidebar = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#FFFFFF]';
   const bgCard = theme === 'dark' ? 'bg-[#131C2D]' : 'bg-[#FFFFFF]';
-  const bgInput = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#F1F5F9]';
-  const bgHeader = theme === 'dark' ? 'bg-[#111827]/60' : 'bg-white/80';
+  const bgInput = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#FFFFFF]';
+  const bgHeader = theme === 'dark' ? 'bg-[#111827]/60' : 'bg-[#FFFFFF]';
   
-  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-200';
+  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-300/80';
   
-  const textTitle = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-slate-900';
-  const textBody = theme === 'dark' ? 'text-[#CBD5E1]' : 'text-slate-700';
-  const textSec = theme === 'dark' ? 'text-[#94A3B8]' : 'text-slate-500';
+  const textTitle = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-slate-950';
+  const textBody = theme === 'dark' ? 'text-[#CBD5E1]' : 'text-slate-800';
+  const textSec = theme === 'dark' ? 'text-[#94A3B8]' : 'text-slate-600';
+  const btnSecondary = theme === 'dark' ? 'bg-[#1E293B] hover:bg-[#273449] text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300/40';
+  const selectThemeText = theme === 'dark' ? 'text-white font-medium' : 'text-slate-900 font-semibold';
 
   // Commercial App Catalog mapped to Plan Requirements
   const appsCatalog = [
@@ -2443,8 +2445,8 @@ export default function App() {
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
             <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className="text-sm font-semibold text-white">Adicionar Lead ao Funil</h3>
-              <button onClick={() => setShowAddLeadModal(false)} className={`${textSec} hover:text-white`}>
+              <h3 className={`text-sm font-semibold ${textTitle}`}>Adicionar Lead ao Funil</h3>
+              <button onClick={() => setShowAddLeadModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2491,7 +2493,7 @@ export default function App() {
                   <select 
                     value={newLead.stage}
                     onChange={(e) => setNewLead(prev => ({ ...prev, stage: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="prospect">Prospecção</option>
                     <option value="qualified">Qualificado</option>
@@ -2504,7 +2506,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddLeadModal(false)}
-                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
+                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2525,8 +2527,8 @@ export default function App() {
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
             <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className="text-sm font-semibold text-white">Cadastrar Cliente Contato</h3>
-              <button onClick={() => setShowAddClientModal(false)} className={`${textSec} hover:text-white`}>
+              <h3 className={`text-sm font-semibold ${textTitle}`}>Cadastrar Cliente Contato</h3>
+              <button onClick={() => setShowAddClientModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2572,7 +2574,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddClientModal(false)}
-                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
+                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2593,8 +2595,8 @@ export default function App() {
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
             <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className="text-sm font-semibold text-white">Criar Cupom de Desconto</h3>
-              <button onClick={() => setShowAddCouponModal(false)} className={`${textSec} hover:text-white`}>
+              <h3 className={`text-sm font-semibold ${textTitle}`}>Criar Cupom de Desconto</h3>
+              <button onClick={() => setShowAddCouponModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2630,7 +2632,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCouponModal(false)}
-                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
+                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2651,8 +2653,8 @@ export default function App() {
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
             <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className="text-sm font-semibold text-white">Ativar Ponto de Venda (PDV)</h3>
-              <button onClick={() => setShowAddPdvModal(false)} className={`${textSec} hover:text-white`}>
+              <h3 className={`text-sm font-semibold ${textTitle}`}>Ativar Ponto de Venda (PDV)</h3>
+              <button onClick={() => setShowAddPdvModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2688,7 +2690,7 @@ export default function App() {
                   <select 
                     value={newPdv.type}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, type: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="Local">Local</option>
                     <option value="Físico Externo">Físico Externo</option>
@@ -2711,7 +2713,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddPdvModal(false)}
-                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
+                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2732,8 +2734,8 @@ export default function App() {
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
             <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
-              <h3 className="text-sm font-semibold text-white">Criar Nova Campanha de Marketing</h3>
-              <button onClick={() => setShowAddCampaignModal(false)} className={`${textSec} hover:text-white`}>
+              <h3 className={`text-sm font-semibold ${textTitle}`}>Criar Nova Campanha de Marketing</h3>
+              <button onClick={() => setShowAddCampaignModal(false)} className={`${textSec} ${theme === 'dark' ? 'hover:text-white' : 'hover:text-slate-905'}`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2757,7 +2759,7 @@ export default function App() {
                   <select 
                     value={newCampaign.channel}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, channel: e.target.value }))}
-                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${selectThemeText}`}
                   >
                     <option value="E-mail">E-mail</option>
                     <option value="WhatsApp">WhatsApp</option>
@@ -2793,7 +2795,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCampaignModal(false)}
-                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-805 text-[#CBD5E1] text-xs font-semibold rounded-lg transition-all`}
+                  className={`px-4 py-2 ${btnSecondary} text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
