@@ -39,7 +39,8 @@ import {
   Smartphone,
   Play,
   Sun,
-  Moon
+  Moon,
+  Menu
 } from 'lucide-react';
 
 export default function App() {
@@ -50,6 +51,7 @@ export default function App() {
   const [marketingSubTab, setMarketingSubTab] = useState('campanhas');
   const [plan, setPlan] = useState('standard');
   const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   // App store installation simulation state
   const [installedApps, setInstalledApps] = useState({
@@ -80,6 +82,11 @@ export default function App() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const selectTab = (tabName) => {
+    setCurrentTab(tabName);
+    setMobileSidebarOpen(false);
+  };
 
   // Theme-based class mapping (Limitless CSS styles)
   const bgMain = theme === 'dark' ? 'bg-[#0f172a] text-[#cbd5e1]' : 'bg-[#f4f6f9] text-[#333333]';
@@ -764,10 +771,10 @@ export default function App() {
     <div className={`page-content flex-1 flex ${bgMain} min-h-screen overflow-hidden transition-colors duration-250`}>
       
       {/* SIDEBAR NAVIGATION - Limitless Sidebar layout */}
-      <aside className={`sidebar ${theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-[#FFFFFF]'} w-64 border-right ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
+      <aside className={`sidebar sidebar-main sidebar-expand-md ${theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-[#FFFFFF]'} ${mobileSidebarOpen ? 'sidebar-mobile-expanded' : ''} border-right ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
         <div>
           {/* Logo Area */}
-          <div className={`p-4 border-bottom ${borderCol}`}>
+          <div className={`p-4 border-bottom ${borderCol} flex items-center justify-between`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 bg-[#2563EB] rounded flex items-center justify-center shadow">
                 <Landmark className="w-5 h-5 text-white" />
@@ -779,6 +786,13 @@ export default function App() {
                 <span className={`text-[10px] ${textSec} uppercase tracking-wider font-semibold`}>ERP & CRM Cloud</span>
               </div>
             </div>
+            <button 
+              type="button"
+              onClick={() => setMobileSidebarOpen(false)}
+              className={`md:hidden p-1 rounded hover:bg-light/10 ${textSec} border-0 bg-transparent cursor-pointer`}
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* User Profile / Menu (Limitless user section) */}
@@ -803,7 +817,7 @@ export default function App() {
 
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('dashboard')} 
+                  onClick={() => selectTab('dashboard')} 
                   className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'dashboard' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -818,7 +832,7 @@ export default function App() {
               {/* FINANCEIRO (ERP) */}
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('financeiro')} 
+                  onClick={() => selectTab('financeiro')} 
                   className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'financeiro' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -833,7 +847,7 @@ export default function App() {
               {/* CONTABILIDADE DISK */}
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('contabilidade')} 
+                  onClick={() => selectTab('contabilidade')} 
                   className={`nav-link w-full text-left flex items-center justify-between px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'contabilidade' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -854,7 +868,7 @@ export default function App() {
               {installedApps.crm === true && (
                 <li className="nav-item w-full">
                   <button 
-                    onClick={() => setCurrentTab('crm')} 
+                    onClick={() => selectTab('crm')} 
                     className={`nav-link w-full text-left flex items-center justify-between px-4 py-2 text-sm transition-all border-l-[3px] ${
                       currentTab === 'crm' 
                         ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -876,7 +890,7 @@ export default function App() {
               {installedApps.mkt === true && (
                 <li className="nav-item w-full">
                   <button 
-                    onClick={() => setCurrentTab('marketing')} 
+                    onClick={() => selectTab('marketing')} 
                     className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                       currentTab === 'marketing' 
                         ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -893,7 +907,7 @@ export default function App() {
 
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('appstore')} 
+                  onClick={() => selectTab('appstore')} 
                   className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'appstore' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -907,7 +921,7 @@ export default function App() {
 
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('marketplace')} 
+                  onClick={() => selectTab('marketplace')} 
                   className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'marketplace' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -921,7 +935,7 @@ export default function App() {
 
               <li className="nav-item w-full">
                 <button 
-                  onClick={() => setCurrentTab('roadmap')} 
+                  onClick={() => selectTab('roadmap')} 
                   className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
                     currentTab === 'roadmap' 
                       ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
@@ -943,8 +957,16 @@ export default function App() {
         {/* HEADER / TOP NAVBAR */}
         <header className={`navbar navbar-expand-md ${headerClass} px-4 py-3 flex items-center justify-between sticky top-0 z-40 transition-colors duration-250`}>
           <div className="flex items-center space-x-2">
-            <span className={`text-xs ${textSec} uppercase tracking-wider font-semibold`}>Espaço de Trabalho</span>
-            <span className="text-slate-400">/</span>
+            <button 
+              type="button"
+              onClick={() => setMobileSidebarOpen(true)}
+              className="md:hidden p-1 rounded hover:bg-light/10 text-slate-500 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
+              title="Abrir Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className={`text-xs ${textSec} uppercase tracking-wider font-semibold hidden sm:inline`}>Espaço de Trabalho</span>
+            <span className="text-slate-400 hidden sm:inline">/</span>
             <span className={`text-sm font-semibold ${textTitle} capitalize`}>
               {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'marketing' ? 'Marketing & Campanhas' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
             </span>
