@@ -769,10 +769,10 @@ export default function App() {
   };
 
   return (
-    <div className={`flex-1 flex ${bgMain} ${textBody} min-h-screen overflow-hidden transition-colors duration-250`}>
+    <div className={`page-content flex-1 flex ${bgMain} ${textBody} min-h-screen overflow-hidden transition-colors duration-250`}>
       
       {/* SIDEBAR NAVIGATION */}
-      <aside className={`w-64 ${bgSidebar} border-r ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
+      <aside className={`sidebar ${theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-[#FFFFFF]'} w-64 border-r ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
         <div>
           {/* Logo Area */}
           <div className={`p-6 border-b ${borderCol} ${bgSidebar}`}>
