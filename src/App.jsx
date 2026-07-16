@@ -111,9 +111,9 @@ export default function App() {
   });
 
   const [accounts, setAccounts] = useState([
-    { id: 'acc-1', name: 'Banco Itaú - Conta Corrente', type: 'Bancária', balance: 420000, color: 'border-orange-400/50' },
-    { id: 'acc-2', name: 'Disk Digital - Antecipações', type: 'Digital', balance: 380000, color: 'border-blue-400/50' },
-    { id: 'acc-3', name: 'Caixa Geral (PDV Físico)', type: 'Caixa', balance: 150000, color: 'border-slate-500/50' }
+    { id: 'acc-1', name: 'Banco Itaú - Conta Corrente', type: 'Bancária', balance: 420000, color: 'border-orange-500/50' },
+    { id: 'acc-2', name: 'Disk Digital - Antecipações', type: 'Digital', balance: 380000, color: 'border-blue-500/50' },
+    { id: 'acc-3', name: 'Caixa Geral (PDV Físico)', type: 'Caixa', balance: 150000, color: 'border-slate-600/50' }
   ]);
 
   const [lancamentos, setLancamentos] = useState([
@@ -654,8 +654,8 @@ export default function App() {
         aiText = 'Auditoria automática de extratos concluída. Encontrei lançamentos prontos para conciliar.';
         html = (
           <div className="mt-2 p-2 bg-[#0d1017] border border-[#222938] rounded-lg text-[10px] space-y-1 font-mono">
-            <p className="text-emerald-450">✓ 5 lançamentos mapeados no banco Itaú/Disk</p>
-            <p className="text-blue-400">❖ Status: Prontos para liquidação</p>
+            <p className="text-emerald-400 font-bold">✓ 5 lançamentos mapeados no banco Itaú/Disk</p>
+            <p className="text-blue-400 font-bold">❖ Status: Prontos para liquidação</p>
             <button 
               onClick={() => {
                 setConciliationItems(prev => prev.map(item => ({ ...item, matched: true })));
@@ -671,11 +671,11 @@ export default function App() {
         aiText = 'DRE consolidada calculada pelo módulo fiscal. Margem líquida do trimestre está em 18.6%.';
         html = (
           <div className="mt-2 border border-[#222938] rounded-lg overflow-hidden">
-            <table className="w-full text-[10px] text-slate-400 font-mono">
-              <tr className="bg-[#0b0f17]"><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-emerald-450">R$ 2.580.000</td></tr>
-              <tr className="border-t border-[#1e2533]"><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-orange-400/80">-R$ 387.000</td></tr>
-              <tr className="border-t border-[#1e2533]"><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-orange-400/80">-R$ 1.713.000</td></tr>
-              <tr className="border-t border-[#1e2533] bg-blue-950/20 font-bold"><td className="p-1 text-white">Lucro Líquido</td><td className="p-1 text-right text-blue-400">R$ 480.000</td></tr>
+            <table className="w-full text-[10px] text-slate-300 font-mono">
+              <tr className="bg-[#0b0f17]"><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-emerald-400">R$ 2.580.000</td></tr>
+              <tr className="border-t border-[#1e2533]"><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-orange-400">-R$ 387.000</td></tr>
+              <tr className="border-t border-[#1e2533]"><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-orange-400">-R$ 1.713.000</td></tr>
+              <tr className="border-t border-[#1e2533] bg-blue-900/20 font-bold"><td className="p-1 text-white">Lucro Líquido</td><td className="p-1 text-right text-blue-400 font-bold">R$ 480.000</td></tr>
             </table>
           </div>
         );
@@ -687,7 +687,7 @@ export default function App() {
             {invoices.filter(inv => inv.status === 'Pendente').map(inv => (
               <div key={inv.id} className="flex justify-between items-center text-slate-300 font-mono">
                 <span>{inv.client} (R$ {inv.amount})</span>
-                <button onClick={() => handleEmitNFe(inv.id)} className="bg-blue-650 hover:bg-blue-600 text-white text-[8px] px-1.5 py-0.5 rounded">Emitir</button>
+                <button onClick={() => handleEmitNFe(inv.id)} className="bg-blue-600 hover:bg-blue-500 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">Emitir</button>
               </div>
             ))}
           </div>
@@ -700,10 +700,10 @@ export default function App() {
               <div key={b.id} className="flex justify-between items-center p-1.5 bg-[#0d1017] border border-[#1e2533] rounded">
                 <div>
                   <span className="font-bold text-white block">{b.name}</span>
-                  <span className="text-slate-500">Repasse Líquido: R$ {b.netPayout.toLocaleString('pt-BR')}</span>
+                  <span className="text-slate-400">Repasse Líquido: R$ {b.netPayout.toLocaleString('pt-BR')}</span>
                 </div>
                 <span className={`px-1.5 py-0.5 rounded font-bold uppercase text-[8px] ${
-                  b.status === 'Aprovado' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-orange-500/10 text-orange-400'
+                  b.status === 'Aprovado' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-orange-500/10 text-orange-400'
                 }`}>{b.status}</span>
               </div>
             ))}
@@ -767,7 +767,7 @@ export default function App() {
               onClick={() => setCurrentTab('dashboard')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'dashboard' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
               }`}
             >
@@ -780,7 +780,7 @@ export default function App() {
               onClick={() => setCurrentTab('financeiro')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'financeiro' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
               }`}
             >
@@ -793,14 +793,14 @@ export default function App() {
               onClick={() => setCurrentTab('contabilidade')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'contabilidade' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
               }`}
             >
-              <Receipt className="w-5 h-5 shrink-0 text-emerald-450" />
+              <Receipt className="w-5 h-5 shrink-0 text-emerald-400" />
               <div className="flex items-center justify-between w-full">
                 <span>Contabilidade Disk</span>
-                <span className="bg-emerald-500/15 text-emerald-450 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">
                   {invoices.filter(inv => inv.status === 'Pendente').length}
                 </span>
               </div>
@@ -812,14 +812,14 @@ export default function App() {
                 onClick={() => setCurrentTab('crm')} 
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                   currentTab === 'crm' 
-                    ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
                 }`}
               >
                 <Users className="w-5 h-5 shrink-0" />
                 <div className="flex items-center justify-between w-full">
                   <span>CRM de Vendas</span>
-                  <span className="bg-blue-550/15 text-blue-400 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <span className="bg-blue-500/10 text-blue-405 text-[10px] px-2 py-0.5 rounded-full font-bold">
                     {leads.filter(l => l.stage !== 'won').length}
                   </span>
                 </div>
@@ -832,7 +832,7 @@ export default function App() {
                 onClick={() => setCurrentTab('marketing')} 
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                   currentTab === 'marketing' 
-                    ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
                 }`}
               >
@@ -851,7 +851,7 @@ export default function App() {
                 }} 
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                   currentTab === 'pdv' 
-                    ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
                 }`}
               >
@@ -864,7 +864,7 @@ export default function App() {
               onClick={() => setCurrentTab('appstore')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'appstore' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
               }`}
             >
@@ -876,7 +876,7 @@ export default function App() {
               onClick={() => setCurrentTab('marketplace')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'marketplace' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border-transparent'
               }`}
             >
@@ -888,7 +888,7 @@ export default function App() {
               onClick={() => setCurrentTab('roadmap')} 
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
                 currentTab === 'roadmap' 
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-sm' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm' 
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'
               }`}
             >
@@ -901,7 +901,7 @@ export default function App() {
         {/* Footer / User profile */}
         <div className="p-4 border-t border-[#1e2533] bg-[#0b0f17]">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-blue-650 border border-blue-500 flex items-center justify-center font-bold text-white shadow-md">
+            <div className="w-10 h-10 rounded-full bg-blue-600 border border-blue-500 flex items-center justify-center font-bold text-white shadow-md">
               V
             </div>
             <div>
@@ -921,7 +921,7 @@ export default function App() {
         <header className="h-16 border-b border-[#1e2533] bg-[#111622]/60 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center space-x-2">
             <span className="text-xs text-slate-500 uppercase tracking-wider">Espaço de Trabalho</span>
-            <span className="text-slate-650">/</span>
+            <span className="text-slate-500">/</span>
             <span className="text-sm font-semibold text-slate-200 capitalize">
               {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'marketing' ? 'Marketing & Campanhas' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
             </span>
@@ -939,7 +939,7 @@ export default function App() {
               />
             </div>
             
-            <button className="p-2 text-slate-400 hover:text-slate-250 bg-[#1e2533]/40 rounded-lg border border-[#1e2533]/80 hover:bg-[#1e2533] relative transition-all">
+            <button className="p-2 text-slate-400 hover:text-slate-200 bg-[#1e2533]/40 rounded-lg border border-[#1e2533]/80 hover:bg-[#1e2533] relative transition-all">
               <span className="absolute top-1 right-1 w-2 h-2 bg-orange-400 rounded-full animate-ping"></span>
               <span className="absolute top-1 right-1 w-2 h-2 bg-orange-400 rounded-full"></span>
               <Bell className="w-4 h-4" />
@@ -977,7 +977,7 @@ export default function App() {
                   <div className="mt-4">
                     <span className="text-2xl font-extrabold text-slate-50 tracking-tight">R$ {financialStats.receita.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-semibold text-emerald-450 flex items-center">
+                      <span className="text-xs font-semibold text-emerald-400 flex items-center">
                         <TrendingUp className="w-3 h-3 mr-0.5" />
                         14.2%
                       </span>
@@ -990,29 +990,29 @@ export default function App() {
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Disponível</span>
-                    <div className="p-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-450 rounded-lg">
+                    <div className="p-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-lg">
                       <Landmark className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
                     <span className="text-2xl font-extrabold text-slate-50 tracking-tight">R$ {financialStats.saldo.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-[10px] text-blue-450 font-semibold bg-blue-500/10 px-2 py-0.5 rounded-full">Pronto para saque</span>
+                      <span className="text-[10px] text-blue-400 font-semibold bg-blue-500/10 px-2 py-0.5 rounded-full">Pronto para saque</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-[#111622] border border-[#1e2533] rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-slate-750 transition-all duration-300">
+                <div className="bg-[#111622] border border-[#1e2533] rounded-xl p-6 relative overflow-hidden shadow-md group hover:border-slate-700 transition-all duration-300">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Repasses Efetuados</span>
-                    <div className="p-1.5 bg-slate-800/40 border border-slate-700/55 text-slate-350 rounded-lg">
+                    <div className="p-1.5 bg-slate-805 border border-slate-700 text-slate-300 rounded-lg">
                       <ArrowRightLeft className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
                     <span className="text-2xl font-extrabold text-slate-50 tracking-tight">R$ {financialStats.repasses.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-semibold text-slate-450 flex items-center">8.3%</span>
+                      <span className="text-xs font-semibold text-slate-400 flex items-center">8.3%</span>
                       <span className="text-[10px] text-slate-500 font-medium">Agendados</span>
                     </div>
                   </div>
@@ -1022,14 +1022,14 @@ export default function App() {
                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Lucro Líquido</span>
-                    <div className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-450 rounded-lg">
+                    <div className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg">
                       <Percent className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
                     <span className="text-2xl font-extrabold text-slate-50 tracking-tight">R$ {financialStats.lucro.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-semibold text-emerald-450 flex items-center">18.6%</span>
+                      <span className="text-xs font-semibold text-emerald-400 flex items-center">18.6%</span>
                       <span className="text-[10px] text-slate-500 font-medium">Margem Operacional</span>
                     </div>
                   </div>
@@ -1073,7 +1073,7 @@ export default function App() {
                       {borderos.map(b => (
                         <div key={b.id} className="flex items-center justify-between p-2 rounded-lg bg-[#090b11]/50 border border-[#1e2533]">
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center font-bold text-blue-450 text-xs">
+                            <div className="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center font-bold text-blue-400 text-xs">
                               {b.name[0]}
                             </div>
                             <div>
@@ -1081,7 +1081,7 @@ export default function App() {
                               <p className="text-[9px] text-slate-500">{b.location}</p>
                             </div>
                           </div>
-                          <span className="text-xs font-bold text-orange-450">R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
+                          <span className="text-xs font-bold text-orange-400">R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
                         </div>
                       ))}
                     </div>
@@ -1111,7 +1111,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('contas')}
                     className={`px-3 py-1.5 rounded-md font-bold transition-all ${
-                      financeSubTab === 'contas' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-250'
+                      financeSubTab === 'contas' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Saldos & Transferências
@@ -1119,7 +1119,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('lancamentos')}
                     className={`px-3 py-1.5 rounded-md font-bold transition-all ${
-                      financeSubTab === 'lancamentos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-250'
+                      financeSubTab === 'lancamentos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Lançamentos
@@ -1127,7 +1127,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('conciliacao')}
                     className={`px-3 py-1.5 rounded-md font-bold transition-all ${
-                      financeSubTab === 'conciliacao' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-250'
+                      financeSubTab === 'conciliacao' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     Conciliação
@@ -1135,7 +1135,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('taxas')}
                     className={`px-3 py-1.5 rounded-md font-bold transition-all ${
-                      financeSubTab === 'taxas' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-250'
+                      financeSubTab === 'taxas' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     PDVs & Taxas
@@ -1152,7 +1152,7 @@ export default function App() {
                       {accounts.map(acc => (
                         <div key={acc.id} className={`bg-[#111622] border-l-4 ${acc.color} border border-[#1e2533] rounded-xl p-5 shadow-sm`}>
                           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">{acc.type}</span>
-                          <h4 className="text-xs font-bold text-slate-250 mt-1">{acc.name}</h4>
+                          <h4 className="text-xs font-bold text-slate-200 mt-1">{acc.name}</h4>
                           <div className="mt-4 font-mono font-extrabold text-lg text-white">
                             R$ {acc.balance.toLocaleString('pt-BR')}
                           </div>
@@ -1183,7 +1183,7 @@ export default function App() {
                         <select 
                           value={transfer.from} 
                           onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
-                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 font-semibold text-slate-350"
+                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 font-semibold text-slate-300"
                         >
                           {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
                         </select>
@@ -1194,7 +1194,7 @@ export default function App() {
                         <select 
                           value={transfer.to} 
                           onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
-                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 font-semibold text-slate-355"
+                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 font-semibold text-slate-300"
                         >
                           {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                         </select>
@@ -1207,7 +1207,7 @@ export default function App() {
                           value={transfer.amount}
                           onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
                           placeholder="Ex: 50000"
-                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-300 font-mono"
+                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-505 text-slate-300 font-mono"
                           required
                         />
                       </div>
@@ -1229,7 +1229,7 @@ export default function App() {
                   <div className="lg:col-span-2 bg-[#111622] border border-[#1e2533] rounded-xl p-6 shadow-md space-y-4">
                     <h3 className="text-sm font-bold text-white border-b border-[#1e2533] pb-3">Fluxo de Caixa Lançamentos</h3>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-slate-350 border-collapse">
+                      <table className="w-full text-xs text-slate-300 border-collapse">
                         <thead>
                           <tr className="border-b border-[#1e2533] text-slate-400 font-bold text-[10px] uppercase text-left">
                             <th className="p-3">Descrição / Vínculo</th>
@@ -1244,14 +1244,14 @@ export default function App() {
                             <tr key={lan.id} className="border-b border-[#1e2533]/40 hover:bg-[#090b11]/30">
                               <td className="p-3">
                                 <div className="flex items-center space-x-2">
-                                  <span className={`w-2 h-2 rounded-full ${lan.type === 'receita' ? 'bg-emerald-400' : 'bg-orange-400'}`} />
+                                  <span className={`w-2 h-2 rounded-full ${lan.type === 'receita' ? 'bg-emerald-400' : 'bg-orange-500'}`} />
                                   <span className="font-semibold text-white">{lan.desc}</span>
                                 </div>
                               </td>
                               <td className="p-3">{lan.category}</td>
                               <td className="p-3 font-mono">{lan.costCenter}</td>
                               <td className="p-3 font-mono">{lan.date}</td>
-                              <td className={`p-3 text-right font-mono font-bold ${lan.type === 'receita' ? 'text-emerald-400' : 'text-orange-450'}`}>
+                              <td className={`p-3 text-right font-mono font-bold ${lan.type === 'receita' ? 'text-emerald-400' : 'text-orange-400'}`}>
                                 {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
                               </td>
                             </tr>
@@ -1263,7 +1263,7 @@ export default function App() {
 
                   <div className="bg-[#111622] border border-[#1e2533] rounded-xl p-6 shadow-md h-fit space-y-4">
                     <div className="flex items-center space-x-2 border-b border-[#1e2533] pb-3">
-                      <Plus className="w-4 h-4 text-blue-450" />
+                      <Plus className="w-4 h-4 text-blue-400" />
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">Lançar Fluxo Manual</h4>
                     </div>
 
@@ -1273,7 +1273,7 @@ export default function App() {
                           type="button"
                           onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
                           className={`flex-1 py-1.5 rounded text-center font-bold transition-all ${
-                            newLancamento.type === 'receita' ? 'bg-emerald-600/20 text-emerald-450' : 'text-slate-500 hover:text-slate-300'
+                            newLancamento.type === 'receita' ? 'bg-emerald-500/20 text-emerald-400' : 'text-slate-500 hover:text-slate-300'
                           }`}
                         >
                           Receita
@@ -1282,7 +1282,7 @@ export default function App() {
                           type="button"
                           onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
                           className={`flex-1 py-1.5 rounded text-center font-bold transition-all ${
-                            newLancamento.type === 'despesa' ? 'bg-orange-650/20 text-orange-450' : 'text-slate-500 hover:text-slate-300'
+                            newLancamento.type === 'despesa' ? 'bg-orange-500/20 text-orange-400' : 'text-slate-500 hover:text-slate-300'
                           }`}
                         >
                           Despesa
@@ -1296,7 +1296,7 @@ export default function App() {
                           value={newLancamento.desc}
                           onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
                           placeholder="Ex: Contratação Equipe Limpeza"
-                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-300"
+                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-505 text-slate-300"
                           required
                         />
                       </div>
@@ -1318,7 +1318,7 @@ export default function App() {
                           <select 
                             value={newLancamento.costCenter}
                             onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
-                            className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-350 font-medium"
+                            className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-300 font-medium"
                           >
                             <option value="Eventos">Eventos</option>
                             <option value="Operacional">Operacional</option>
@@ -1334,7 +1334,7 @@ export default function App() {
                         <select 
                           value={newLancamento.category}
                           onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
-                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-355 font-medium"
+                          className="w-full bg-[#090b11] border border-[#1e2533] rounded p-2 focus:outline-none focus:border-blue-500 text-slate-300 font-medium"
                         >
                           <option value="Venda Ingressos">Venda Ingressos</option>
                           <option value="Serviços de Terceiros">Serviços de Terceiros</option>
@@ -1361,7 +1361,7 @@ export default function App() {
                   <div className="border-b border-[#1e2533] pb-3 flex justify-between items-center">
                     <div className="flex items-center space-x-2">
                       <Landmark className="w-5 h-5 text-blue-400" />
-                      <h3 className="text-sm font-bold text-slate-200">Conciliação Automática Vindi / PagSeguro</h3>
+                      <h3 className="text-sm font-bold text-slate-205">Conciliação Automática Vindi / PagSeguro</h3>
                     </div>
                   </div>
 
@@ -1375,7 +1375,7 @@ export default function App() {
                       >
                         <div className="flex items-center space-x-3">
                           <span className={`p-1.5 rounded-md ${
-                            item.type === 'in' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-orange-500/10 text-orange-450'
+                            item.type === 'in' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-orange-500/10 text-orange-400'
                           }`}>
                             {item.type === 'in' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowRightLeft className="w-4 h-4" />}
                           </span>
@@ -1384,7 +1384,7 @@ export default function App() {
                               <h4 className="text-xs font-semibold text-slate-200">{item.desc}</h4>
                               <span className="text-[9px] text-slate-500 font-mono">{item.date}</span>
                             </div>
-                            <p className="text-[10px] text-blue-450 font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
+                            <p className="text-[10px] text-blue-400 font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
                           </div>
                         </div>
 
@@ -1396,14 +1396,14 @@ export default function App() {
                           </span>
                           
                           {item.matched ? (
-                            <span className="flex items-center space-x-1 text-emerald-405 text-[10px] font-bold">
+                            <span className="flex items-center space-x-1 text-emerald-400 text-[10px] font-bold">
                               <CheckCircle className="w-3.5 h-3.5" />
                               <span>Conciliado</span>
                             </span>
                           ) : (
                             <button 
                               onClick={() => handleReconcile(item.id)}
-                              className="px-2.5 py-1 bg-blue-650 hover:bg-blue-600 text-white text-[10px] font-bold rounded"
+                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold rounded"
                             >
                               Conciliar
                             </button>
@@ -1453,7 +1453,7 @@ export default function App() {
                           <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
                             <div>
                               <span className="text-[9px] text-slate-500 uppercase block">Saldo Retido</span>
-                              <span className="text-xs font-mono font-bold text-emerald-450">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
+                              <span className="text-xs font-mono font-bold text-emerald-400">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
                             </div>
 
                             {pdv.balance > 0 && isPlanEligible('advanced') && (
@@ -1519,7 +1519,7 @@ export default function App() {
                   <button 
                     onClick={() => setAccountingSubTab('fechamento')}
                     className={`px-3 py-1.5 rounded-md font-bold transition-all ${
-                      accountingSubTab === 'fechamento' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                      accountingSubTab === 'fechamento' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-slate-205'
                     }`}
                   >
                     DRE & Fechamento
@@ -1541,14 +1541,14 @@ export default function App() {
                           onClick={() => setActiveBorderoEvent(b.id)}
                           className={`w-full text-left p-3 rounded-lg border transition-all ${
                             activeBorderoEvent === b.id 
-                              ? 'bg-blue-600/10 border-blue-500 text-blue-300' 
-                              : 'bg-[#090b11]/40 border-[#1e2533] hover:border-slate-700 text-slate-350'
+                              ? 'bg-blue-500/10 border-blue-500 text-blue-400' 
+                              : 'bg-[#090b11]/40 border-[#1e2533] hover:border-slate-700 text-slate-300'
                           }`}
                         >
                           <div className="flex justify-between items-start">
                             <span className="font-bold text-xs truncate block w-40">{b.name}</span>
                             <span className={`text-[8px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
-                              b.status === 'Aprovado' ? 'bg-emerald-500/20 text-emerald-450' : 'bg-orange-500/20 text-orange-400'
+                              b.status === 'Aprovado' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-orange-500/20 text-orange-400'
                             }`}>{b.status}</span>
                           </div>
                           <span className="text-[10px] text-slate-500 font-mono mt-1 block">Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
@@ -1585,15 +1585,15 @@ export default function App() {
                           </div>
                           <div className="p-3 bg-[#090b11]/60 border border-[#1e2533] rounded-lg">
                             <span className="text-[9px] text-slate-500 font-bold uppercase block">Gateway (Vindi)</span>
-                            <span className="text-sm font-mono font-bold text-orange-400/80 mt-1 block">- R$ {event.gatewayFee.toLocaleString('pt-BR')}</span>
+                            <span className="text-sm font-mono font-bold text-orange-400 mt-1 block">- R$ {event.gatewayFee.toLocaleString('pt-BR')}</span>
                           </div>
                           <div className="p-3 bg-[#090b11]/60 border border-[#1e2533] rounded-lg">
                             <span className="text-[9px] text-slate-500 font-bold uppercase block">Comissão Disk</span>
-                            <span className="text-sm font-mono font-bold text-orange-400/80 mt-1 block">- R$ {event.diskFee.toLocaleString('pt-BR')}</span>
+                            <span className="text-sm font-mono font-bold text-orange-400 mt-1 block">- R$ {event.diskFee.toLocaleString('pt-BR')}</span>
                           </div>
                         </div>
 
-                        <div className="p-4 bg-blue-950/20 border border-blue-900/35 rounded-xl flex flex-col sm:flex-row justify-between items-center">
+                        <div className="p-4 bg-blue-950/20 border border-blue-900/30 rounded-xl flex flex-col sm:flex-row justify-between items-center">
                           <div>
                             <span className="text-xs text-blue-400 font-bold block">Repasse Líquido à Produtora:</span>
                             <span className="text-2xl font-mono font-extrabold text-white mt-1 block">
@@ -1604,12 +1604,12 @@ export default function App() {
                           {event.status === 'Aprovado' ? (
                             <div className="text-center sm:text-right mt-3 sm:mt-0">
                               <span className="text-[9px] text-slate-500 font-bold block">Autorizado por:</span>
-                              <span className="text-emerald-450 text-xs font-semibold block">{event.authorizedBy}</span>
+                              <span className="text-emerald-400 text-xs font-semibold block">{event.authorizedBy}</span>
                             </div>
                           ) : (
                             <button 
                               onClick={() => handleAuthorizeBordero(event.id)}
-                              className="mt-3 sm:mt-0 px-4 py-2 bg-blue-650 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-lg transition-all"
+                              className="mt-3 sm:mt-0 px-4 py-2 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-bold rounded-lg transition-all"
                             >
                               Liberar Repasse Financeiro
                             </button>
@@ -1632,7 +1632,7 @@ export default function App() {
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-slate-355 border-collapse">
+                    <table className="w-full text-xs text-slate-300 border-collapse">
                       <thead>
                         <tr className="border-b border-[#1e2533] text-slate-400 font-bold text-[10px] uppercase text-left">
                           <th className="p-3">ID Nota</th>
@@ -1655,10 +1655,10 @@ export default function App() {
                             <td className="p-3 text-right font-mono font-semibold text-blue-400">R$ {inv.amount.toLocaleString('pt-BR')}</td>
                             <td className="p-3 text-center">
                               {inv.status === 'Emitida' && (
-                                <span className="bg-emerald-500/10 text-emerald-450 text-[9px] px-2 py-0.5 rounded-full font-bold">Autorizada</span>
+                                <span className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold">Autorizada</span>
                               )}
                               {inv.status === 'Processando' && (
-                                <span className="bg-slate-805 text-slate-450 text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse">Enviando...</span>
+                                <span className="bg-slate-800 text-slate-400 text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse">Enviando...</span>
                               )}
                               {inv.status === 'Pendente' && (
                                 <button 
@@ -1690,7 +1690,7 @@ export default function App() {
                       <select 
                         value={invoiceMonth}
                         onChange={(e) => setInvoiceMonth(e.target.value)}
-                        className="bg-[#090b11] border border-[#1e2533] p-1 rounded text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                        className="bg-[#090b11] border border-[#1e2533] p-1 rounded text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                       >
                         <option value="Julho">Julho 2026</option>
                         <option value="Junho">Junho 2026</option>
@@ -1705,17 +1705,17 @@ export default function App() {
                       </div>
                       <div className="flex justify-between p-2 hover:bg-[#090b11]/20">
                         <span className="text-slate-400">(-) Impostos Fiscais (Simples/NFe)</span>
-                        <span className="text-orange-400/80">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
+                        <span className="text-orange-400">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
                       </div>
                       <div className="flex justify-between p-2 hover:bg-[#090b11]/20">
                         <span className="text-slate-400">(-) Spread e Comissões de Lançamento</span>
-                        <span className="text-orange-400/80">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
+                        <span className="text-orange-400">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
                       </div>
                       <div className="flex justify-between p-2 hover:bg-[#090b11]/20">
                         <span className="text-slate-400">(-) Custos de Produção & Infraestrutura</span>
-                        <span className="text-orange-400/80">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
+                        <span className="text-orange-400">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
                       </div>
-                      <div className="border-t border-[#1e2533] my-2 pt-2 flex justify-between p-2 bg-blue-950/20 rounded font-bold">
+                      <div className="border-t border-[#1e2533] my-2 pt-2 flex justify-between p-2 bg-blue-900/20 rounded font-bold">
                         <span className="text-white">Lucro Líquido Final</span>
                         <span className="text-blue-400">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
                       </div>
@@ -1735,7 +1735,7 @@ export default function App() {
                       <div className="space-y-2 pt-2 text-xs">
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
-                          className="w-full text-left p-2.5 bg-[#090b11] border border-[#1e2533] hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all"
+                          className="w-full text-left p-2.5 bg-[#090b11] border border-[#1e2533] hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all"
                         >
                           <span>Recebimento por Pedido</span>
                           <Download className="w-3.5 h-3.5 text-blue-400" />
@@ -1743,7 +1743,7 @@ export default function App() {
                         
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
-                          className="w-full text-left p-2.5 bg-[#090b11] border border-[#1e2533] hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all"
+                          className="w-full text-left p-2.5 bg-[#090b11] border border-[#1e2533] hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all"
                         >
                           <span>Recebimento por Data</span>
                           <Download className="w-3.5 h-3.5 text-blue-400" />
@@ -1753,7 +1753,7 @@ export default function App() {
 
                     <button 
                       onClick={() => triggerToast("DRE Completa", "Gerando demonstrativo do ano fiscal consolidado...")}
-                      className="mt-6 w-full py-2 bg-blue-650 hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-all"
+                      className="mt-6 w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all"
                     >
                       Exportar DRE Consolidada Anual
                     </button>
@@ -1791,14 +1791,14 @@ export default function App() {
                     <div key={stage} className="bg-[#111622]/50 border border-[#1e2533] rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]">
                       <div className="flex items-center justify-between border-b border-[#1e2533] pb-2">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stageLabels[stage]}</span>
-                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-355 font-bold">
+                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-300 font-bold">
                           {leads.filter(l => l.stage === stage).length}
                         </span>
                       </div>
                       <div className="space-y-3 flex-1 overflow-y-auto">
                         {leads.filter(l => l.stage === stage).map(lead => (
                           <div key={lead.id} className="bg-[#111622] border border-[#1e2533] hover:border-blue-500/20 p-3 rounded-lg shadow space-y-2 group transition-all">
-                            <span className="text-[8px] bg-blue-550/20 text-blue-400 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
+                            <span className="text-[8px] bg-blue-500/20 text-blue-400 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
                             <div>
                               <h4 className="text-xs font-bold text-white">{lead.name}</h4>
                               <p className="text-[10px] text-slate-500">{lead.company}</p>
@@ -1808,7 +1808,7 @@ export default function App() {
                               {stage !== 'won' && (
                                 <button 
                                   onClick={() => moveLeadStage(lead.id, lead.stage)}
-                                  className="p-1 bg-[#1e2533]/40 hover:bg-blue-650 hover:text-white rounded text-slate-400 transition-all"
+                                  className="p-1 bg-[#1e2533]/40 hover:bg-blue-600 hover:text-white rounded text-slate-400 transition-all"
                                 >
                                   <ChevronRight className="w-3 h-3" />
                                 </button>
@@ -1879,7 +1879,7 @@ export default function App() {
                     </div>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-slate-350 border-collapse">
+                      <table className="w-full text-xs text-slate-300 border-collapse">
                         <thead>
                           <tr className="border-b border-[#1e2533] text-slate-400 font-bold text-[10px] uppercase text-left">
                             <th className="p-3">Nome da Campanha</th>
@@ -1906,7 +1906,7 @@ export default function App() {
                                   camp.status === 'Concluída' 
                                     ? 'bg-emerald-500/10 text-emerald-450' 
                                     : camp.status === 'Disparando' 
-                                    ? 'bg-slate-850 text-blue-400 animate-pulse'
+                                    ? 'bg-slate-800 text-blue-400 animate-pulse'
                                     : 'bg-orange-500/10 text-orange-400'
                                 }`}>
                                   {camp.status}
@@ -1919,7 +1919,7 @@ export default function App() {
                                 {camp.status === 'Agendada' && (
                                   <button 
                                     onClick={() => handleTriggerCampaign(camp.id)}
-                                    className="p-1 bg-blue-650 hover:bg-blue-600 rounded text-white active:scale-95 transition-all"
+                                    className="p-1 bg-blue-600 hover:bg-blue-500 rounded text-white active:scale-95 transition-all"
                                     title="Disparar campanha agora"
                                   >
                                     <Play className="w-3.5 h-3.5" />
@@ -1955,7 +1955,7 @@ export default function App() {
                       </div>
                       <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                         <span>Média Conversão:</span>
-                        <span className="text-emerald-450 font-bold">3.2% global</span>
+                        <span className="text-emerald-400 font-bold">3.2% global</span>
                       </div>
                     </div>
                   </div>
@@ -1990,9 +1990,9 @@ export default function App() {
                             </div>
                           </div>
                           <div className="flex items-center space-x-4">
-                            <span className="text-[10px] text-slate-500 font-mono">Usos: {coupon.usages}</span>
+                            <span className="text-[10px] text-slate-505 font-mono">Usos: {coupon.usages}</span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                              coupon.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-slate-805 text-slate-500'
+                              coupon.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-450' : 'bg-slate-800 text-slate-500'
                             }`}>{coupon.status}</span>
                           </div>
                         </div>
@@ -2057,7 +2057,7 @@ export default function App() {
                           
                           <div className="flex flex-col items-end space-y-1">
                             {installed ? (
-                              <span className="bg-emerald-500/15 text-emerald-450 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
+                              <span className="bg-emerald-500/15 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
                             ) : eligible ? (
                               <span className="bg-blue-500/10 text-blue-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Desbloqueado</span>
                             ) : (
@@ -2104,7 +2104,7 @@ export default function App() {
                               setCurrentTab('marketplace');
                               triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
                             }}
-                            className="w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-350 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-1"
+                            className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-1"
                           >
                             <Sparkles className="w-3.5 h-3.5 text-orange-400" />
                             <span>Fazer Upgrade no Plano</span>
@@ -2140,13 +2140,13 @@ export default function App() {
                     <hr className="border-[#1e2533] my-6" />
                     
                     <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-450" /><span>Financeiro ERP Básico</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-450" /><span>Borderô Contábil Simples</span></li>
-                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV/Bar)</span></li>
-                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Módulos Comerciais (CRM/Mkt)</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Financeiro ERP Básico</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Borderô Contábil Simples</span></li>
+                      <li className="flex items-center space-x-3 text-slate-550"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV/Bar)</span></li>
+                      <li className="flex items-center space-x-3 text-slate-550"><X className="w-4 h-4" /><span>Sem Módulos Comerciais (CRM/Mkt)</span></li>
                     </ul>
                   </div>
-                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className="mt-8 w-full py-3 bg-slate-805 text-slate-500 text-sm font-bold rounded-xl">Plano Atual</button>
+                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className="mt-8 w-full py-3 bg-slate-800 text-slate-500 text-sm font-bold rounded-xl">Plano Atual</button>
                 </div>
 
                 {/* Advanced */}
@@ -2163,17 +2163,17 @@ export default function App() {
                     <hr className="border-[#1e2533] my-6" />
                     
                     <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Unlocks CRM de Vendas & Mkt</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Unlocks Gestão de PDVs & Logística</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Automação Contábil Completa</span></li>
-                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Copiloto de IA</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Unlocks CRM de Vendas & Mkt</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Unlocks Gestão de PDVs & Logística</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Automação Contábil Completa</span></li>
+                      <li className="flex items-center space-x-3 text-slate-550"><X className="w-4 h-4" /><span>Sem Copiloto de IA</span></li>
                     </ul>
                   </div>
-                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-blue-650 hover:bg-blue-600 text-white text-sm font-bold rounded-xl transition-all">Assinar Advanced</button>
+                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all">Assinar Advanced</button>
                 </div>
 
                 {/* Expert */}
-                <div className={`bg-[#111622] border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-750 transition-all ${
+                <div className={`bg-[#111622] border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
                   plan === 'expert' ? 'border-orange-500' : 'border-[#1e2533]'
                 }`}>
                   {plan === 'expert' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-450 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
@@ -2185,12 +2185,12 @@ export default function App() {
                     <hr className="border-[#1e2533] my-6" />
                     
                     <ul className="space-y-4 text-xs text-slate-300">
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Libera Disk AI Copilot & Open Finance</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Libera Módulos de Bar, Insumos & POS</span></li>
-                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Notas fiscais e Borderôs Ilimitados</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Libera Disk AI Copilot & Open Finance</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Libera Módulos de Bar, Insumos & POS</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-400" /><span>Notas fiscais e Borderôs Ilimitados</span></li>
                     </ul>
                   </div>
-                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-blue-650 to-orange-550 hover:from-blue-600 hover:to-orange-500 text-white text-sm font-bold rounded-xl transition-all">Assinar Expert</button>
+                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-blue-600 to-orange-500 hover:from-blue-500 hover:to-orange-400 text-white text-sm font-bold rounded-xl transition-all">Assinar Expert</button>
                 </div>
               </div>
             </div>
@@ -2207,11 +2207,11 @@ export default function App() {
               {/* Progress Summary */}
               <div className="bg-[#111622] border border-[#1e2533] rounded-xl p-6 shadow-md space-y-4">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                  <span className="text-blue-450">Progresso Geral do Protótipo (Fases 1 e 2)</span>
+                  <span className="text-blue-400">Progresso Geral do Protótipo (Fases 1 e 2)</span>
                   <span className="text-white">100% Concluído</span>
                 </div>
                 <div className="w-full bg-[#090b11] rounded-full h-3.5 border border-[#1e2533] overflow-hidden p-0.5">
-                  <div className="bg-gradient-to-r from-blue-500 to-orange-555 h-full rounded-full w-full"></div>
+                  <div className="bg-gradient-to-r from-blue-500 to-orange-500 h-full rounded-full w-full"></div>
                 </div>
                 <p className="text-xs text-slate-400">
                   Todas as especificações de navegação simulada, layouts multibanco, gestão de borderôs e comissionamento foram entregues como protótipo interativo e modular.
@@ -2226,14 +2226,14 @@ export default function App() {
                   <div>
                     <div className="flex items-center justify-between mb-4 border-b border-[#1e2533] pb-3">
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 1: Demonstração</h3>
-                      <span className="bg-emerald-500/10 text-emerald-450 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                      <span className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-slate-350">
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Níveis de Planos (Standard, Advanced, Expert)</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Fluxo de contratação e upgrade simulados</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Demonstração estática das funcionalidades principais</span></li>
+                    <ul className="space-y-3 text-xs text-slate-300">
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Níveis de Planos (Standard, Advanced, Expert)</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Fluxo de contratação e upgrade simulados</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Demonstração estática das funcionalidades principais</span></li>
                     </ul>
                   </div>
                 </div>
@@ -2243,14 +2243,14 @@ export default function App() {
                   <div>
                     <div className="flex items-center justify-between mb-4 border-b border-[#1e2533] pb-3">
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 2: Protótipo Funcional</h3>
-                      <span className="bg-emerald-500/10 text-emerald-455 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
+                      <span className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-slate-355">
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Dashboards interativos com atualizações</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-450 shrink-0 mt-0.5" /><span>Fluxos realistas: Sangrias de PDV e emissões SEFAZ</span></li>
-                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-455 shrink-0 mt-0.5" /><span>Fechamento real de borderôs com liberação de repasse</span></li>
+                    <ul className="space-y-3 text-xs text-slate-300">
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Dashboards interativos com atualizações</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Fluxos realistas: Sangrias de PDV e emissões SEFAZ</span></li>
+                      <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>Fechamento real de borderôs com liberação de repasse</span></li>
                     </ul>
                   </div>
                 </div>
@@ -2262,7 +2262,7 @@ export default function App() {
                       <h3 className="text-sm font-bold text-white uppercase tracking-wider">Fase 3: Sistema de Produção</h3>
                       <span className="bg-blue-500/10 text-blue-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">Planejado</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-slate-350">
+                    <ul className="space-y-3 text-xs text-slate-300">
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" /><span>Migração de rotas estáticas para React + Vite</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" /><span>Implementação de CSS utilitário com Tailwind CSS</span></li>
                       <li className="flex items-start space-x-2 text-slate-500"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Banco de dados relacional (Firebase / MySQL)</span></li>
@@ -2305,7 +2305,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-white">Disk AI Copilot</h3>
-                    <p className="text-[9px] text-emerald-450 font-medium flex items-center">
+                    <p className="text-[9px] text-emerald-400 font-medium flex items-center">
                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full inline-block mr-1"></span>
                       Online & Ativo
                     </p>
@@ -2321,14 +2321,14 @@ export default function App() {
                 {chatMessages.map(msg => (
                   <div key={msg.id} className={`flex items-start space-x-2.5 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                     {msg.sender === 'ai' && (
-                      <div className="w-6.5 h-6.5 rounded bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
+                      <div className="w-6 h-6 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
                         AI
                       </div>
                     )}
                     <div className={`p-3 rounded-r-xl rounded-bl-xl max-w-[80%] border text-[11px] leading-relaxed ${
                       msg.sender === 'user' 
-                        ? 'bg-blue-600 border-blue-500 text-white rounded-l-xl rounded-br-none' 
-                        : 'bg-[#090b11]/80 border border-[#1e2533] text-slate-355'
+                        ? 'bg-blue-650 border-blue-600 text-white rounded-l-xl rounded-br-none' 
+                        : 'bg-[#090b11]/80 border border-[#1e2533] text-slate-300'
                     }`}>
                       <p>{msg.text}</p>
                       {msg.htmlResponse && msg.htmlResponse}
@@ -2338,7 +2338,7 @@ export default function App() {
                 
                 {isTyping && (
                   <div className="flex items-start space-x-2.5">
-                    <div className="w-6.5 h-6.5 rounded bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
+                    <div className="w-6 h-6 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
                       AI
                     </div>
                     <div className="bg-[#090b11]/80 border border-[#1e2533] p-3 rounded-r-xl rounded-bl-xl max-w-[80%]">
@@ -2382,7 +2382,7 @@ export default function App() {
                   placeholder="Pergunte sobre DRE, borderô, NFe..."
                   className="flex-1 bg-[#090b11] border border-[#1e2533] rounded px-2.5 py-1 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                 />
-                <button type="submit" className="p-1 bg-blue-650 hover:bg-blue-600 rounded text-white active:scale-95 transition-all">
+                <button type="submit" className="p-1 bg-blue-600 hover:bg-blue-500 rounded text-white active:scale-95 transition-all">
                   <Send className="w-4 h-4" />
                 </button>
               </form>
@@ -2421,7 +2421,7 @@ export default function App() {
                   value={newLead.name}
                   onChange={(e) => setNewLead(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Roberto Alencar"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
                   required
                 />
               </div>
@@ -2455,7 +2455,7 @@ export default function App() {
                   <select 
                     value={newLead.stage}
                     onChange={(e) => setNewLead(prev => ({ ...prev, stage: e.target.value }))}
-                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-350 font-medium"
+                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300 font-medium"
                   >
                     <option value="prospect">Prospecção</option>
                     <option value="qualified">Qualificado</option>
@@ -2468,7 +2468,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddLeadModal(false)}
-                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-850 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-800 text-slate-305 text-xs font-bold rounded-lg transition-all"
                 >
                   Cancelar
                 </button>
@@ -2503,7 +2503,7 @@ export default function App() {
                   value={newClient.name}
                   onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Felipe Silveira"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                   required
                 />
               </div>
@@ -2515,7 +2515,7 @@ export default function App() {
                   value={newClient.company}
                   onChange={(e) => setNewClient(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="Ex: Prime Eventos Ltda"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                   required
                 />
               </div>
@@ -2527,7 +2527,7 @@ export default function App() {
                   value={newClient.email}
                   onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="felipe@empresa.com.br"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-350 font-mono"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300 font-mono"
                   required
                 />
               </div>
@@ -2536,7 +2536,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddClientModal(false)}
-                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-850 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
                 >
                   Cancelar
                 </button>
@@ -2594,13 +2594,13 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCouponModal(false)}
-                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-850 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-blue-650 hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-550 text-white text-xs font-bold rounded-lg transition-all"
                 >
                   Salvar Cupom
                 </button>
@@ -2641,7 +2641,7 @@ export default function App() {
                   value={newPdv.manager}
                   onChange={(e) => setNewPdv(prev => ({ ...prev, manager: e.target.value }))}
                   placeholder="Ex: Sandra Costa"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                   required
                 />
               </div>
@@ -2652,7 +2652,7 @@ export default function App() {
                   <select 
                     value={newPdv.type}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-350 font-medium"
+                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300 font-medium"
                   >
                     <option value="Local">Local</option>
                     <option value="Físico Externo">Físico Externo</option>
@@ -2666,7 +2666,7 @@ export default function App() {
                     value={newPdv.balance}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, balance: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300 font-mono"
+                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300 font-mono"
                   />
                 </div>
               </div>
@@ -2675,7 +2675,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddPdvModal(false)}
-                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-850 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
                 >
                   Cancelar
                 </button>
@@ -2710,7 +2710,7 @@ export default function App() {
                   value={newCampaign.name}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Pré-venda Festival de Inverno"
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                   required
                 />
               </div>
@@ -2721,7 +2721,7 @@ export default function App() {
                   <select 
                     value={newCampaign.channel}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, channel: e.target.value }))}
-                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-350 font-medium"
+                    className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300 font-medium"
                   >
                     <option value="E-mail">E-mail</option>
                     <option value="WhatsApp">WhatsApp</option>
@@ -2748,7 +2748,7 @@ export default function App() {
                   value={newCampaign.subject}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, subject: e.target.value }))}
                   placeholder="Ex: Não perca! Lote exclusivo com 20% de desconto..."
-                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-505 text-slate-300"
+                  className="w-full bg-[#090b11] border border-[#1e2533] rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500 text-slate-300"
                   required
                 />
               </div>
@@ -2757,7 +2757,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCampaignModal(false)}
-                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-850 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-2 bg-[#1e2533] hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
                 >
                   Cancelar
                 </button>
