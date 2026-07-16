@@ -33,7 +33,8 @@ import {
   Layers,
   ShieldCheck,
   MapPin,
-  Eye
+  Eye,
+  Lock
 } from 'lucide-react';
 
 export default function App() {
@@ -43,12 +44,17 @@ export default function App() {
   const [accountingSubTab, setAccountingSubTab] = useState('bordero');
   const [plan, setPlan] = useState('standard');
   
-  // App store installation simulation
+  // App store installation simulation state
   const [installedApps, setInstalledApps] = useState({
     financeiro: true,
     contabilidade: true,
     crm: false,
-    mkt: false
+    mkt: false,
+    pdv: false,
+    logistica: false,
+    bar: false,
+    patrimonio: false,
+    ai: false
   });
   
   // Toast notifications state
@@ -67,6 +73,29 @@ export default function App() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Commercial App Catalog mapped to Plan Requirements
+  const appsCatalog = [
+    { id: 'financeiro', name: 'Financeiro (ERP)', desc: 'Gestão de contas, saldo, fluxo de caixa e conciliação bancária.', category: 'Finanças', planRequired: 'standard', icon: CreditCard },
+    { id: 'contabilidade', name: 'Contabilidade Disk', desc: 'Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.', category: 'Fiscal', planRequired: 'standard', icon: Receipt },
+    { id: 'crm', name: 'CRM de Vendas', desc: 'Contatos de novos produtores, funil de vendas e metas comerciais.', category: 'Vendas', planRequired: 'advanced', icon: Users },
+    { id: 'mkt', name: 'Marketing Automação', desc: 'Disparo de e-mails em massa e gerador de cupons de desconto.', category: 'Marketing', planRequired: 'Marketing', icon: Mail },
+    { id: 'pdv', name: 'Gestão de PDVs', desc: 'Controle de pontos de venda, monitor de caixas e sangrias.', category: 'Operações', planRequired: 'advanced', icon: ShoppingBag },
+    { id: 'logistica', name: 'Logística & Impressão', desc: 'Montagem de ingressos físicos, períodos de entrega e layouts.', category: 'Logística', planRequired: 'advanced', icon: Briefcase },
+    { id: 'bar', name: 'Sistema de Bar & Estoque', desc: 'Cardápios digitais, controle de insumos e consumo local.', category: 'Operações', planRequired: 'expert', icon: Layers },
+    { id: 'patrimonio', name: 'Gestão de Patrimônio & POS', desc: 'Controle de POS físicos em eventos e remessa de máquinas.', category: 'Patrimônio', planRequired: 'expert', icon: Landmark },
+    { id: 'ai', name: 'Disk AI Copilot', desc: 'Copiloto de IA para análises de margens e auditoria contábil.', category: 'Inteligência', planRequired: 'expert', icon: Brain },
+  ];
+
+  // Helper to check if a plan meets requirements
+  const isPlanEligible = (required) => {
+    if (required === 'standard') return true;
+    if (required === 'advanced' || required === 'Marketing') {
+      return plan === 'advanced' || plan === 'expert';
+    }
+    if (required === 'expert') return plan === 'expert';
+    return false;
+  };
 
   // ================= 1. FINANCEIRO (ERP) DATA & STATE =================
   const [financialStats, setFinancialStats] = useState({
@@ -103,7 +132,7 @@ export default function App() {
   // Manual post state
   const [newLancamento, setNewLancamento] = useState({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
 
-  // Gateway transaction fee configurations
+  // Gateway rates configurations
   const gatewayRates = {
     pix: { name: 'PIX Direto', rate: 0.8, fixed: 0.0 },
     cartao_vista: { name: 'Cartão à Vista', rate: 2.3, fixed: 0.4 },
@@ -184,7 +213,16 @@ export default function App() {
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [newClient, setNewClient] = useState({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
 
-  // ================= 4. MARKETING COUPONS =================
+  // ================= 4. PDVS (PONTOS DE VENDA) STATE =================
+  const [pdvs, setPdvs] = useState([
+    { id: 'pdv-1', name: 'Bilheteria Principal - Portão A', manager: 'Sandra Costa', type: 'Local', balance: 35000, status: 'Aberto' },
+    { id: 'pdv-2', name: 'Quiosque Shopping Mueller', manager: 'Daniel Santos', type: 'Físico Externo', balance: 82000, status: 'Aberto' },
+    { id: 'pdv-3', name: 'Ponto de Venda - Teatro Guaíra', manager: 'Guilherme Lima', type: 'Teatro', balance: 33000, status: 'Fechado' }
+  ]);
+  const [showAddPdvModal, setShowAddPdvModal] = useState(false);
+  const [newPdv, setNewPdv] = useState({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
+
+  // ================= 5. MARKETING COUPONS =================
   const [coupons, setCoupons] = useState([
     { id: 'coup-1', code: 'INVERNO15', discount: 15, event: 'Festival de Inverno Curitiba', status: 'Ativo', usages: 342 },
     { id: 'coup-2', code: 'METAL20', discount: 20, event: 'Metal Fest 2026', status: 'Ativo', usages: 198 },
@@ -218,7 +256,7 @@ export default function App() {
         "Módulo Ativado!",
         `O módulo de ${appName} foi instalado com sucesso. Uma nova aba foi adicionada à sua barra lateral!`
       );
-    }, 2000);
+    }, 1800);
   };
 
   // Switch Plan Upgrade
@@ -226,7 +264,7 @@ export default function App() {
     setPlan(planId);
     triggerToast(
       "Upgrade Concluído! 🎉",
-      `Sua conta DiskHub foi atualizada para o plano ${planName} com sucesso.`
+      `Sua conta DiskHub foi atualizada para o plano ${planName} com sucesso. Verifique a Central de Apps para liberar novos recursos.`
     );
   };
 
@@ -236,10 +274,7 @@ export default function App() {
   const handleAccountTransfer = (e) => {
     e.preventDefault();
     const amountVal = parseFloat(transfer.amount);
-    if (!amountVal || amountVal <= 0) {
-      triggerToast("Erro", "Preencha um valor válido.", "warning");
-      return;
-    }
+    if (!amountVal || amountVal <= 0) return;
 
     const sourceAcc = accounts.find(a => a.id === transfer.from);
     if (sourceAcc.balance < amountVal) {
@@ -253,7 +288,6 @@ export default function App() {
       return a;
     }));
 
-    // Add entry
     const entry = {
       id: `lan-${Date.now()}`,
       type: 'despesa',
@@ -266,17 +300,14 @@ export default function App() {
     };
     setLancamentos(prev => [entry, ...prev]);
     setTransfer(prev => ({ ...prev, amount: '' }));
-    triggerToast("Transferência Efetuada", `R$ ${amountVal.toLocaleString('pt-BR')} transferidos com sucesso.`);
+    triggerToast("Transferência Efetuada", `R$ ${amountVal.toLocaleString('pt-BR')} transferidos.`);
   };
 
   // 2. Lançamento Financeiro Manual (Financeiro)
   const handleCreateLancamento = (e) => {
     e.preventDefault();
     const amountVal = parseFloat(newLancamento.amount);
-    if (!newLancamento.desc || !amountVal) {
-      triggerToast("Erro", "Preencha todos os campos obrigatórios.", "warning");
-      return;
-    }
+    if (!newLancamento.desc || !amountVal) return;
 
     const added = {
       id: `lan-${Date.now()}`,
@@ -287,7 +318,6 @@ export default function App() {
 
     setLancamentos(prev => [added, ...prev]);
 
-    // Update global balance
     setFinancialStats(prev => {
       const isInc = added.type === 'receita';
       return {
@@ -299,7 +329,7 @@ export default function App() {
     });
 
     setNewLancamento({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
-    triggerToast("Lançamento Registrado", `Entrada de ${added.desc} gravada com sucesso.`);
+    triggerToast("Lançamento Registrado", `Entrada de ${added.desc} gravada.`);
   };
 
   // 3. Efetuar Fechamento de Caixa / Borderô (Contabilidade)
@@ -326,9 +356,7 @@ export default function App() {
   // 4. Emissão de NFe Individual (Contabilidade)
   const handleEmitNFe = (invoiceId) => {
     setInvoices(prev => prev.map(inv => {
-      if (inv.id === invoiceId) {
-        return { ...inv, status: 'Processando' };
-      }
+      if (inv.id === invoiceId) return { ...inv, status: 'Processando' };
       return inv;
     }));
 
@@ -336,13 +364,67 @@ export default function App() {
 
     setTimeout(() => {
       setInvoices(prev => prev.map(inv => {
-        if (inv.id === invoiceId) {
-          return { ...inv, status: 'Emitida' };
-        }
+        if (inv.id === invoiceId) return { ...inv, status: 'Emitida' };
         return inv;
       }));
-      triggerToast("NFe Autorizada! 🧾", `Nota fiscal do evento emitida com sucesso na SEFAZ.`);
+      triggerToast("NFe Autorizada! 🧾", `Nota fiscal emitida na SEFAZ com sucesso.`);
     }, 1800);
+  };
+
+  // 5. Sangria de Caixa em PDV (Operações / PDV)
+  const handlePdvBleeding = (pdvId, amountToBleed) => {
+    const bleedVal = parseFloat(amountToBleed);
+    if (!bleedVal || bleedVal <= 0) return;
+
+    const pdv = pdvs.find(p => p.id === pdvId);
+    if (pdv.balance < bleedVal) {
+      triggerToast("Saldo Insuficiente", `O PDV não possui saldo acumulado suficiente para esta sangria.`, "warning");
+      return;
+    }
+
+    // Process bleeding
+    setPdvs(prev => prev.map(p => {
+      if (p.id === pdvId) return { ...p, balance: p.balance - bleedVal };
+      return p;
+    }));
+
+    // Transfer value to Caja Geral
+    setAccounts(prev => prev.map(a => {
+      if (a.id === 'acc-3') return { ...a, balance: a.balance + bleedVal };
+      return a;
+    }));
+
+    // Add entry
+    const entry = {
+      id: `lan-${Date.now()}`,
+      type: 'receita',
+      desc: `Sangria de Caixa: ${pdv.name}`,
+      amount: bleedVal,
+      category: 'Venda Ingressos',
+      costCenter: 'Operacional',
+      date: 'Hoje',
+      status: 'Recebido'
+    };
+    setLancamentos(prev => [entry, ...prev]);
+    triggerToast("Sangria Concluída 💸", `R$ ${bleedVal.toLocaleString('pt-BR')} recolhidos e transferidos para o Caixa Geral.`);
+  };
+
+  // Create Pdv physical point
+  const handleCreatePdv = (e) => {
+    e.preventDefault();
+    if (!newPdv.name || !newPdv.manager) return;
+    const addedPdv = {
+      id: `pdv-${Date.now()}`,
+      name: newPdv.name,
+      manager: newPdv.manager,
+      type: newPdv.type,
+      balance: newPdv.balance ? parseFloat(newPdv.balance) : 0,
+      status: newPdv.status
+    };
+    setPdvs(prev => [...prev, addedPdv]);
+    setShowAddPdvModal(false);
+    setNewPdv({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
+    triggerToast("Sucesso", "Novo ponto de venda física (PDV) ativo.");
   };
 
   // Reconcile item
@@ -361,7 +443,7 @@ export default function App() {
       }
       return item;
     }));
-    triggerToast("Conciliação Confirmada", "Transação bancária vinculada com sucesso à nota fiscal.");
+    triggerToast("Conciliação Confirmada", "Transação bancária vinculada.");
   };
 
   // CRM Kanban lead progression
@@ -627,7 +709,7 @@ export default function App() {
               <Receipt className="w-5 h-5 shrink-0 text-emerald-450" />
               <div className="flex items-center justify-between w-full">
                 <span>Contabilidade Disk</span>
-                <span className="bg-emerald-500/20 text-emerald-350 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                <span className="bg-emerald-500/20 text-emerald-355 text-[10px] px-2 py-0.5 rounded-full font-bold">
                   {invoices.filter(inv => inv.status === 'Pendente').length}
                 </span>
               </div>
@@ -665,6 +747,25 @@ export default function App() {
               >
                 <Mail className="w-5 h-5 shrink-0" />
                 <span>Mkt & Cupons</span>
+              </button>
+            )}
+
+            {/* GESTÃO DE PDVS (only if installed) */}
+            {installedApps.pdv === true && (
+              <button 
+                onClick={() => {
+                  setCurrentTab('financeiro');
+                  setFinanceSubTab('taxas');
+                  triggerToast("Gestão de PDVs", "Redirecionado para a aba de taxas e sangrias físicas.");
+                }} 
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                  currentTab === 'pdv' 
+                    ? 'bg-indigo-600/15 text-indigo-400 border-indigo-500/30 shadow-sm' 
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'
+                }`}
+              >
+                <ShoppingBag className="w-5 h-5 shrink-0" />
+                <span>Gestão de PDVs</span>
               </button>
             )}
 
@@ -898,14 +999,12 @@ export default function App() {
           {currentTab === 'financeiro' && (
             <div className="space-y-8 animate-fadeIn">
               
-              {/* Top Summary Bar & Sub-Tabs */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-extrabold text-white tracking-tight">Gestão Financeira (ERP)</h2>
                   <p className="text-sm text-slate-400">Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
                 </div>
                 
-                {/* Finance sub-navigation */}
                 <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg space-x-1 text-xs">
                   <button 
                     onClick={() => setFinanceSubTab('contas')}
@@ -937,7 +1036,7 @@ export default function App() {
                       financeSubTab === 'taxas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    Gateway & Taxas
+                    PDVs & Taxas
                   </button>
                 </div>
               </div>
@@ -945,8 +1044,6 @@ export default function App() {
               {/* Sub-Tab 1: Saldos & Contas */}
               {financeSubTab === 'contas' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  
-                  {/* Account list */}
                   <div className="lg:col-span-2 space-y-6">
                     <h3 className="text-sm font-bold text-slate-350 uppercase tracking-wider">Saldo das Contas do Sistema</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -972,7 +1069,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Transfer Form */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md h-fit space-y-4">
                     <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
                       <ArrowRightLeft className="w-4 h-4 text-indigo-400" />
@@ -1028,8 +1124,6 @@ export default function App() {
               {/* Sub-Tab 2: Lançamentos */}
               {financeSubTab === 'lancamentos' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  
-                  {/* Table list */}
                   <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
                     <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Fluxo de Caixa Lançamentos</h3>
                     <div className="overflow-x-auto">
@@ -1065,7 +1159,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Launch Form */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md h-fit space-y-4">
                     <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
                       <Plus className="w-4 h-4 text-indigo-400" />
@@ -1139,7 +1232,7 @@ export default function App() {
                         <select 
                           value={newLancamento.category}
                           onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
-                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 text-slate-355 font-medium"
                         >
                           <option value="Venda Ingressos">Venda Ingressos</option>
                           <option value="Serviços de Terceiros">Serviços de Terceiros</option>
@@ -1189,7 +1282,7 @@ export default function App() {
                               <h4 className="text-xs font-semibold text-slate-200">{item.desc}</h4>
                               <span className="text-[9px] text-slate-500 font-mono">{item.date}</span>
                             </div>
-                            <p className="text-[10px] text-indigo-450 font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
+                            <p className="text-[10px] text-indigo-455 font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
                           </div>
                         </div>
 
@@ -1220,56 +1313,75 @@ export default function App() {
                 </div>
               )}
 
-              {/* Sub-Tab 4: Taxas e Gateway */}
+              {/* Sub-Tab 4: PDVs & Taxas */}
               {financeSubTab === 'taxas' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   
-                  {/* Gateway rates */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
-                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Taxas Contratuais do Gateway Disk</h3>
-                    <div className="space-y-4">
-                      {Object.entries(gatewayRates).map(([key, data]) => (
-                        <div key={key} className="flex justify-between items-center p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
+                  {/* PDV Control List */}
+                  <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                      <div className="flex items-center space-x-2">
+                        <ShoppingBag className="w-5 h-5 text-indigo-400" />
+                        <h3 className="text-sm font-bold text-white">Controle de Pontos de Venda Físicos (PDVs)</h3>
+                      </div>
+                      
+                      {isPlanEligible('advanced') ? (
+                        <button 
+                          onClick={() => setShowAddPdvModal(true)}
+                          className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded"
+                        >
+                          Novo PDV
+                        </button>
+                      ) : (
+                        <span className="text-[9px] text-slate-500 bg-slate-800 px-2 py-1 rounded">Requer Plano Advanced</span>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      {pdvs.map(pdv => (
+                        <div key={pdv.id} className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                           <div>
-                            <h4 className="text-xs font-bold text-slate-200">{data.name}</h4>
-                            <p className="text-[9px] text-slate-500">Mapeado via API - Liquidável D+1</p>
+                            <div className="flex items-center space-x-2">
+                              <h4 className="text-xs font-bold text-white">{pdv.name}</h4>
+                              <span className="text-[8px] bg-slate-800 px-1.5 rounded text-slate-400 uppercase">{pdv.type}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-0.5">Operador Responsável: {pdv.manager}</p>
                           </div>
-                          <div className="text-right font-mono text-xs">
-                            <span className="text-indigo-400 font-bold">{data.rate > 0 ? `${data.rate}%` : 'Isento'}</span>
-                            {data.fixed > 0 && <span className="text-slate-500 text-[10px] ml-1">+ R$ {data.fixed.toFixed(2)}</span>}
+
+                          <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
+                            <div>
+                              <span className="text-[9px] text-slate-500 uppercase block">Saldo Retido</span>
+                              <span className="text-xs font-mono font-bold text-emerald-400">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
+                            </div>
+
+                            {pdv.balance > 0 && isPlanEligible('advanced') && (
+                              <button 
+                                onClick={() => handlePdvBleeding(pdv.id, pdv.balance)}
+                                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-[10px] font-bold rounded"
+                                title="Recolher dinheiro do caixa"
+                              >
+                                Recolher (Sangria)
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Seat/Invoicing details */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Consulta Seats e Bilheteria</h3>
-                      <p className="text-xs text-slate-400">
-                        O monitoramento de assentos e ingressos digitais gerencia em tempo real o spread retido pelos gateways de pagamento conveniados.
-                      </p>
-                      
-                      <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 space-y-2">
-                        <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                          <span>Gateway Spread Médio:</span>
-                          <span className="text-white font-bold">1.4%</span>
+                  {/* Fee list */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Gateway & Custos Operacionais</h3>
+                    <div className="space-y-3 text-xs">
+                      {Object.entries(gatewayRates).map(([key, data]) => (
+                        <div key={key} className="flex justify-between items-center p-2 bg-slate-950/40 border border-slate-850 rounded">
+                          <span className="font-semibold">{data.name}</span>
+                          <span className="font-mono text-indigo-400 font-bold">{data.rate}% {data.fixed > 0 && `+ R$ ${data.fixed}`}</span>
                         </div>
-                        <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                          <span>Contratos Antecipados:</span>
-                          <span className="text-emerald-400 font-bold">D+1 Ativo</span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                    
-                    <button 
-                      onClick={() => triggerToast("Consulta Seats", "Exportando logs de vendas em cartões do terminal...")}
-                      className="mt-6 w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-bold rounded-lg"
-                    >
-                      Exportar Logs de Vendas em Cartões
-                    </button>
                   </div>
+
                 </div>
               )}
 
@@ -1280,11 +1392,10 @@ export default function App() {
           {currentTab === 'contabilidade' && (
             <div className="space-y-8 animate-fadeIn">
               
-              {/* Top Selector & sub navigation */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-extrabold text-white tracking-tight">Contabilidade Disk</h2>
-                  <p className="text-sm text-slate-400">Borderôs oficiais, emissão de NFes, auditorias e fechamento de eventos.</p>
+                  <p className="text-sm text-slate-400">Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
                 </div>
 
                 <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg space-x-1 text-xs">
@@ -1319,7 +1430,7 @@ export default function App() {
               {accountingSubTab === 'bordero' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   
-                  {/* Event Selector List */}
+                  {/* Event list selector */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
                     <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Selecione o Evento</h3>
                     <div className="space-y-3">
@@ -1345,7 +1456,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Borderô Sheet Details */}
+                  {/* Borderô details */}
                   {(() => {
                     const event = borderos.find(b => b.id === activeBorderoEvent);
                     if (!event) return null;
@@ -1357,32 +1468,30 @@ export default function App() {
                             <p className="text-xs text-slate-400">{event.location}</p>
                           </div>
                           <div className="text-right">
-                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Fechamento Borderô</span>
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold block">Fechamento</span>
                             <span className="text-xs font-mono font-bold text-slate-300 block">{event.dateClosed}</span>
                           </div>
                         </div>
 
-                        {/* Calculations */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                           <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
-                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Ingressos</span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase block">Ingressos</span>
                             <span className="text-sm font-mono font-bold text-white mt-1 block">{event.ticketsSold}</span>
                           </div>
                           <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
-                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Receita Bruta</span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase block">Receita Bruta</span>
                             <span className="text-sm font-mono font-bold text-white mt-1 block">R$ {event.grossRevenue.toLocaleString('pt-BR')}</span>
                           </div>
                           <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
-                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Gateway (Vindi)</span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase block">Gateway (Vindi)</span>
                             <span className="text-sm font-mono font-bold text-pink-400 mt-1 block">- R$ {event.gatewayFee.toLocaleString('pt-BR')}</span>
                           </div>
                           <div className="p-3 bg-slate-950/60 border border-slate-850 rounded-lg">
-                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Comissão Disk</span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase block">Comissão Disk</span>
                             <span className="text-sm font-mono font-bold text-pink-400 mt-1 block">- R$ {event.diskFee.toLocaleString('pt-BR')}</span>
                           </div>
                         </div>
 
-                        {/* Net payout result */}
                         <div className="p-4 bg-indigo-950/20 border border-indigo-900/35 rounded-xl flex flex-col sm:flex-row justify-between items-center">
                           <div>
                             <span className="text-xs text-indigo-400 font-bold block">Repasse Líquido à Produtora:</span>
@@ -1422,14 +1531,14 @@ export default function App() {
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-slate-350 border-collapse">
+                    <table className="w-full text-xs text-slate-355 border-collapse">
                       <thead>
                         <tr className="border-b border-slate-800 text-slate-400 font-bold text-[10px] uppercase text-left">
                           <th className="p-3">ID Nota</th>
-                          <th className="p-3">Cliente / Razão Social</th>
+                          <th className="p-3">Razão Social</th>
                           <th className="p-3">CNPJ / CPF</th>
                           <th className="p-3">Evento Vinculado</th>
-                          <th className="p-3">Data Lançamento</th>
+                          <th className="p-3">Lançamento</th>
                           <th className="p-3 text-right">Valor</th>
                           <th className="p-3 text-center">Status SEFAZ</th>
                         </tr>
@@ -1470,8 +1579,6 @@ export default function App() {
               {/* Sub-Tab 3: DRE & Fechamentos */}
               {accountingSubTab === 'fechamento' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  
-                  {/* Financial Report Generators */}
                   <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-6">
                     <div className="flex justify-between items-center border-b border-slate-800 pb-3">
                       <div className="flex items-center space-x-2">
@@ -1514,7 +1621,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Reports export */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md flex flex-col justify-between">
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
@@ -1525,10 +1631,10 @@ export default function App() {
                         Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
                       </p>
 
-                      <div className="space-y-2 pt-2">
+                      <div className="space-y-2 pt-2 text-xs">
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
-                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 text-xs font-semibold rounded flex justify-between items-center transition-all"
+                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all"
                         >
                           <span>Recebimento por Pedido</span>
                           <Download className="w-3.5 h-3.5 text-indigo-400" />
@@ -1536,7 +1642,7 @@ export default function App() {
                         
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
-                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 text-xs font-semibold rounded flex justify-between items-center transition-all"
+                          className="w-full text-left p-2.5 bg-slate-950 border border-slate-850 hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all"
                         >
                           <span>Recebimento por Data</span>
                           <Download className="w-3.5 h-3.5 text-indigo-400" />
@@ -1591,7 +1697,7 @@ export default function App() {
                       <div className="space-y-3 flex-1 overflow-y-auto">
                         {leads.filter(l => l.stage === stage).map(lead => (
                           <div key={lead.id} className="bg-slate-900 border border-slate-800 hover:border-indigo-500/20 p-3 rounded-lg shadow space-y-2 group transition-all">
-                            <span className="text-[8px] bg-indigo-550/20 text-indigo-350 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
+                            <span className="text-[8px] bg-indigo-550/20 text-indigo-355 font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
                             <div>
                               <h4 className="text-xs font-bold text-white">{lead.name}</h4>
                               <p className="text-[10px] text-slate-500">{lead.company}</p>
@@ -1660,68 +1766,101 @@ export default function App() {
             </div>
           )}
 
-          {/* ================= 5. CENTRAL DE APP STORE ================= */}
+          {/* ================= 5. CENTRAL DE APLICATIVOS (APP STORE) ================= */}
           {currentTab === 'appstore' && (
             <div className="space-y-8 animate-fadeIn">
               <div>
                 <h2 className="text-2xl font-extrabold text-white tracking-tight">Central de Aplicativos</h2>
-                <p className="text-sm text-slate-400">Adicione ou ative ferramentas integradas contábeis ou comerciais.</p>
+                <p className="text-sm text-slate-400">Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
               </div>
 
+              {/* Grid of Catalog Apps */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center text-pink-400">
-                        <Users className="w-6 h-6" />
-                      </div>
-                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">Disponível</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">CRM de Vendas</h3>
-                    <p className="text-xs text-slate-400 mt-1">Negociações, cadastro de novos contatos e funil de prospecção.</p>
-                  </div>
-                  {installedApps.crm === true ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">Habilitado</button>
-                  ) : installedApps.crm === 'installing' ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-400 text-xs font-bold rounded-lg flex items-center justify-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /><span>Instalando...</span>
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => handleInstallApp('crm', 'CRM de Vendas')} 
-                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg"
-                    >
-                      Instalar Módulo
-                    </button>
-                  )}
-                </div>
+                {appsCatalog.map(app => {
+                  const IconComponent = app.icon;
+                  const eligible = isPlanEligible(app.planRequired);
+                  const installed = installedApps[app.id] === true;
+                  const installing = installedApps[app.id] === 'installing';
 
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-sky-500/10 rounded-lg flex items-center justify-center text-sky-400">
-                        <Mail className="w-6 h-6" />
-                      </div>
-                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">Disponível</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-200">Marketing Automação</h3>
-                    <p className="text-xs text-slate-400 mt-1">Disparo de e-mails em massa e gerador de cupons de descontos.</p>
-                  </div>
-                  {installedApps.mkt === true ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed">Habilitado</button>
-                  ) : installedApps.mkt === 'installing' ? (
-                    <button disabled className="mt-6 w-full py-2 bg-slate-800 text-slate-400 text-xs font-bold rounded-lg flex items-center justify-center space-x-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /><span>Instalando...</span>
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={() => handleInstallApp('mkt', 'Marketing Automação')} 
-                      className="mt-6 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg"
+                  return (
+                    <div 
+                      key={app.id} 
+                      className={`bg-slate-900 border rounded-xl p-6 flex flex-col justify-between transition-all duration-300 ${
+                        eligible 
+                          ? 'border-slate-800 hover:border-slate-700 hover:shadow-lg hover:shadow-indigo-500/2' 
+                          : 'border-slate-850 opacity-80'
+                      }`}
                     >
-                      Instalar Módulo
-                    </button>
-                  )}
-                </div>
+                      <div>
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                            eligible ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-800 text-slate-600'
+                          }`}>
+                            <IconComponent className="w-6 h-6" />
+                          </div>
+                          
+                          {/* Badges */}
+                          <div className="flex flex-col items-end space-y-1">
+                            {installed ? (
+                              <span className="bg-emerald-500/15 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
+                            ) : eligible ? (
+                              <span className="bg-indigo-500/10 text-indigo-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Desbloqueado</span>
+                            ) : (
+                              <span className="bg-amber-500/10 text-amber-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center space-x-1">
+                                <Lock className="w-2.5 h-2.5" />
+                                <span>Requer {app.planRequired}</span>
+                              </span>
+                            )}
+                            <span className="text-[8px] text-slate-500 uppercase tracking-widest font-bold">{app.category}</span>
+                          </div>
+                        </div>
+
+                        <h3 className="text-base font-bold text-slate-200">{app.name}</h3>
+                        <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">{app.desc}</p>
+                      </div>
+
+                      {/* Action buttons based on status */}
+                      <div className="mt-6 pt-4 border-t border-slate-850/60">
+                        {installed ? (
+                          <button 
+                            disabled 
+                            className="w-full py-2 bg-slate-950 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center justify-center space-x-1"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>Módulo Ativo no Menu</span>
+                          </button>
+                        ) : installing ? (
+                          <button 
+                            disabled 
+                            className="w-full py-2 bg-slate-950 text-slate-400 text-xs font-bold rounded-lg flex items-center justify-center space-x-2"
+                          >
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Instalando...</span>
+                          </button>
+                        ) : eligible ? (
+                          <button 
+                            onClick={() => handleInstallApp(app.id, app.name)}
+                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all"
+                          >
+                            Instalar Módulo
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => {
+                              setCurrentTab('marketplace');
+                              triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
+                            }}
+                            className="w-full py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-1"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Fazer Upgrade no Plano</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1731,47 +1870,74 @@ export default function App() {
             <div className="space-y-8 animate-fadeIn text-center">
               <div className="max-w-2xl mx-auto space-y-2">
                 <h2 className="text-3xl font-extrabold text-white tracking-tight">Assinaturas & Recursos Contábeis</h2>
-                <p className="text-sm text-slate-400">Liberte o copiloto fiscal e ferramentas multibancos em escala de alta performance.</p>
+                <p className="text-sm text-slate-400">Liberte o copiloto fiscal e ferramentas de vendas físicas em escala de alta performance.</p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6 max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6 max-w-5xl mx-auto text-left">
                 {/* Standard */}
                 <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
                   plan === 'standard' ? 'border-indigo-500' : 'border-slate-800'
                 }`}>
                   {plan === 'standard' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
-                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Iniciante</span>
+                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest block">Iniciante</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Standard</h3>
-                    <p className="text-xs text-slate-400 mt-2">Fechamento de eventos simples e dashboard geral.</p>
+                    <p className="text-xs text-slate-400 mt-2">Gestão financeira básica, extratos de contas e conciliação manual.</p>
+                    
+                    <hr className="border-slate-800 my-6" />
+                    
+                    <ul className="space-y-4 text-xs text-slate-300">
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-450" /><span>Financeiro ERP Básico</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Borderô Contábil Simples</span></li>
+                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV/Bar)</span></li>
+                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Módulos Comerciais (CRM/Mkt)</span></li>
+                    </ul>
                   </div>
                   <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className="mt-8 w-full py-3 bg-slate-800 text-slate-500 text-sm font-bold rounded-xl">Plano Atual</button>
                 </div>
 
                 {/* Advanced */}
                 <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-indigo-500 transition-all ${
-                  plan === 'advanced' ? 'border-indigo-500' : 'border-indigo-500/20'
+                  plan === 'advanced' ? 'border-indigo-500' : 'border-indigo-500/30'
                 }`}>
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-[10px] px-4 py-1 rounded-full font-bold tracking-widest shadow-md">RECOMENDADO</div>
                   {plan === 'advanced' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
-                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Profissional</span>
+                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest block">Profissional</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Advanced</h3>
-                    <p className="text-xs text-slate-400 mt-2">Conciliação automática e DREs por competência mensais.</p>
+                    <p className="text-xs text-slate-400 mt-2">Libera CRM comercial, campanhas de Marketing e gestão de PDVs externos.</p>
+                    
+                    <hr className="border-slate-800 my-6" />
+                    
+                    <ul className="space-y-4 text-xs text-slate-300">
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-450" /><span>Unlocks CRM de Vendas & Mkt</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Unlocks Gestão de PDVs & Logística</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Automação Contábil Completa</span></li>
+                      <li className="flex items-center space-x-3 text-slate-500"><X className="w-4 h-4" /><span>Sem Copiloto de IA</span></li>
+                    </ul>
                   </div>
-                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-indigo-650 text-white text-sm font-bold rounded-xl">Assinar Advanced</button>
+                  <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-indigo-650 hover:bg-indigo-600 text-white text-sm font-bold rounded-xl transition-all">Assinar Advanced</button>
                 </div>
 
                 {/* Expert */}
-                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-indigo-500 transition-all ${
-                  plan === 'expert' ? 'border-indigo-550' : 'border-slate-800'
+                <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-750 transition-all ${
+                  plan === 'expert' ? 'border-indigo-500' : 'border-slate-800'
                 }`}>
                   {plan === 'expert' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
-                    <span className="text-xs font-bold text-violet-400 uppercase tracking-widest">Alta Escala</span>
+                    <span className="text-xs font-bold text-violet-400 uppercase tracking-widest block">Alta Escala</span>
                     <h3 className="text-2xl font-extrabold text-white mt-2">Expert</h3>
                     <p className="text-xs text-slate-400 mt-2">Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
+                    
+                    <hr className="border-slate-800 my-6" />
+                    
+                    <ul className="space-y-4 text-xs text-slate-300">
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Libera Disk AI Copilot & Open Finance</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Libera Módulos de Bar, Insumos & POS</span></li>
+                      <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-emerald-455" /><span>Notas fiscais e Borderôs Ilimitados</span></li>
+                    </ul>
                   </div>
-                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-bold rounded-xl">Assinar Expert</button>
+                  <button disabled={plan==='expert'} onClick={()=>handleUpgradePlan('expert', 'Expert')} className="mt-8 w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-bold rounded-xl transition-all">Assinar Expert</button>
                 </div>
               </div>
             </div>
@@ -1828,7 +1994,7 @@ export default function App() {
                     <div className={`p-3 rounded-r-xl rounded-bl-xl max-w-[80%] border text-[11px] leading-relaxed ${
                       msg.sender === 'user' 
                         ? 'bg-indigo-600 border-indigo-500 text-white rounded-l-xl rounded-br-none' 
-                        : 'bg-slate-950/80 border-slate-850 text-slate-350'
+                        : 'bg-slate-950/80 border-slate-850 text-slate-355'
                     }`}>
                       <p>{msg.text}</p>
                       {msg.htmlResponse && msg.htmlResponse}
@@ -2103,6 +2269,87 @@ export default function App() {
                   className="px-4 py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-all"
                 >
                   Salvar Cupom
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4. ADD PDV MODAL */}
+      {showAddPdvModal && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+              <h3 className="text-sm font-bold text-white">Ativar Ponto de Venda (PDV)</h3>
+              <button onClick={() => setShowAddPdvModal(false)} className="text-slate-400 hover:text-slate-200">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreatePdv} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Nome do PDV *</label>
+                <input 
+                  type="text" 
+                  value={newPdv.name}
+                  onChange={(e) => setNewPdv(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Ex: Bilheteria Principal - Portão B"
+                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Operador Responsável *</label>
+                <input 
+                  type="text" 
+                  value={newPdv.manager}
+                  onChange={(e) => setNewPdv(prev => ({ ...prev, manager: e.target.value }))}
+                  placeholder="Ex: Sandra Costa"
+                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase">Tipo de PDV</label>
+                  <select 
+                    value={newPdv.type}
+                    onChange={(e) => setNewPdv(prev => ({ ...prev, type: e.target.value }))}
+                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
+                  >
+                    <option value="Local">Local</option>
+                    <option value="Físico Externo">Físico Externo</option>
+                    <option value="Teatro">Teatro</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase">Saldo Inicial (R$)</label>
+                  <input 
+                    type="number" 
+                    value={newPdv.balance}
+                    onChange={(e) => setNewPdv(prev => ({ ...prev, balance: e.target.value }))}
+                    placeholder="0"
+                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex space-x-3 justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddPdvModal(false)}
+                  className="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all"
+                >
+                  Ativar PDV
                 </button>
               </div>
             </form>
