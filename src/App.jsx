@@ -65,6 +65,26 @@ export default function App() {
     patrimonio: false,
     ai: false
   });
+
+  const [logisticsBatches, setLogisticsBatches] = useState([
+    { id: 'batch-1', event: 'Festival de Inverno Curitiba', type: 'Ingressos VIP', qty: 3000, printed: 3000, status: 'Enviado', tracking: 'BR-9821-XQ' },
+    { id: 'batch-2', event: 'Festival de Inverno Curitiba', type: 'Pista Lote 1', qty: 15000, printed: 15000, status: 'Entregue', tracking: 'BR-8122-ZP' },
+    { id: 'batch-3', event: 'Metal Fest 2026', type: 'Pista Lote 1', qty: 10000, printed: 6000, status: 'Imprimindo', tracking: 'Em processamento' },
+  ]);
+
+  const [barInventory, setBarInventory] = useState([
+    { id: 'inv-1', name: 'Cerveja Spaten Lata 350ml', stock: 12000, maxStock: 15000, price: 12.00, sold: 1840 },
+    { id: 'inv-2', name: 'Água Mineral sem Gás 500ml', stock: 8500, maxStock: 10000, price: 6.00, sold: 920 },
+    { id: 'inv-3', name: 'Refrigerante Coca-Cola Lata', stock: 6100, maxStock: 8000, price: 8.00, sold: 450 },
+    { id: 'inv-4', name: 'Combo Energético + Vodka', stock: 2400, maxStock: 3000, price: 45.00, sold: 290 },
+  ]);
+
+  const [posTerminals, setPosTerminals] = useState([
+    { id: 'pos-1', serial: 'PAX-A920-8912', event: 'Festival de Inverno Curitiba', operator: 'Sandra Costa', battery: 94, status: 'Em uso' },
+    { id: 'pos-2', serial: 'PAX-A920-8913', event: 'Festival de Inverno Curitiba', operator: 'Daniel Santos', battery: 85, status: 'Em uso' },
+    { id: 'pos-3', serial: 'PAX-A920-8914', event: 'Metal Fest 2026', operator: 'Aguardando', battery: 100, status: 'Disponível' },
+    { id: 'pos-4', serial: 'PAX-S920-4122', event: 'Manutenção Geral', operator: 'N/A', battery: 42, status: 'Manutenção' },
+  ]);
   
   // Toast notifications state
   const [toast, setToast] = useState({ show: false, title: '', body: '', type: 'success' });
@@ -899,6 +919,91 @@ export default function App() {
                   >
                     <Mail className={`w-4 h-4 shrink-0 ${currentTab === 'marketing' ? 'text-[#3B82F6]' : textSec}`} />
                     <span>Mkt & Campanhas</span>
+                  </button>
+                </li>
+              )}
+
+              {/* PDV option (only if installed) */}
+              {installedApps.pdv === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => selectTab('pdv')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'pdv' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'pdv' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Gestão de PDVs</span>
+                  </button>
+                </li>
+              )}
+
+              {/* Logistica option (only if installed) */}
+              {installedApps.logistica === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => selectTab('logistica')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'logistica' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <Briefcase className={`w-4 h-4 shrink-0 ${currentTab === 'logistica' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Logística & Ingressos</span>
+                  </button>
+                </li>
+              )}
+
+              {/* Bar & Estoque option (only if installed) */}
+              {installedApps.bar === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => selectTab('bar')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'bar' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <Layers className={`w-4 h-4 shrink-0 ${currentTab === 'bar' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Bar & Estoque</span>
+                  </button>
+                </li>
+              )}
+
+              {/* Patrimonio option (only if installed) */}
+              {installedApps.patrimonio === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => selectTab('patrimonio')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'patrimonio' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <Landmark className={`w-4 h-4 shrink-0 ${currentTab === 'patrimonio' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Patrimônio & POS</span>
+                  </button>
+                </li>
+              )}
+
+              {/* AI option (only if installed) */}
+              {installedApps.ai === true && (
+                <li className="nav-item w-full">
+                  <button 
+                    onClick={() => selectTab('ai')} 
+                    className={`nav-link w-full text-left flex items-center space-x-3 px-4 py-2 text-sm transition-all border-l-[3px] ${
+                      currentTab === 'ai' 
+                        ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                        : `${textSec} hover:bg-light/10 border-transparent`
+                    }`}
+                  >
+                    <Brain className={`w-4 h-4 shrink-0 ${currentTab === 'ai' ? 'text-[#3B82F6]' : textSec}`} />
+                    <span>Disk AI Analytics</span>
                   </button>
                 </li>
               )}
@@ -2126,6 +2231,315 @@ export default function App() {
                 </div>
               )}
 
+            </div>
+          )}
+
+          {/* ================= 4. GESTÃO DE PDVS VIEW ================= */}
+          {currentTab === 'pdv' && installedApps.pdv === true && (
+            <div className="space-y-4 animate-fadeIn">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Gestão de Pontos de Venda (PDV)</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Controle de caixas físicos, operadores, sangrias de dinheiro e saldos em tempo real.</p>
+                </div>
+                <button 
+                  onClick={() => setShowAddPdvModal(true)}
+                  className="btn btn-primary flex items-center space-x-1.5 px-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded text-xs font-semibold border-0 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Ativar Novo PDV</span>
+                </button>
+              </div>
+
+              <div className="row">
+                {pdvs.map(pdv => (
+                  <div key={pdv.id} className="col-md-4 mb-3">
+                    <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                      <div>
+                        <div className="flex justify-between items-start">
+                          <h3 className={`text-xs font-bold ${textTitle} mb-0`}>{pdv.name}</h3>
+                          <span className={`badge ${pdv.status === 'Aberto' ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' : 'bg-[#EF4444]/12 text-[#EF4444]'} text-[8px] font-bold px-1.5 py-0.5 rounded-full`}>
+                            {pdv.status}
+                          </span>
+                        </div>
+                        <p className={`text-[10px] ${textSec} mt-1 mb-3`}>Operador: {pdv.manager} ({pdv.type})</p>
+
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded text-center`}>
+                          <span className={`text-[9px] ${textSec} uppercase block`}>Saldo Retido no Caixa</span>
+                          <span className="text-md font-mono font-bold text-[#22C55E] mt-1 block">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
+                        </div>
+                      </div>
+
+                      {pdv.balance > 0 && (
+                        <button 
+                          onClick={() => handlePdvBleeding(pdv.id, pdv.balance)}
+                          className="btn btn-primary w-full mt-3 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0"
+                        >
+                          Realizar Sangria Total
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ================= GESTÃO DE LOGÍSTICA & INGRESSOS VIEW ================= */}
+          {currentTab === 'logistica' && installedApps.logistica === true && (
+            <div className="space-y-4 animate-fadeIn">
+              <div>
+                <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Logística & Ingressos Físicos</h2>
+                <p className={`text-xs ${textSec} mb-0`}>Monitore lotes impressos, remessas físicas e entregas de ingressos nas bilheterias.</p>
+              </div>
+
+              <div className={`card ${cardClass} p-4`}>
+                <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Lotes de Ingressos Físicos</h3>
+                <div className="table-responsive">
+                  <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                    <thead>
+                      <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                        <th className="p-3 border-0">Lote ID</th>
+                        <th className="p-3 border-0">Evento</th>
+                        <th className="p-3 border-0">Tipo de Ingresso</th>
+                        <th className="p-3 border-0 text-center">Quantidade</th>
+                        <th className="p-3 border-0 text-center">Impresso</th>
+                        <th className="p-3 border-0 text-center">Status</th>
+                        <th className="p-3 border-0 text-right">Rastreio</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logisticsBatches.map(batch => (
+                        <tr key={batch.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
+                          <td className={`p-3 border-0 font-mono font-semibold ${textTitle} uppercase`}>{batch.id}</td>
+                          <td className={`p-3 border-0 font-semibold ${textTitle}`}>{batch.event}</td>
+                          <td className={`p-3 border-0 ${textSec}`}>{batch.type}</td>
+                          <td className="p-3 border-0 text-center font-mono">{batch.qty.toLocaleString()}</td>
+                          <td className="p-3 border-0 text-center font-mono">{batch.printed.toLocaleString()}</td>
+                          <td className="p-3 border-0 text-center">
+                            <span className={`badge ${
+                              batch.status === 'Entregue' 
+                                ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' 
+                                : batch.status === 'Enviado' 
+                                ? 'badge-primary bg-[#3B82F6]/12 text-[#3B82F6]'
+                                : 'badge-warning bg-[#F59E0B]/12 text-[#F59E0B] animate-pulse'
+                            } text-[9px] font-bold px-2 py-0.5 rounded-full`}>
+                              {batch.status}
+                            </span>
+                          </td>
+                          <td className="p-3 border-0 text-right font-mono text-[#3B82F6]">{batch.tracking}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= GESTÃO DE BAR & ESTOQUE VIEW ================= */}
+          {currentTab === 'bar' && installedApps.bar === true && (
+            <div className="space-y-4 animate-fadeIn">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Bar & Controle de Estoque</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Monitore o nível de estoque de bebidas/insumos nos caixas e simule vendas.</p>
+                </div>
+              </div>
+
+              <div className="row">
+                {/* Live POS simulator */}
+                <div className="col-lg-6 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Simulador de Vendas no Bar</h3>
+                    <p className={`text-xs ${textSec} mb-4`}>Clique nos produtos abaixo para simular vendas rápidas nos terminais e deduzir estoque.</p>
+                    
+                    <div className="row">
+                      {barInventory.map(item => (
+                        <div key={item.id} className="col-sm-6 mb-3">
+                          <button 
+                            onClick={() => {
+                              if (item.stock <= 0) {
+                                triggerToast("Estoque Esgotado", `O item ${item.name} não possui estoque disponível.`, "warning");
+                                return;
+                              }
+                              // Deduct stock, increase sold, increase money
+                              setBarInventory(prev => prev.map(inv => inv.id === item.id ? { ...inv, stock: inv.stock - 1, sold: inv.sold + 1 } : inv));
+                              setFinancialStats(stats => ({
+                                ...stats,
+                                receita: stats.receita + item.price,
+                                saldo: stats.saldo + item.price,
+                                lucro: stats.lucro + item.price
+                              }));
+                              triggerToast("Venda Registrada 🍻", `1x ${item.name} vendida por R$ ${item.price.toFixed(2)}.`);
+                            }}
+                            className={`w-full text-left p-3 rounded border transition-all ${theme === 'dark' ? 'bg-[#111827] border-white/5 hover:border-[#3B82F6]' : 'bg-slate-50 border-slate-300 hover:border-[#3B82F6]'} cursor-pointer`}
+                          >
+                            <span className={`text-xs font-semibold ${textTitle} block truncate`}>{item.name}</span>
+                            <span className="text-[10px] text-[#3B82F6] font-semibold mt-1 block">Preço: R$ {item.price.toFixed(2)}</span>
+                            <span className={`text-[9px] ${textSec} block mt-0.5`}>Estoque: {item.stock} uni</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Inventory management */}
+                <div className="col-lg-6 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100`}>
+                    <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Nível de Insumos</h3>
+                    <div className="space-y-3">
+                      {barInventory.map(item => {
+                        const pct = Math.max(0, Math.min(100, Math.round((item.stock / item.maxStock) * 100)));
+                        return (
+                          <div key={item.id} className="space-y-1 text-xs">
+                            <div className="flex justify-between font-semibold">
+                              <span className={textTitle}>{item.name}</span>
+                              <span className={textSec}>{item.stock.toLocaleString()} / {item.maxStock.toLocaleString()} ({pct}%)</span>
+                            </div>
+                            <div className={`w-full ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-200'} rounded-full h-2 overflow-hidden`}>
+                              <div 
+                                className={`h-full ${pct < 20 ? 'bg-[#EF4444]' : pct < 50 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]'} transition-all duration-300`} 
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= GESTÃO DE PATRIMÔNIO & POS VIEW ================= */}
+          {currentTab === 'patrimonio' && installedApps.patrimonio === true && (
+            <div className="space-y-4 animate-fadeIn">
+              <div>
+                <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Patrimônio & Terminais POS</h2>
+                <p className={`text-xs ${textSec} mb-0`}>Monitore a entrega, status de manutenção e distribuição física das maquininhas de cartão.</p>
+              </div>
+
+              <div className={`card ${cardClass} p-4`}>
+                <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Terminais Ativos</h3>
+                <div className="table-responsive">
+                  <table className={`table table-striped table-hover text-xs ${textBody}`}>
+                    <thead>
+                      <tr className={`border-bottom ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
+                        <th className="p-3 border-0">Nº de Série</th>
+                        <th className="p-3 border-0">Evento Vinculado</th>
+                        <th className="p-3 border-0">Operador</th>
+                        <th className="p-3 border-0 text-center">Bateria</th>
+                        <th className="p-3 border-0 text-center">Status</th>
+                        <th className="p-3 border-0 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {posTerminals.map(pos => (
+                        <tr key={pos.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
+                          <td className={`p-3 border-0 font-mono font-semibold ${textTitle}`}>{pos.serial}</td>
+                          <td className={`p-3 border-0 font-semibold ${textTitle}`}>{pos.event}</td>
+                          <td className={`p-3 border-0 ${textSec}`}>{pos.operator}</td>
+                          <td className="p-3 border-0 text-center font-mono font-semibold">{pos.battery}%</td>
+                          <td className="p-3 border-0 text-center">
+                            <span className={`badge ${
+                              pos.status === 'Em uso' 
+                                ? 'badge-success bg-[#22C55E]/12 text-[#22C55E]' 
+                                : pos.status === 'Disponível' 
+                                ? 'badge-primary bg-[#3B82F6]/12 text-[#3B82F6]'
+                                : 'badge-danger bg-[#EF4444]/12 text-[#EF4444]'
+                            } text-[9px] font-bold px-2 py-0.5 rounded-full`}>
+                              {pos.status}
+                            </span>
+                          </td>
+                          <td className="p-3 border-0 text-right">
+                            <button 
+                              onClick={() => triggerToast("Comando Enviado", "Terminal resetado ou pingado com sucesso.")}
+                              className="btn btn-primary btn-sm px-2.5 py-1 text-[10px] font-semibold rounded border-0 cursor-pointer"
+                            >
+                              Ping
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= DISK AI ANALYTICS VIEW ================= */}
+          {currentTab === 'ai' && installedApps.ai === true && (
+            <div className="space-y-4 animate-fadeIn">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Disk AI Analytics Control</h2>
+                  <p className={`text-xs ${textSec} mb-0`}>Auditoria autônoma de margens de eventos, anomalías fiscais e controle de conciliação.</p>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-lg-8 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Relatório de Auditoria Contábil Automática</h3>
+                      <div className="space-y-3 text-xs leading-relaxed">
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded`}>
+                          <h4 className="text-xs font-bold text-[#22C55E] flex items-center mb-1">
+                            <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                            Nenhuma Anomalia Crítica Encontrada
+                          </h4>
+                          <p className={`${textSec} mb-0`}>Os borderôs de eventos batem 100% com as taxas de comissionamento de lote acordadas em contrato.</p>
+                        </div>
+
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded`}>
+                          <h4 className="text-xs font-bold text-[#3B82F6] flex items-center mb-1">
+                            <AlertCircle className="w-3.5 h-3.5 mr-1.5" />
+                            Spread e Markup de Operações
+                          </h4>
+                          <p className={`${textSec} mb-0`}>Custo médio de Gateway de Pagamentos fixado em 3.0% da receita bruta dos eventos. Margem preservada.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2 mt-4 pt-3 border-top border-light/5">
+                      <button 
+                        onClick={() => triggerAIResponse('conciliacao')}
+                        className="btn btn-primary py-2 px-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer"
+                      >
+                        Auditar Conciliação
+                      </button>
+                      <button 
+                        onClick={() => triggerAIResponse('dre')}
+                        className="btn btn-primary py-2 px-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer"
+                      >
+                        Análise Margens DRE
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-4 mb-3">
+                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                    <div>
+                      <h3 className={`text-sm font-semibold ${textTitle} border-bottom ${borderCol} pb-3 mb-3`}>Copilot Widget</h3>
+                      <p className={`text-xs ${textSec} leading-relaxed`}>
+                        O copiloto fiscal está ativo e pode ser acessado também através do balão flutuante no canto inferior direito da tela.
+                      </p>
+                    </div>
+                    
+                    <button 
+                      onClick={() => setChatOpen(true)}
+                      className="btn btn-primary w-full py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded border-0 cursor-pointer"
+                    >
+                      Abrir Janela Chat
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
