@@ -50,7 +50,7 @@ export default function App() {
   const [accountingSubTab, setAccountingSubTab] = useState('bordero');
   const [marketingSubTab, setMarketingSubTab] = useState('campanhas');
   const [plan, setPlan] = useState('standard');
-  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+  const [theme, setTheme] = useState('light'); // 'dark' or 'light'
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   // App store installation simulation state
