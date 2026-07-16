@@ -34,7 +34,10 @@ import {
   ShieldCheck,
   MapPin,
   Eye,
-  Lock
+  Lock,
+  Megaphone,
+  Smartphone,
+  Play
 } from 'lucide-react';
 
 export default function App() {
@@ -42,6 +45,7 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [financeSubTab, setFinanceSubTab] = useState('contas');
   const [accountingSubTab, setAccountingSubTab] = useState('bordero');
+  const [marketingSubTab, setMarketingSubTab] = useState('campanhas');
   const [plan, setPlan] = useState('standard');
   
   // App store installation simulation state
@@ -79,7 +83,7 @@ export default function App() {
     { id: 'financeiro', name: 'Financeiro (ERP)', desc: 'Gestão de contas, saldo, fluxo de caixa e conciliação bancária.', category: 'Finanças', planRequired: 'standard', icon: CreditCard },
     { id: 'contabilidade', name: 'Contabilidade Disk', desc: 'Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.', category: 'Fiscal', planRequired: 'standard', icon: Receipt },
     { id: 'crm', name: 'CRM de Vendas', desc: 'Contatos de novos produtores, funil de vendas e metas comerciais.', category: 'Vendas', planRequired: 'advanced', icon: Users },
-    { id: 'mkt', name: 'Marketing Automação', desc: 'Disparo de e-mails em massa e gerador de cupons de desconto.', category: 'Marketing', planRequired: 'Marketing', icon: Mail },
+    { id: 'mkt', name: 'Marketing Automação', desc: 'Disparo de e-mails em massa e gerador de cupons de desconto.', category: 'Marketing', planRequired: 'advanced', icon: Mail },
     { id: 'pdv', name: 'Gestão de PDVs', desc: 'Controle de pontos de venda, monitor de caixas e sangrias.', category: 'Operações', planRequired: 'advanced', icon: ShoppingBag },
     { id: 'logistica', name: 'Logística & Impressão', desc: 'Montagem de ingressos físicos, períodos de entrega e layouts.', category: 'Logística', planRequired: 'advanced', icon: Briefcase },
     { id: 'bar', name: 'Sistema de Bar & Estoque', desc: 'Cardápios digitais, controle de insumos e consumo local.', category: 'Operações', planRequired: 'expert', icon: Layers },
@@ -222,7 +226,17 @@ export default function App() {
   const [showAddPdvModal, setShowAddPdvModal] = useState(false);
   const [newPdv, setNewPdv] = useState({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
 
-  // ================= 5. MARKETING COUPONS =================
+  // ================= 5. MARKETING CAMPAIGNS & COUPONS STATE =================
+  const [campaigns, setCampaigns] = useState([
+    { id: 'camp-1', name: 'Black Friday Antecipado', channel: 'E-mail', sent: 25000, openRate: 28.4, clickRate: 11.2, conversions: 840, revenue: 84000, status: 'Concluída', date: '10/07/2026' },
+    { id: 'camp-2', name: 'Pré-Venda Metal Fest 2026', channel: 'WhatsApp', sent: 12000, openRate: 94.2, clickRate: 18.5, conversions: 490, revenue: 58800, status: 'Concluída', date: '12/07/2026' },
+    { id: 'camp-3', name: 'Reengajamento Ingressos Inverno', channel: 'E-mail', sent: 8000, openRate: 19.8, clickRate: 6.4, conversions: 120, revenue: 14400, status: 'Concluída', date: '15/07/2026' },
+    { id: 'camp-4', name: 'Promoção Relâmpago Embafeste', channel: 'SMS', sent: 5000, openRate: 88.0, clickRate: 14.2, conversions: 0, revenue: 0, status: 'Agendada', date: '20/07/2026' }
+  ]);
+  
+  const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
+  const [newCampaign, setNewCampaign] = useState({ name: '', channel: 'E-mail', subject: '', date: '18/07/2026', targetEvent: 'Festival de Inverno Curitiba' });
+
   const [coupons, setCoupons] = useState([
     { id: 'coup-1', code: 'INVERNO15', discount: 15, event: 'Festival de Inverno Curitiba', status: 'Ativo', usages: 342 },
     { id: 'coup-2', code: 'METAL20', discount: 20, event: 'Metal Fest 2026', status: 'Ativo', usages: 198 },
@@ -382,19 +396,16 @@ export default function App() {
       return;
     }
 
-    // Process bleeding
     setPdvs(prev => prev.map(p => {
       if (p.id === pdvId) return { ...p, balance: p.balance - bleedVal };
       return p;
     }));
 
-    // Transfer value to Caja Geral
     setAccounts(prev => prev.map(a => {
       if (a.id === 'acc-3') return { ...a, balance: a.balance + bleedVal };
       return a;
     }));
 
-    // Add entry
     const entry = {
       id: `lan-${Date.now()}`,
       type: 'receita',
@@ -425,6 +436,87 @@ export default function App() {
     setShowAddPdvModal(false);
     setNewPdv({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
     triggerToast("Sucesso", "Novo ponto de venda física (PDV) ativo.");
+  };
+
+  // 6. Disparar / Simular Disparo de Campanha (Marketing)
+  const handleTriggerCampaign = (campaignId) => {
+    setCampaigns(prev => prev.map(c => {
+      if (c.id === campaignId) {
+        return { ...c, status: 'Disparando' };
+      }
+      return c;
+    }));
+
+    triggerToast("Disparando Campanha 🚀", "Os contatos e leads segmentados começaram a receber as notificações.");
+
+    setTimeout(() => {
+      const conversionsVal = Math.floor(Math.random() * 200) + 50;
+      const revenueVal = conversionsVal * 120; // Average ticket
+
+      setCampaigns(prev => prev.map(c => {
+        if (c.id === campaignId) {
+          return {
+            ...c,
+            status: 'Concluída',
+            conversions: conversionsVal,
+            revenue: revenueVal,
+            openRate: parseFloat((Math.random() * 25 + 15).toFixed(1)),
+            clickRate: parseFloat((Math.random() * 8 + 3).toFixed(1))
+          };
+        }
+        return c;
+      }));
+
+      // Update global accounts & statistics
+      setFinancialStats(stats => ({
+        ...stats,
+        receita: stats.receita + revenueVal,
+        saldo: stats.saldo + revenueVal,
+        lucro: stats.lucro + revenueVal
+      }));
+
+      setAccounts(accounts => accounts.map(a => {
+        if (a.id === 'acc-2') return { ...a, balance: a.balance + revenueVal };
+        return a;
+      }));
+
+      // Add to Ledger (Lançamento)
+      const entry = {
+        id: `lan-${Date.now()}`,
+        type: 'receita',
+        desc: `Conversões Campanhas: ${campaigns.find(cp => cp.id === campaignId)?.name || 'Marketing'}`,
+        amount: revenueVal,
+        category: 'Venda Ingressos',
+        costCenter: 'Marketing',
+        date: 'Hoje',
+        status: 'Recebido'
+      };
+      setLancamentos(prev => [entry, ...prev]);
+
+      triggerToast("Disparo Concluído! 🎉", `A campanha gerou R$ ${revenueVal.toLocaleString('pt-BR')} em novas vendas de ingressos.`);
+    }, 2500);
+  };
+
+  // Create Marketing Campaign
+  const handleCreateCampaign = (e) => {
+    e.preventDefault();
+    if (!newCampaign.name || !newCampaign.subject) return;
+    const addedCampaign = {
+      id: `camp-${Date.now()}`,
+      name: newCampaign.name,
+      channel: newCampaign.channel,
+      sent: Math.floor(Math.random() * 10000) + 1500,
+      openRate: 0,
+      clickRate: 0,
+      conversions: 0,
+      revenue: 0,
+      status: 'Agendada',
+      date: newCampaign.date
+    };
+    setCampaigns(prev => [...prev, addedCampaign]);
+    setShowAddCampaignModal(false);
+    setNewCampaign({ name: '', channel: 'E-mail', subject: '', date: '18/07/2026', targetEvent: 'Festival de Inverno Curitiba' });
+    triggerToast("Campanha Agendada", `A campanha "${addedCampaign.name}" foi agendada para ${addedCampaign.date}.`);
   };
 
   // Reconcile item
@@ -580,7 +672,7 @@ export default function App() {
         aiText = 'DRE consolidada calculada pelo módulo fiscal. Margem líquida do trimestre está em 18.6%.';
         html = (
           <div className="mt-2 border border-slate-800 rounded-lg overflow-hidden">
-            <table className="w-full text-[10px] text-slate-350 font-mono">
+            <table className="w-full text-[10px] text-slate-355 font-mono">
               <tr className="bg-slate-950"><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-emerald-400">R$ 2.580.000</td></tr>
               <tr className="border-t border-slate-900"><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-pink-400">-R$ 387.000</td></tr>
               <tr className="border-t border-slate-900"><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-pink-400">-R$ 1.713.000</td></tr>
@@ -746,7 +838,7 @@ export default function App() {
                 }`}
               >
                 <Mail className="w-5 h-5 shrink-0" />
-                <span>Mkt & Cupons</span>
+                <span>Mkt & Campanhas</span>
               </button>
             )}
 
@@ -820,7 +912,7 @@ export default function App() {
             <span className="text-xs text-slate-500 uppercase tracking-wider">Espaço de Trabalho</span>
             <span className="text-slate-600">/</span>
             <span className="text-sm font-semibold text-slate-200 capitalize">
-              {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
+              {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'marketing' ? 'Marketing & Campanhas' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
             </span>
           </div>
           
@@ -1045,7 +1137,7 @@ export default function App() {
               {financeSubTab === 'contas' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   <div className="lg:col-span-2 space-y-6">
-                    <h3 className="text-sm font-bold text-slate-350 uppercase tracking-wider">Saldo das Contas do Sistema</h3>
+                    <h3 className="text-sm font-bold text-slate-355 uppercase tracking-wider">Saldo das Contas do Sistema</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                       {accounts.map(acc => (
                         <div key={acc.id} className={`bg-slate-900 border-l-4 ${acc.color} border border-slate-800 rounded-xl p-5 shadow-sm`}>
@@ -1064,7 +1156,7 @@ export default function App() {
                         <h4 className="text-sm font-bold text-white">Resumo Patrimonial Consolidador</h4>
                       </div>
                       <p className="text-xs text-slate-400">
-                        O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
+                        O saldo líquido disponível consolidado includes taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
                       </p>
                     </div>
                   </div>
@@ -1092,7 +1184,7 @@ export default function App() {
                         <select 
                           value={transfer.to} 
                           onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
-                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 font-semibold text-slate-350"
+                          className="w-full bg-slate-950 border border-slate-850 rounded p-2 focus:outline-none focus:border-indigo-500 font-semibold text-slate-355"
                         >
                           {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                         </select>
@@ -1316,8 +1408,6 @@ export default function App() {
               {/* Sub-Tab 4: PDVs & Taxas */}
               {financeSubTab === 'taxas' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  
-                  {/* PDV Control List */}
                   <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
                     <div className="flex justify-between items-center border-b border-slate-800 pb-3">
                       <div className="flex items-center space-x-2">
@@ -1369,7 +1459,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Fee list */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
                     <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Gateway & Custos Operacionais</h3>
                     <div className="space-y-3 text-xs">
@@ -1381,14 +1470,13 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-
                 </div>
               )}
 
             </div>
           )}
 
-          {/* ================= 2. CONTABILIDADE DISK VIEW ================= */}
+          {/* ================= 3. CONTABILIDADE DISK VIEW ================= */}
           {currentTab === 'contabilidade' && (
             <div className="space-y-8 animate-fadeIn">
               
@@ -1429,8 +1517,6 @@ export default function App() {
               {/* Sub-Tab 1: Borderô Eventos */}
               {accountingSubTab === 'bordero' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  
-                  {/* Event list selector */}
                   <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
                     <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Selecione o Evento</h3>
                     <div className="space-y-3">
@@ -1663,7 +1749,7 @@ export default function App() {
             </div>
           )}
 
-          {/* ================= 3. CRM DE VENDAS VIEW ================= */}
+          {/* ================= 4. CRM DE VENDAS VIEW ================= */}
           {currentTab === 'crm' && (
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -1690,7 +1776,7 @@ export default function App() {
                     <div key={stage} className="bg-slate-900/50 border border-slate-850 rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{stageLabels[stage]}</span>
-                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-350 font-bold">
+                        <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded-full text-slate-355 font-bold">
                           {leads.filter(l => l.stage === stage).length}
                         </span>
                       </div>
@@ -1723,50 +1809,206 @@ export default function App() {
             </div>
           )}
 
-          {/* ================= 4. MARKETING VIEW ================= */}
+          {/* ================= 5. MARKETING & CAMPANHAS VIEW ================= */}
           {currentTab === 'marketing' && (
             <div className="space-y-8 animate-fadeIn">
+              
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Marketing & Cupons</h2>
-                  <p className="text-sm text-slate-400">Ative descontos e engaje seus clientes com campanhas integradas.</p>
+                  <h2 className="text-2xl font-extrabold text-white tracking-tight">Mkt & Campanhas</h2>
+                  <p className="text-sm text-slate-400">Ative cupons, dispare notificações e analise métricas de conversão.</p>
                 </div>
-                <button 
-                  onClick={() => setShowAddCouponModal(true)}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Novo Cupom</span>
-                </button>
+                
+                <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg space-x-1 text-xs">
+                  <button 
+                    onClick={() => setMarketingSubTab('campanhas')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      marketingSubTab === 'campanhas' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Disparos & Campanhas
+                  </button>
+                  <button 
+                    onClick={() => setMarketingSubTab('cupons')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      marketingSubTab === 'cupons' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Cupons
+                  </button>
+                  <button 
+                    onClick={() => setMarketingSubTab('performance')}
+                    className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+                      marketingSubTab === 'performance' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Métricas & ROI
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 lg:col-span-2 shadow-md space-y-4">
-                  <h3 className="text-sm font-bold text-slate-200">Cupons Ativos</h3>
-                  <div className="space-y-3">
-                    {coupons.map(coupon => (
-                      <div key={coupon.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 rounded bg-indigo-600/10 text-indigo-400 font-bold flex items-center justify-center text-xs">
-                            {coupon.discount}%
+              {/* Sub-Tab 1: Disparos & Campanhas */}
+              {marketingSubTab === 'campanhas' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  
+                  {/* Campaign List */}
+                  <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                      <h3 className="text-sm font-bold text-white">Histórico de Disparos</h3>
+                      <button 
+                        onClick={() => setShowAddCampaignModal(true)}
+                        className="px-2 py-1 bg-indigo-650 hover:bg-indigo-600 text-white text-[10px] font-bold rounded"
+                      >
+                        Nova Campanha
+                      </button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs text-slate-350 border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-bold text-[10px] uppercase text-left">
+                            <th className="p-3">Nome da Campanha</th>
+                            <th className="p-3">Canal</th>
+                            <th className="p-3">Data</th>
+                            <th className="p-3 text-center">Status</th>
+                            <th className="p-3 text-right">Vendas</th>
+                            <th className="p-3 text-center">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {campaigns.map(camp => (
+                            <tr key={camp.id} className="border-b border-slate-850 hover:bg-slate-950/20">
+                              <td className="p-3">
+                                <div>
+                                  <span className="font-semibold text-white block">{camp.name}</span>
+                                  {camp.sent > 0 && <span className="text-[10px] text-slate-500 font-mono">Enviados: {camp.sent.toLocaleString()}</span>}
+                                </div>
+                              </td>
+                              <td className="p-3 font-mono">{camp.channel}</td>
+                              <td className="p-3 font-mono">{camp.date}</td>
+                              <td className="p-3 text-center">
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                                  camp.status === 'Concluída' 
+                                    ? 'bg-emerald-500/10 text-emerald-450' 
+                                    : camp.status === 'Disparando' 
+                                    ? 'bg-slate-850 text-indigo-400 animate-pulse'
+                                    : 'bg-amber-500/10 text-amber-400'
+                                }`}>
+                                  {camp.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right font-mono font-bold text-indigo-300">
+                                R$ {camp.revenue.toLocaleString('pt-BR')}
+                              </td>
+                              <td className="p-3 text-center">
+                                {camp.status === 'Agendada' && (
+                                  <button 
+                                    onClick={() => handleTriggerCampaign(camp.id)}
+                                    className="p-1 bg-indigo-650 hover:bg-indigo-600 rounded text-white active:scale-95 transition-all"
+                                    title="Disparar campanha agora"
+                                  >
+                                    <Play className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                                {camp.status === 'Concluída' && (
+                                  <button 
+                                    onClick={() => triggerToast("Relatório", "Baixando relatório de conversões detalhado...")}
+                                    className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300"
+                                  >
+                                    Relatório
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Campaign tips & performance panel */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4 h-fit">
+                    <h3 className="text-sm font-bold text-white border-b border-slate-800 pb-3">Dicas de Conversão</h3>
+                    <p className="text-xs text-slate-400">
+                      Disparos via WhatsApp possuem uma taxa de clique média de 18.5%, contra 6.4% em campanhas de E-mail de reengajamento.
+                    </p>
+                    
+                    <div className="p-3 bg-slate-950 rounded-lg border border-slate-850 space-y-2">
+                      <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>Audiência Estimada:</span>
+                        <span className="text-white font-bold">54.000 Compradores</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                        <span>Média Conversão:</span>
+                        <span className="text-emerald-450 font-bold">3.2% global</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* Sub-Tab 2: Cupons */}
+              {marketingSubTab === 'cupons' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+                  <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md space-y-4">
+                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                      <h3 className="text-sm font-bold text-slate-200">Cupons Ativos</h3>
+                      <button 
+                        onClick={() => setShowAddCouponModal(true)}
+                        className="px-2 py-1 bg-indigo-650 hover:bg-indigo-600 text-white text-[10px] font-bold rounded"
+                      >
+                        Novo Cupom
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {coupons.map(coupon => (
+                        <div key={coupon.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded bg-indigo-600/10 text-indigo-400 font-bold flex items-center justify-center text-xs">
+                              {coupon.discount}%
+                            </div>
+                            <div>
+                              <span className="text-xs font-mono font-bold text-white tracking-wider block">{coupon.code}</span>
+                              <span className="text-[9px] text-slate-500">{coupon.event}</span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-xs font-mono font-bold text-white tracking-wider block">{coupon.code}</span>
-                            <span className="text-[9px] text-slate-500">{coupon.event}</span>
+                          <div className="flex items-center space-x-4">
+                            <span className="text-[10px] text-slate-500 font-mono">Usos: {coupon.usages}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                              coupon.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'
+                            }`}>{coupon.status}</span>
                           </div>
                         </div>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                          coupon.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'
-                        }`}>{coupon.status}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Sub-Tab 3: Métricas & ROI */}
+              {marketingSubTab === 'performance' && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block">Faturamento Campanhas</span>
+                    <span className="text-xl font-mono font-extrabold text-white mt-1 block">R$ {campaigns.reduce((acc, c) => acc + c.revenue, 0).toLocaleString('pt-BR')}</span>
+                  </div>
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block">Taxa Média de Abertura</span>
+                    <span className="text-xl font-mono font-extrabold text-indigo-400 mt-1 block">47.6%</span>
+                  </div>
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-widest font-bold block">Total Ingressos Vendidos</span>
+                    <span className="text-xl font-mono font-extrabold text-emerald-400 mt-1 block">{campaigns.reduce((acc, c) => acc + c.conversions, 0)}</span>
+                  </div>
+                </div>
+              )}
+
             </div>
           )}
 
-          {/* ================= 5. CENTRAL DE APLICATIVOS (APP STORE) ================= */}
+          {/* ================= 6. CENTRAL DE APLICATIVOS (APP STORE) ================= */}
           {currentTab === 'appstore' && (
             <div className="space-y-8 animate-fadeIn">
               <div>
@@ -1774,7 +2016,6 @@ export default function App() {
                 <p className="text-sm text-slate-400">Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
               </div>
 
-              {/* Grid of Catalog Apps */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {appsCatalog.map(app => {
                   const IconComponent = app.icon;
@@ -1792,7 +2033,6 @@ export default function App() {
                       }`}
                     >
                       <div>
-                        {/* Header */}
                         <div className="flex items-start justify-between mb-4">
                           <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                             eligible ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-800 text-slate-600'
@@ -1800,7 +2040,6 @@ export default function App() {
                             <IconComponent className="w-6 h-6" />
                           </div>
                           
-                          {/* Badges */}
                           <div className="flex flex-col items-end space-y-1">
                             {installed ? (
                               <span className="bg-emerald-500/15 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Ativo</span>
@@ -1820,8 +2059,7 @@ export default function App() {
                         <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">{app.desc}</p>
                       </div>
 
-                      {/* Action buttons based on status */}
-                      <div className="mt-6 pt-4 border-t border-slate-850/60">
+                      <div className="mt-6 pt-4 border-t border-slate-855/60">
                         {installed ? (
                           <button 
                             disabled 
@@ -1865,7 +2103,7 @@ export default function App() {
             </div>
           )}
 
-          {/* ================= 6. MARKETPLACE VIEW ================= */}
+          {/* ================= 7. MARKETPLACE VIEW ================= */}
           {currentTab === 'marketplace' && (
             <div className="space-y-8 animate-fadeIn text-center">
               <div className="max-w-2xl mx-auto space-y-2">
@@ -1921,7 +2159,7 @@ export default function App() {
 
                 {/* Expert */}
                 <div className={`bg-slate-900 border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-750 transition-all ${
-                  plan === 'expert' ? 'border-indigo-500' : 'border-slate-800'
+                  plan === 'expert' ? 'border-indigo-550' : 'border-slate-800'
                 }`}>
                   {plan === 'expert' && <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
@@ -2044,7 +2282,7 @@ export default function App() {
                 <input 
                   type="text" 
                   value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
+                  onChange={(e) => userInput(e.target.value)}
                   placeholder="Pergunte sobre DRE, borderô, NFe..."
                   className="flex-1 bg-slate-950 border border-slate-850 rounded px-2.5 py-1 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
                 />
@@ -2350,6 +2588,88 @@ export default function App() {
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all"
                 >
                   Ativar PDV
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5. ADD CAMPAIGN MODAL */}
+      {showAddCampaignModal && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+              <h3 className="text-sm font-bold text-white">Criar Nova Campanha de Marketing</h3>
+              <button onClick={() => setShowAddCampaignModal(false)} className="text-slate-400 hover:text-slate-200">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateCampaign} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Nome da Campanha *</label>
+                <input 
+                  type="text" 
+                  value={newCampaign.name}
+                  onChange={(e) => setNewCampaign(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Ex: Pré-venda Festival de Inverno"
+                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase">Canal de Disparo</label>
+                  <select 
+                    value={newCampaign.channel}
+                    onChange={(e) => setNewCampaign(prev => ({ ...prev, channel: e.target.value }))}
+                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-350 font-medium"
+                  >
+                    <option value="E-mail">E-mail</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="SMS">SMS</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase">Data de Envio *</label>
+                  <input 
+                    type="text" 
+                    value={newCampaign.date}
+                    onChange={(e) => setNewCampaign(prev => ({ ...prev, date: e.target.value }))}
+                    placeholder="20/07/2026"
+                    className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300 font-mono"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Assunto / Conteúdo Notificação *</label>
+                <input 
+                  type="text" 
+                  value={newCampaign.subject}
+                  onChange={(e) => setNewCampaign(prev => ({ ...prev, subject: e.target.value }))}
+                  placeholder="Ex: Não perca! Lote exclusivo com 20% de desconto..."
+                  className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-300"
+                  required
+                />
+              </div>
+
+              <div className="pt-4 flex space-x-3 justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddCampaignModal(false)}
+                  className="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-lg transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition-all"
+                >
+                  Agendar Campanha
                 </button>
               </div>
             </form>
