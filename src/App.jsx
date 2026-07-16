@@ -37,7 +37,9 @@ import {
   Lock,
   Megaphone,
   Smartphone,
-  Play
+  Play,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function App() {
@@ -47,6 +49,7 @@ export default function App() {
   const [accountingSubTab, setAccountingSubTab] = useState('bordero');
   const [marketingSubTab, setMarketingSubTab] = useState('campanhas');
   const [plan, setPlan] = useState('standard');
+  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
   
   // App store installation simulation state
   const [installedApps, setInstalledApps] = useState({
@@ -78,8 +81,20 @@ export default function App() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Theme-based class helpers
+  const bgMain = theme === 'dark' ? 'bg-[#0F172A]' : 'bg-[#F8FAFC]';
+  const bgSidebar = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#FFFFFF]';
+  const bgCard = theme === 'dark' ? 'bg-[#131C2D]' : 'bg-[#FFFFFF]';
+  const bgInput = theme === 'dark' ? 'bg-[#111827]' : 'bg-[#F1F5F9]';
+  const bgHeader = theme === 'dark' ? 'bg-[#111827]/60' : 'bg-white/80';
+  
+  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-200';
+  
+  const textTitle = theme === 'dark' ? 'text-[#F8FAFC]' : 'text-slate-900';
+  const textBody = theme === 'dark' ? 'text-[#CBD5E1]' : 'text-slate-700';
+  const textSec = theme === 'dark' ? 'text-[#94A3B8]' : 'text-slate-500';
+
   // Commercial App Catalog mapped to Plan Requirements
-  // Brand colors: Blue (advanced) and Orange (expert) accents in soft tones
   const appsCatalog = [
     { id: 'financeiro', name: 'Financeiro (ERP)', desc: 'Gestão de contas, saldo, fluxo de caixa e conciliação bancária.', category: 'Finanças', planRequired: 'standard', icon: CreditCard },
     { id: 'contabilidade', name: 'Contabilidade Disk', desc: 'Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.', category: 'Fiscal', planRequired: 'standard', icon: Receipt },
@@ -92,7 +107,6 @@ export default function App() {
     { id: 'ai', name: 'Disk AI Copilot', desc: 'Copiloto de IA para análises de margens e auditoria contábil.', category: 'Inteligência', planRequired: 'expert', icon: Brain },
   ];
 
-  // Helper to check if a plan meets requirements
   const isPlanEligible = (required) => {
     if (required === 'standard') return true;
     if (required === 'advanced' || required === 'Marketing') {
@@ -198,6 +212,8 @@ export default function App() {
     { id: 'nf-8923', client: 'Arena Music Curitiba', doc: '33.222.111/0001-44', event: 'Arena Music', amount: 12500, type: 'Taxa Serviço', status: 'Pendente', date: '13/07/2026' }
   ]);
 
+  const activeEvent = borderos.find(b => b.id === activeBorderoEvent);
+
   // ================= 3. CRM DE VENDAS DATA & STATE =================
   const [leads, setLeads] = useState([
     { id: 'lead-1', name: 'Roberto Alencar', company: 'Prime Show Eventos', value: 120000, stage: 'prospect', date: '10 Jul', tag: 'VIP' },
@@ -252,6 +268,16 @@ export default function App() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [chatMessages, isTyping]);
+
+  // Sync theme class on HTML element for external scripts/components
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   // Toast helper
   const triggerToast = (title, body, type = 'success') => {
@@ -653,7 +679,7 @@ export default function App() {
       if (scenario === 'conciliacao') {
         aiText = 'Auditoria automática de extratos concluída. Encontrei lançamentos prontos para conciliar.';
         html = (
-          <div className="mt-2 p-2 bg-[#111827] border border-white/5 rounded-lg text-[10px] space-y-1 font-mono">
+          <div className={`mt-2 p-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} border ${borderCol} rounded-lg text-[10px] space-y-1 font-mono`}>
             <p className="text-[#22C55E] font-medium">✓ 5 lançamentos mapeados no banco Itaú/Disk</p>
             <p className="text-[#3B82F6] font-medium">❖ Status: Prontos para liquidação</p>
             <button 
@@ -670,12 +696,12 @@ export default function App() {
       } else if (scenario === 'dre') {
         aiText = 'DRE consolidada calculada pelo módulo fiscal. Margem líquida do trimestre está em 18.6%.';
         html = (
-          <div className="mt-2 border border-white/5 rounded-lg overflow-hidden bg-[#131C2D]">
-            <table className="w-full text-[10px] text-[#94A3B8] font-mono">
-              <tr className="bg-[#111827]"><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-[#22C55E]">R$ 2.580.000</td></tr>
-              <tr className="border-t border-white/5"><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-[#EF4444]">-R$ 387.000</td></tr>
-              <tr className="border-t border-white/5"><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-[#EF4444]">-R$ 1.713.000</td></tr>
-              <tr className="border-t border-white/5 bg-blue-900/10 font-bold"><td className="p-1 text-white">Lucro Líquido</td><td className="p-1 text-right text-[#3B82F6] font-semibold">R$ 480.000</td></tr>
+          <div className={`mt-2 border ${borderCol} rounded-lg overflow-hidden ${bgCard}`}>
+            <table className={`w-full text-[10px] ${textSec} font-mono`}>
+              <tr className={theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'}><td className="p-1">Receita Operacional</td><td className="p-1 text-right text-[#22C55E]">R$ 2.580.000</td></tr>
+              <tr className={`border-t ${borderCol}`}><td className="p-1">(-) Gateway & Spread</td><td className="p-1 text-right text-[#EF4444]">-R$ 387.000</td></tr>
+              <tr className={`border-t ${borderCol}`}><td className="p-1">(-) Custos Produtora</td><td className="p-1 text-right text-[#EF4444]">-R$ 1.713.000</td></tr>
+              <tr className={`border-t ${borderCol} bg-[#3B82F6]/10 font-bold`}><td className={`p-1 ${textTitle}`}>Lucro Líquido</td><td className="p-1 text-right text-[#3B82F6] font-semibold">R$ 480.000</td></tr>
             </table>
           </div>
         );
@@ -683,9 +709,9 @@ export default function App() {
         const count = invoices.filter(inv => inv.status === 'Pendente').length;
         aiText = `Varredura fiscal: Existem **${count} notas fiscais** pendentes de emissão.`;
         html = (
-          <div className="mt-2 p-2 bg-[#111827] border border-white/5 rounded-lg text-[10px] space-y-1">
+          <div className={`mt-2 p-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} border ${borderCol} rounded-lg text-[10px] space-y-1`}>
             {invoices.filter(inv => inv.status === 'Pendente').map(inv => (
-              <div key={inv.id} className="flex justify-between items-center text-[#94A3B8] font-mono">
+              <div key={inv.id} className={`flex justify-between items-center ${textSec} font-mono`}>
                 <span>{inv.client} (R$ {inv.amount})</span>
                 <button onClick={() => handleEmitNFe(inv.id)} className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[8px] px-1.5 py-0.5 rounded font-semibold">Emitir</button>
               </div>
@@ -697,10 +723,10 @@ export default function App() {
         html = (
           <div className="mt-2 space-y-1.5 text-[10px]">
             {borderos.map(b => (
-              <div key={b.id} className="flex justify-between items-center p-1.5 bg-[#111827] border border-white/5 rounded">
+              <div key={b.id} className={`flex justify-between items-center p-1.5 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} rounded`}>
                 <div>
-                  <span className="font-semibold text-white block">{b.name}</span>
-                  <span className="text-[#94A3B8]">Repasse Líquido: R$ {b.netPayout.toLocaleString('pt-BR')}</span>
+                  <span className={`font-semibold ${textTitle} block`}>{b.name}</span>
+                  <span className={textSec}>Repasse Líquido: R$ {b.netPayout.toLocaleString('pt-BR')}</span>
                 </div>
                 <span className={`px-1.5 py-0.5 rounded font-semibold uppercase text-[8px] ${
                   b.status === 'Aprovado' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#F59E0B]/10 text-[#F59E0B]'
@@ -741,37 +767,37 @@ export default function App() {
   };
 
   return (
-    <div className="flex-1 flex bg-[#0F172A] text-[#CBD5E1] min-h-screen overflow-hidden">
+    <div className={`flex-1 flex ${bgMain} ${textBody} min-h-screen overflow-hidden transition-colors duration-250`}>
       
-      {/* SIDEBAR NAVIGATION - Strict Enterprise dark design system */}
-      <aside className="w-64 bg-[#111827] border-r border-white/5 flex flex-col justify-between shrink-0 z-30">
+      {/* SIDEBAR NAVIGATION */}
+      <aside className={`w-64 ${bgSidebar} border-r ${borderCol} flex flex-col justify-between shrink-0 z-30 transition-colors duration-250`}>
         <div>
           {/* Logo Area */}
-          <div className="p-6 border-b border-white/5 bg-[#111827]">
+          <div className={`p-6 border-b ${borderCol} ${bgSidebar}`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 bg-[#2563EB] rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/10">
                 <Landmark className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold tracking-tight text-[#F8FAFC] flex items-center">
+                <h1 className={`text-lg font-bold tracking-tight ${textTitle} flex items-center`}>
                   DISK<span className="text-[#3B82F6] font-normal ml-0.5">HUB</span>
                 </h1>
-                <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">ERP & CRM Cloud</span>
+                <span className={`text-[10px] ${textSec} uppercase tracking-wider font-semibold`}>ERP & CRM Cloud</span>
               </div>
             </div>
           </div>
 
-          {/* Nav Links - Active Item Left border accent style */}
+          {/* Nav Links */}
           <nav className="py-4 space-y-1">
             <button 
               onClick={() => setCurrentTab('dashboard')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'dashboard' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <BarChart3 className={`w-4 h-4 shrink-0 ${currentTab === 'dashboard' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <BarChart3 className={`w-4 h-4 shrink-0 ${currentTab === 'dashboard' ? 'text-[#3B82F6]' : textSec}`} />
               <span>Dashboard</span>
             </button>
 
@@ -780,11 +806,11 @@ export default function App() {
               onClick={() => setCurrentTab('financeiro')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'financeiro' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <CreditCard className={`w-4 h-4 shrink-0 ${currentTab === 'financeiro' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <CreditCard className={`w-4 h-4 shrink-0 ${currentTab === 'financeiro' ? 'text-[#3B82F6]' : textSec}`} />
               <span>Financeiro (ERP)</span>
             </button>
 
@@ -793,14 +819,14 @@ export default function App() {
               onClick={() => setCurrentTab('contabilidade')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'contabilidade' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <Receipt className={`w-4 h-4 shrink-0 ${currentTab === 'contabilidade' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <Receipt className={`w-4 h-4 shrink-0 ${currentTab === 'contabilidade' ? 'text-[#3B82F6]' : textSec}`} />
               <div className="flex items-center justify-between w-full">
                 <span>Contabilidade Disk</span>
-                <span className="bg-[#22C55E]/10 text-[#4ADE80] text-[10px] px-2 py-0.5 rounded-full font-bold">
+                <span className="bg-[#22C55E]/12 text-[#22C55E] text-[10px] px-2 py-0.5 rounded-full font-bold">
                   {invoices.filter(inv => inv.status === 'Pendente').length}
                 </span>
               </div>
@@ -812,14 +838,14 @@ export default function App() {
                 onClick={() => setCurrentTab('crm')} 
                 className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                   currentTab === 'crm' 
-                    ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                    : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
                 }`}
               >
-                <Users className={`w-4 h-4 shrink-0 ${currentTab === 'crm' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+                <Users className={`w-4 h-4 shrink-0 ${currentTab === 'crm' ? 'text-[#3B82F6]' : textSec}`} />
                 <div className="flex items-center justify-between w-full">
                   <span>CRM de Vendas</span>
-                  <span className="bg-[#3B82F6]/12 text-[#60A5FA] text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <span className="bg-[#3B82F6]/12 text-[#3B82F6] text-[10px] px-2 py-0.5 rounded-full font-bold">
                     {leads.filter(l => l.stage !== 'won').length}
                   </span>
                 </div>
@@ -832,11 +858,11 @@ export default function App() {
                 onClick={() => setCurrentTab('marketing')} 
                 className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                   currentTab === 'marketing' 
-                    ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                    : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
                 }`}
               >
-                <Mail className={`w-4 h-4 shrink-0 ${currentTab === 'marketing' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+                <Mail className={`w-4 h-4 shrink-0 ${currentTab === 'marketing' ? 'text-[#3B82F6]' : textSec}`} />
                 <span>Mkt & Campanhas</span>
               </button>
             )}
@@ -851,26 +877,26 @@ export default function App() {
                 }} 
                 className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                   currentTab === 'pdv' 
-                    ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                    : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                    ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                    : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
                 }`}
               >
-                <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'pdv' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+                <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'pdv' ? 'text-[#3B82F6]' : textSec}`} />
                 <span>Gestão de PDVs</span>
               </button>
             )}
 
-            <div className="h-px bg-white/5 my-2 mx-4" />
+            <div className={`h-px ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-200'} my-2 mx-4`} />
 
             <button 
               onClick={() => setCurrentTab('appstore')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'appstore' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'appstore' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <ShoppingBag className={`w-4 h-4 shrink-0 ${currentTab === 'appstore' ? 'text-[#3B82F6]' : textSec}`} />
               <span>Central de Apps</span>
             </button>
 
@@ -878,11 +904,11 @@ export default function App() {
               onClick={() => setCurrentTab('marketplace')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'marketplace' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <Sparkles className={`w-4 h-4 shrink-0 ${currentTab === 'marketplace' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <Sparkles className={`w-4 h-4 shrink-0 ${currentTab === 'marketplace' ? 'text-[#3B82F6]' : textSec}`} />
               <span>Planos & Upgrades</span>
             </button>
 
@@ -890,25 +916,25 @@ export default function App() {
               onClick={() => setCurrentTab('roadmap')} 
               className={`w-full flex items-center space-x-3 px-6 py-2.5 text-sm font-medium transition-all duration-150 border-l-[3px] ${
                 currentTab === 'roadmap' 
-                  ? 'bg-[#1E293B] text-white border-[#3B82F6]' 
-                  : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/40 border-transparent'
+                  ? `${theme === 'dark' ? 'bg-[#1E293B] text-white' : 'bg-slate-100 text-slate-900'} border-[#3B82F6]` 
+                  : `${textSec} hover:text-white hover:bg-[#1E293B]/40 border-transparent`
               }`}
             >
-              <ShieldCheck className={`w-4 h-4 shrink-0 ${currentTab === 'roadmap' ? 'text-[#3B82F6]' : 'text-[#94A3B8]'}`} />
+              <ShieldCheck className={`w-4 h-4 shrink-0 ${currentTab === 'roadmap' ? 'text-[#3B82F6]' : textSec}`} />
               <span>Status & Roadmap</span>
             </button>
           </nav>
         </div>
 
         {/* Footer / User profile */}
-        <div className="p-4 border-t border-white/5 bg-[#111827]">
+        <div className={`p-4 border-t ${borderCol} ${bgSidebar}`}>
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-full bg-[#1E293B] border border-white/5 flex items-center justify-center font-bold text-white shadow">
+            <div className={`w-9 h-9 rounded-full ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} flex items-center justify-center font-bold ${textTitle} shadow`}>
               V
             </div>
             <div>
-              <h4 className="text-sm font-medium text-[#F8FAFC]">Vinicius</h4>
-              <p className="text-xs text-[#94A3B8] font-normal uppercase tracking-wider">
+              <h4 className={`text-sm font-medium ${textTitle}`}>Vinicius</h4>
+              <p className={`text-xs ${textSec} font-normal uppercase tracking-wider font-mono`}>
                 Plano {plan}
               </p>
             </div>
@@ -917,14 +943,14 @@ export default function App() {
       </aside>
 
       {/* MAIN CONTENT CONTAINER */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-20 z-10 bg-[#0F172A]">
+      <main className={`flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-20 z-10 ${bgMain} transition-colors duration-250`}>
         
         {/* HEADER */}
-        <header className="h-16 border-b border-white/5 bg-[#111827]/60 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
+        <header className={`h-16 border-b ${borderCol} ${bgHeader} backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40 transition-colors duration-250`}>
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">Espaço de Trabalho</span>
-            <span className="text-slate-700">/</span>
-            <span className="text-sm font-semibold text-[#F8FAFC] capitalize">
+            <span className={`text-xs ${textSec} uppercase tracking-wider font-semibold`}>Espaço de Trabalho</span>
+            <span className="text-slate-400">/</span>
+            <span className={`text-sm font-semibold ${textTitle} capitalize`}>
               {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'marketing' ? 'Marketing & Campanhas' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
             </span>
           </div>
@@ -932,23 +958,36 @@ export default function App() {
           <div className="flex items-center space-x-4">
             <div className="relative w-64">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-[#94A3B8]" />
+                <Search className={`h-4 w-4 ${textSec}`} />
               </span>
               <input 
                 type="text" 
                 placeholder="Buscar no ecossistema..." 
-                className="w-full pl-9 pr-4 py-1.5 bg-[#111827] border border-white/5 rounded-lg text-xs text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6]/50 focus:ring-1 focus:ring-[#3B82F6]/50 transition-all placeholder-[#64748B]"
+                className={`w-full pl-9 pr-4 py-1.5 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} rounded-lg text-xs ${textBody} focus:outline-none focus:border-[#3B82F6]/50 focus:ring-1 focus:ring-[#3B82F6]/50 transition-all placeholder-[#64748B]`}
               />
             </div>
             
-            <button className="p-2 text-[#94A3B8] hover:text-white bg-[#1E293B]/40 rounded-lg border border-white/5 hover:bg-[#1E293B] relative transition-all">
+            {/* Theme switch button */}
+            <button 
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className={`p-2 rounded-lg border transition-all ${
+                theme === 'dark' 
+                  ? 'text-[#94A3B8] hover:text-white bg-[#1E293B]/40 border-white/5 hover:bg-[#1E293B]' 
+                  : 'text-slate-500 hover:text-slate-900 bg-slate-100 border-slate-200 hover:bg-slate-200'
+              }`}
+              title={theme === 'dark' ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
+            <button className={`p-2 ${textSec} hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40' : 'bg-slate-100'} rounded-lg border ${borderCol} relative transition-all`}>
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#3B82F6] rounded-full"></span>
               <Bell className="w-4 h-4" />
             </button>
           </div>
         </header>
 
-        {/* VIEWS WRAPPER - Consistent spacing & Enterprise styling */}
+        {/* VIEWS WRAPPER */}
         <div className="p-8 max-w-7xl w-full mx-auto space-y-8">
             
           {/* ================= 1. DASHBOARD VIEW ================= */}
@@ -956,79 +995,79 @@ export default function App() {
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">Visão Geral de Performance</h2>
-                  <p className="text-sm text-[#94A3B8]">Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
+                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Visão Geral de Performance</h2>
+                  <p className={`text-sm ${textSec}`}>Gerencie receitas, repasses e a saúde contábil dos seus eventos em tempo real.</p>
                 </div>
-                <div className="flex items-center space-x-2 bg-[#111827] border border-white/5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#CBD5E1]">
-                  <Calendar className="w-4 h-4 text-[#94A3B8]" />
+                <div className={`flex items-center space-x-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} px-3 py-1.5 rounded-lg text-xs font-medium ${textBody}`}>
+                  <Calendar className={`w-4 h-4 ${textSec}`} />
                   <span>Julho, 2026</span>
                 </div>
               </div>
 
-              {/* KPI Cards in clean Vercel/Linear style */}
+              {/* KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Receita Total</span>
-                    <div className="p-1.5 text-[#94A3B8] rounded-lg">
+                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Receita Total</span>
+                    <div className={`p-1.5 ${textSec} rounded-lg`}>
                       <DollarSign className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
-                    <span className="text-2xl font-bold text-[#F8FAFC] tracking-tight">R$ {financialStats.receita.toLocaleString('pt-BR')}</span>
+                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.receita.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
                       <span className="text-xs font-semibold text-[#22C55E] flex items-center">
                         <TrendingUp className="w-3 h-3 mr-0.5" />
                         14.2%
                       </span>
-                      <span className="text-[10px] text-[#94A3B8] font-medium">vs último mês</span>
+                      <span className={`text-[10px] ${textSec} font-medium`}>vs último mês</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Saldo Disponível</span>
-                    <div className="p-1.5 text-[#94A3B8] rounded-lg">
+                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Saldo Disponível</span>
+                    <div className={`p-1.5 ${textSec} rounded-lg`}>
                       <Landmark className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
-                    <span className="text-2xl font-bold text-[#F8FAFC] tracking-tight">R$ {financialStats.saldo.toLocaleString('pt-BR')}</span>
+                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.saldo.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
                       <span className="text-[10px] text-[#3B82F6] font-semibold bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">Pronto para saque</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Repasses Efetuados</span>
-                    <div className="p-1.5 text-[#94A3B8] rounded-lg">
+                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Repasses Efetuados</span>
+                    <div className={`p-1.5 ${textSec} rounded-lg`}>
                       <ArrowRightLeft className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
-                    <span className="text-2xl font-bold text-[#F8FAFC] tracking-tight">R$ {financialStats.repasses.toLocaleString('pt-BR')}</span>
+                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.repasses.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
-                      <span className="text-xs font-medium text-[#94A3B8]">8.3%</span>
-                      <span className="text-[10px] text-[#94A3B8] font-normal"> / Agendados</span>
+                      <span className={`text-xs font-medium ${textSec}`}>8.3%</span>
+                      <span className={`text-[10px] ${textSec} font-normal`}> / Agendados</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm group hover:border-[#3B82F6]/20 transition-all duration-200`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Lucro Líquido</span>
-                    <div className="p-1.5 text-[#94A3B8] rounded-lg">
+                    <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Lucro Líquido</span>
+                    <div className={`p-1.5 ${textSec} rounded-lg`}>
                       <Percent className="w-4 h-4" />
                     </div>
                   </div>
                   <div className="mt-4">
-                    <span className="text-2xl font-bold text-[#F8FAFC] tracking-tight">R$ {financialStats.lucro.toLocaleString('pt-BR')}</span>
+                    <span className={`text-2xl font-bold ${textTitle} tracking-tight`}>R$ {financialStats.lucro.toLocaleString('pt-BR')}</span>
                     <div className="flex items-center space-x-1 mt-2">
                       <span className="text-xs font-semibold text-[#22C55E] flex items-center">18.6%</span>
-                      <span className="text-[10px] text-[#94A3B8] font-normal"> / Margem Operacional</span>
+                      <span className={`text-[10px] ${textSec} font-normal`}> / Margem Operacional</span>
                     </div>
                   </div>
                 </div>
@@ -1036,11 +1075,11 @@ export default function App() {
 
               {/* Chart & Featured Events */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 lg:col-span-2 shadow-sm">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 lg:col-span-2 shadow-sm`}>
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-200">Fluxo de Caixa Mensal</h3>
-                      <p className="text-xs text-[#94A3B8]">Projeção e balanço de receitas no período</p>
+                      <h3 className={`text-sm font-semibold ${textTitle}`}>Fluxo de Caixa Mensal</h3>
+                      <p className={`text-xs ${textSec}`}>Projeção e balanço de receitas no período</p>
                     </div>
                   </div>
                   
@@ -1052,39 +1091,39 @@ export default function App() {
                           <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
                         </linearGradient>
                       </defs>
-                      <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
-                      <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
-                      <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                      <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                      <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
+                      <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(0,0,0,0.04)" strokeDasharray="4,4" strokeWidth="1"/>
                       <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60 L 500 150 L 0 150 Z" fill="url(#indigo-grad)"/>
                       <path d="M 0 150 Q 100 80, 200 110 T 400 40 L 500 60" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <div className="flex justify-between text-[10px] text-[#94A3B8] mt-2 font-semibold font-mono">
+                  <div className={`flex justify-between text-[10px] ${textSec} mt-2 font-semibold font-mono`}>
                     <span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span><span>JUL</span>
                   </div>
                 </div>
 
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-200 mb-4">Eventos em Destaque</h3>
+                    <h3 className={`text-sm font-semibold ${textTitle} mb-4`}>Eventos em Destaque</h3>
                     <div className="space-y-4">
                       {borderos.map(b => (
-                        <div key={b.id} className="flex items-center justify-between p-3 rounded-lg bg-[#111827] border border-white/5">
+                        <div key={b.id} className={`flex items-center justify-between p-3 rounded-lg ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol}`}>
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded bg-[#1E293B] flex items-center justify-center font-bold text-[#94A3B8] text-xs">
+                            <div className={`w-8 h-8 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} flex items-center justify-center font-bold ${textSec} text-xs`}>
                               {b.name[0]}
                             </div>
                             <div>
-                              <h4 className="text-xs font-semibold text-[#F8FAFC] truncate w-32">{b.name}</h4>
-                              <p className="text-[9px] text-[#94A3B8]">{b.location}</p>
+                              <h4 className={`text-xs font-semibold ${textTitle} truncate w-32`}>{b.name}</h4>
+                              <p className={`text-[9px] ${textSec}`}>{b.location}</p>
                             </div>
                           </div>
-                          <span className="text-xs font-semibold text-[#F8FAFC]">R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
+                          <span className={`text-xs font-semibold ${textTitle}`}>R$ {(b.grossRevenue/1000).toFixed(0)}k</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-white/5 text-center">
+                  <div className={`mt-6 pt-4 border-t ${borderCol} text-center`}>
                     <button onClick={() => setCurrentTab('contabilidade')} className="text-xs font-semibold text-[#3B82F6] hover:text-[#60A5FA] inline-flex items-center hover:underline">
                       Auditar fechamentos contábeis
                       <ChevronRight className="w-3.5 h-3.5 ml-1" />
@@ -1101,15 +1140,15 @@ export default function App() {
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">Gestão Financeira (ERP)</h2>
-                  <p className="text-sm text-[#94A3B8]">Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
+                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Gestão Financeira (ERP)</h2>
+                  <p className={`text-sm ${textSec}`}>Contas bancárias, lançamentos manuais, custos e taxas do ecossistema.</p>
                 </div>
                 
-                <div className="flex bg-[#111827] border border-white/5 p-1 rounded-lg space-x-1 text-xs">
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
                   <button 
                     onClick={() => setFinanceSubTab('contas')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'contas' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      financeSubTab === 'contas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
                     }`}
                   >
                     Saldos & Contas
@@ -1117,7 +1156,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('lancamentos')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'lancamentos' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      financeSubTab === 'lancamentos' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
                     }`}
                   >
                     Lançamentos
@@ -1125,7 +1164,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('conciliacao')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'conciliacao' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      financeSubTab === 'conciliacao' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
                     }`}
                   >
                     Conciliação
@@ -1133,7 +1172,7 @@ export default function App() {
                   <button 
                     onClick={() => setFinanceSubTab('taxas')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      financeSubTab === 'taxas' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      financeSubTab === 'taxas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-white`
                     }`}
                   >
                     PDVs & Taxas
@@ -1145,67 +1184,67 @@ export default function App() {
               {financeSubTab === 'contas' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   <div className="lg:col-span-2 space-y-6">
-                    <h3 className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Saldo das Contas do Sistema</h3>
+                    <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>Saldo das Contas do Sistema</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                       {accounts.map(acc => (
-                        <div key={acc.id} className="bg-[#131C2D] border border-white/5 rounded-xl p-5 shadow-sm">
-                          <span className="text-[9px] text-[#94A3B8] font-semibold uppercase tracking-wider block">{acc.type}</span>
-                          <h4 className="text-xs font-semibold text-[#F8FAFC] mt-1">{acc.name}</h4>
-                          <div className="mt-4 font-mono font-bold text-lg text-white">
+                        <div key={acc.id} className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
+                          <span className={`text-[9px] ${textSec} font-semibold uppercase tracking-wider block`}>{acc.type}</span>
+                          <h4 className={`text-xs font-semibold ${textTitle} mt-1`}>{acc.name}</h4>
+                          <div className={`mt-4 font-mono font-bold text-lg ${textTitle}`}>
                             R$ {acc.balance.toLocaleString('pt-BR')}
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="p-5 bg-[#131C2D] border border-white/5 rounded-xl space-y-4">
+                    <div className={`${bgCard} border ${borderCol} rounded-xl p-5 space-y-4`}>
                       <div className="flex items-center space-x-2">
                         <TrendingUp className="w-5 h-5 text-[#3B82F6]" />
-                        <h4 className="text-sm font-semibold text-white">Resumo Patrimonial Consolidador</h4>
+                        <h4 className={`text-sm font-semibold ${textTitle}`}>Resumo Patrimonial Consolidador</h4>
                       </div>
-                      <p className="text-xs text-[#94A3B8] leading-relaxed">
+                      <p className={`text-xs ${textSec} leading-relaxed`}>
                         O saldo líquido disponível consolidado inclui taxas antecipadas do portal DiskIngressos e valores retidos em PDVs físicos pendentes de sangria.
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm h-fit space-y-4">
-                    <div className="flex items-center space-x-2 border-b border-white/5 pb-3">
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm h-fit space-y-4`}>
+                    <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
                       <ArrowRightLeft className="w-4 h-4 text-[#3B82F6]" />
-                      <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Transferência entre Contas</h4>
+                      <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Transferência entre Contas</h4>
                     </div>
 
                     <form onSubmit={handleAccountTransfer} className="space-y-4 text-xs">
                       <div className="space-y-1">
-                        <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Origem</label>
+                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Origem</label>
                         <select 
                           value={transfer.from} 
                           onChange={(e) => setTransfer(prev => ({ ...prev, from: e.target.value }))}
-                          className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium text-white"
+                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium ${textTitle}`}
                         >
                           {accounts.map(a => <option key={a.id} value={a.id}>{a.name} (R$ {a.balance.toLocaleString()})</option>)}
                         </select>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Destino</label>
+                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Destino</label>
                         <select 
                           value={transfer.to} 
                           onChange={(e) => setTransfer(prev => ({ ...prev, to: e.target.value }))}
-                          className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium text-white"
+                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] font-medium ${textTitle}`}
                         >
                           {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                         </select>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Valor (R$)</label>
+                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$)</label>
                         <input 
                           type="number" 
                           value={transfer.amount}
                           onChange={(e) => setTransfer(prev => ({ ...prev, amount: e.target.value }))}
                           placeholder="Ex: 50000"
-                          className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] text-white font-mono"
+                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                           required
                         />
                       </div>
@@ -1224,12 +1263,12 @@ export default function App() {
               {/* Sub-Tab 2: Lançamentos */}
               {financeSubTab === 'lancamentos' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <h3 className="text-sm font-semibold text-white border-b border-white/5 pb-3">Fluxo de Caixa Lançamentos</h3>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Fluxo de Caixa Lançamentos</h3>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-[#CBD5E1] border-collapse">
+                      <table className={`w-full text-xs ${textBody} border-collapse`}>
                         <thead>
-                          <tr className="border-b border-white/5 text-[#94A3B8] font-semibold text-[10px] uppercase text-left">
+                          <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
                             <th className="p-3">Descrição / Vínculo</th>
                             <th className="p-3">Categoria</th>
                             <th className="p-3">Centro de Custo</th>
@@ -1239,16 +1278,16 @@ export default function App() {
                         </thead>
                         <tbody>
                           {lancamentos.map(lan => (
-                            <tr key={lan.id} className="border-b border-white/5 hover:bg-white/5">
+                            <tr key={lan.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
                               <td className="p-3">
                                 <div className="flex items-center space-x-2">
                                   <span className={`w-1.5 h-1.5 rounded-full ${lan.type === 'receita' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'}`} />
-                                  <span className="font-semibold text-[#F8FAFC]">{lan.desc}</span>
+                                  <span className={`font-semibold ${textTitle}`}>{lan.desc}</span>
                                 </div>
                               </td>
-                              <td className="p-3 text-[#94A3B8]">{lan.category}</td>
-                              <td className="p-3 font-mono text-[#94A3B8]">{lan.costCenter}</td>
-                              <td className="p-3 font-mono text-[#94A3B8]">{lan.date}</td>
+                              <td className={`p-3 ${textSec}`}>{lan.category}</td>
+                              <td className={`p-3 font-mono ${textSec}`}>{lan.costCenter}</td>
+                              <td className={`p-3 font-mono ${textSec}`}>{lan.date}</td>
                               <td className={`p-3 text-right font-mono font-semibold ${lan.type === 'receita' ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
                                 {lan.type === 'receita' ? '+' : '-'} R$ {lan.amount.toLocaleString('pt-BR')}
                               </td>
@@ -1259,19 +1298,19 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm h-fit space-y-4">
-                    <div className="flex items-center space-x-2 border-b border-white/5 pb-3">
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm h-fit space-y-4`}>
+                    <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
                       <Plus className="w-4 h-4 text-[#3B82F6]" />
-                      <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Lançar Fluxo Manual</h4>
+                      <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Lançar Fluxo Manual</h4>
                     </div>
 
                     <form onSubmit={handleCreateLancamento} className="space-y-4 text-xs">
-                      <div className="flex bg-[#111827] p-1 border border-white/5 rounded-lg space-x-1">
+                      <div className={`flex ${bgInput} p-1 border ${borderCol} rounded-lg space-x-1`}>
                         <button 
                           type="button"
                           onClick={() => setNewLancamento(prev => ({ ...prev, type: 'receita' }))}
                           className={`flex-1 py-1.5 rounded text-center font-medium transition-all ${
-                            newLancamento.type === 'receita' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-slate-205'
+                            newLancamento.type === 'receita' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} hover:text-slate-205`
                           }`}
                         >
                           Receita
@@ -1280,7 +1319,7 @@ export default function App() {
                           type="button"
                           onClick={() => setNewLancamento(prev => ({ ...prev, type: 'despesa' }))}
                           className={`flex-1 py-1.5 rounded text-center font-medium transition-all ${
-                            newLancamento.type === 'despesa' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-slate-205'
+                            newLancamento.type === 'despesa' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-white'} ${textTitle}` : `${textSec} hover:text-slate-205`
                           }`}
                         >
                           Despesa
@@ -1288,35 +1327,35 @@ export default function App() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Descrição *</label>
+                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Descrição *</label>
                         <input 
                           type="text" 
                           value={newLancamento.desc}
                           onChange={(e) => setNewLancamento(prev => ({ ...prev, desc: e.target.value }))}
                           placeholder="Ex: Contratação Equipe Limpeza"
-                          className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] text-white text-xs"
+                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs`}
                           required
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Valor (R$) *</label>
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Valor (R$) *</label>
                           <input 
                             type="number" 
                             value={newLancamento.amount}
                             onChange={(e) => setNewLancamento(prev => ({ ...prev, amount: e.target.value }))}
                             placeholder="1200"
-                            className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] text-white font-mono text-xs"
+                            className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono text-xs`}
                             required
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Centro de Custo</label>
+                          <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Centro de Custo</label>
                           <select 
                             value={newLancamento.costCenter}
                             onChange={(e) => setNewLancamento(prev => ({ ...prev, costCenter: e.target.value }))}
-                            className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] text-white text-xs font-medium"
+                            className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs font-medium`}
                           >
                             <option value="Eventos">Eventos</option>
                             <option value="Operacional">Operacional</option>
@@ -1328,11 +1367,11 @@ export default function App() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[9px] text-[#94A3B8] font-semibold uppercase">Categoria</label>
+                        <label className={`text-[9px] ${textSec} font-semibold uppercase`}>Categoria</label>
                         <select 
                           value={newLancamento.category}
                           onChange={(e) => setNewLancamento(prev => ({ ...prev, category: e.target.value }))}
-                          className="w-full bg-[#111827] border border-white/5 rounded p-2 focus:outline-none focus:border-[#3B82F6] text-white text-xs font-medium"
+                          className={`w-full ${bgInput} border ${borderCol} rounded p-2 focus:outline-none focus:border-[#3B82F6] ${textTitle} text-xs font-medium`}
                         >
                           <option value="Venda Ingressos">Venda Ingressos</option>
                           <option value="Serviços de Terceiros">Serviços de Terceiros</option>
@@ -1355,11 +1394,11 @@ export default function App() {
 
               {/* Sub-Tab 3: Conciliação */}
               {financeSubTab === 'conciliacao' && (
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4 animate-fadeIn">
-                  <div className="border-b border-white/5 pb-3 flex justify-between items-center">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4 animate-fadeIn`}>
+                  <div className={`border-b ${borderCol} pb-3 flex justify-between items-center`}>
                     <div className="flex items-center space-x-2">
                       <Landmark className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className="text-sm font-semibold text-slate-200">Conciliação Automática Vindi / PagSeguro</h3>
+                      <h3 className={`text-sm font-semibold ${textTitle}`}>Conciliação Automática Vindi / PagSeguro</h3>
                     </div>
                   </div>
 
@@ -1368,7 +1407,9 @@ export default function App() {
                       <div 
                         key={item.id} 
                         className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                          item.matched ? 'bg-[#111827]/40 border-white/5 opacity-60' : 'bg-[#111827]/70 border-white/5'
+                          item.matched 
+                            ? `${theme === 'dark' ? 'bg-[#111827]/40' : 'bg-slate-50/50'} border-transparent opacity-60` 
+                            : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-white'} border-white/5`
                         }`}
                       >
                         <div className="flex items-center space-x-3">
@@ -1379,10 +1420,10 @@ export default function App() {
                           </span>
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h4 className="text-xs font-semibold text-[#F8FAFC]">{item.desc}</h4>
-                              <span className="text-[9px] text-[#94A3B8] font-mono">{item.date}</span>
+                              <h4 className={`text-xs font-semibold ${textTitle}`}>{item.desc}</h4>
+                              <span className={`text-[9px] ${textSec} font-mono`}>{item.date}</span>
                             </div>
-                            <p className="text-[10px] text-[#94A3B8] font-mono mt-0.5">Vínculo Contábil: {item.matchInvoice}</p>
+                            <p className={`text-[10px] ${textSec} font-mono mt-0.5`}>Vínculo Contábil: {item.matchInvoice}</p>
                           </div>
                         </div>
 
@@ -1418,11 +1459,11 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   
                   {/* PDV Control List */}
-                  <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
                       <div className="flex items-center space-x-2">
                         <ShoppingBag className="w-5 h-5 text-[#3B82F6]" />
-                        <h3 className="text-sm font-semibold text-white">Controle de Pontos de Venda Físicos (PDVs)</h3>
+                        <h3 className={`text-sm font-semibold ${textTitle}`}>Controle de Pontos de Venda Físicos (PDVs)</h3>
                       </div>
                       
                       {isPlanEligible('advanced') ? (
@@ -1433,24 +1474,24 @@ export default function App() {
                           Novo PDV
                         </button>
                       ) : (
-                        <span className="text-[9px] text-[#94A3B8] bg-[#111827] px-2 py-1 rounded">Requer Plano Advanced</span>
+                        <span className={`text-[9px] ${textSec} bg-[#111827] px-2 py-1 rounded`}>Requer Plano Advanced</span>
                       )}
                     </div>
 
                     <div className="space-y-3">
                       {pdvs.map(pdv => (
-                        <div key={pdv.id} className="p-3 bg-[#111827]/70 border border-white/5 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div key={pdv.id} className={`p-3 ${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border ${borderCol} rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h4 className="text-xs font-semibold text-[#F8FAFC]">{pdv.name}</h4>
-                              <span className="text-[8px] bg-[#1E293B] px-1.5 rounded text-[#94A3B8] uppercase">{pdv.type}</span>
+                              <h4 className={`text-xs font-semibold ${textTitle}`}>{pdv.name}</h4>
+                              <span className={`text-[8px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-1.5 rounded ${textSec} uppercase`}>{pdv.type}</span>
                             </div>
-                            <p className="text-[10px] text-[#94A3B8] mt-0.5">Operador Responsável: {pdv.manager}</p>
+                            <p className={`text-[10px] ${textSec} mt-0.5`}>Operador Responsável: {pdv.manager}</p>
                           </div>
 
                           <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
                             <div>
-                              <span className="text-[9px] text-[#94A3B8] uppercase block">Saldo Retido</span>
+                              <span className={`text-[9px] ${textSec} uppercase block`}>Saldo Retido</span>
                               <span className="text-xs font-mono font-semibold text-[#22C55E]">R$ {pdv.balance.toLocaleString('pt-BR')}</span>
                             </div>
 
@@ -1470,12 +1511,12 @@ export default function App() {
                   </div>
 
                   {/* Fee list */}
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <h3 className="text-sm font-semibold text-white border-b border-white/5 pb-3">Gateway & Custos Operacionais</h3>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Gateway & Custos Operacionais</h3>
                     <div className="space-y-3 text-xs">
                       {Object.entries(gatewayRates).map(([key, data]) => (
-                        <div key={key} className="flex justify-between items-center p-2.5 bg-[#111827]/60 border border-white/5 rounded">
-                          <span className="font-medium text-[#CBD5E1]">{data.name}</span>
+                        <div key={key} className={`flex justify-between items-center p-2.5 ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol} rounded`}>
+                          <span className={`font-medium ${textBody}`}>{data.name}</span>
                           <span className="font-mono text-[#3B82F6] font-semibold">{data.rate}% {data.fixed > 0 && `+ R$ ${data.fixed}`}</span>
                         </div>
                       ))}
@@ -1493,15 +1534,15 @@ export default function App() {
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">Contabilidade Disk</h2>
-                  <p className="text-sm text-[#94A3B8]">Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
+                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Contabilidade Disk</h2>
+                  <p className={`text-sm ${textSec}`}>Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.</p>
                 </div>
 
-                <div className="flex bg-[#111827] border border-white/5 p-1 rounded-lg space-x-1 text-xs">
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
                   <button 
                     onClick={() => setAccountingSubTab('bordero')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'bordero' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-slate-205'
+                      accountingSubTab === 'bordero' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     Borderô Eventos
@@ -1509,7 +1550,7 @@ export default function App() {
                   <button 
                     onClick={() => setAccountingSubTab('notas')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'notas' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-slate-205'
+                      accountingSubTab === 'notas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     Notas Fiscais (SEFAZ)
@@ -1517,7 +1558,7 @@ export default function App() {
                   <button 
                     onClick={() => setAccountingSubTab('fechamento')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      accountingSubTab === 'fechamento' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-slate-205'
+                      accountingSubTab === 'fechamento' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     DRE & Fechamento
@@ -1530,8 +1571,8 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   
                   {/* Event list selector */}
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <h3 className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider border-b border-white/5 pb-3">Selecione o Evento</h3>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <h3 className={`text-xs font-semibold ${textSec} uppercase tracking-wider border-b ${borderCol} pb-3`}>Selecione o Evento</h3>
                     <div className="space-y-3">
                       {borderos.map(b => (
                         <button 
@@ -1539,8 +1580,8 @@ export default function App() {
                           onClick={() => setActiveBorderoEvent(b.id)}
                           className={`w-full text-left p-3 rounded-lg border transition-all ${
                             activeBorderoEvent === b.id 
-                              ? 'bg-[#131C2D] border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)] text-[#F8FAFC]' 
-                              : 'bg-[#111827]/70 border-white/5 hover:border-slate-700 text-[#CBD5E1]'
+                              ? `bg-transparent border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)] ${textTitle}` 
+                              : `${theme === 'dark' ? 'bg-[#111827]/70' : 'bg-slate-50'} border-transparent hover:border-slate-700 ${textBody}`
                           }`}
                         >
                           <div className="flex justify-between items-start">
@@ -1549,90 +1590,87 @@ export default function App() {
                               b.status === 'Aprovado' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : 'bg-[#F59E0B]/12 text-[#FB923C]'
                             }`}>{b.status}</span>
                           </div>
-                          <span className="text-[10px] text-[#94A3B8] font-mono mt-1 block">Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
+                          
+                          <span className={`text-[10px] ${textSec} font-mono mt-1 block`}>Receita Bruta: R$ {b.grossRevenue.toLocaleString('pt-BR')}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Borderô details */}
-                  {(() => {
-                    const event = borderos.find(b => b.id === activeBorderoEvent);
-                    if (!event) return null;
-                    return (
-                      <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn">
-                        <div className="border-b border-white/5 pb-4 flex justify-between items-start">
-                          <div>
-                            <h3 className="text-base font-bold text-white">{event.name}</h3>
-                            <p className="text-xs text-[#94A3B8]">{event.location}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[9px] text-[#94A3B8] uppercase tracking-widest font-semibold block font-mono">Fechamento</span>
-                            <span className="text-xs font-mono font-semibold text-[#CBD5E1] block">{event.dateClosed}</span>
-                          </div>
+                  {activeEvent && (
+                    <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn`}>
+                      <div className={`border-b ${borderCol} pb-4 flex justify-between items-start`}>
+                        <div>
+                          <h3 className={`text-base font-bold ${textTitle}`}>{activeEvent.name}</h3>
+                          <p className={`text-xs ${textSec}`}>{activeEvent.location}</p>
                         </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                          <div className="p-3 bg-[#111827] border border-white/5 rounded-lg">
-                            <span className="text-[9px] text-[#94A3B8] font-semibold uppercase block">Ingressos</span>
-                            <span className="text-sm font-mono font-semibold text-white mt-1 block">{event.ticketsSold}</span>
-                          </div>
-                          <div className="p-3 bg-[#111827] border border-white/5 rounded-lg">
-                            <span className="text-[9px] text-[#94A3B8] font-semibold uppercase block">Receita Bruta</span>
-                            <span className="text-sm font-mono font-semibold text-white mt-1 block">R$ {event.grossRevenue.toLocaleString('pt-BR')}</span>
-                          </div>
-                          <div className="p-3 bg-[#111827] border border-white/5 rounded-lg">
-                            <span className="text-[9px] text-[#94A3B8] font-semibold uppercase block">Gateway (Vindi)</span>
-                            <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {event.gatewayFee.toLocaleString('pt-BR')}</span>
-                          </div>
-                          <div className="p-3 bg-[#111827] border border-white/5 rounded-lg">
-                            <span className="text-[9px] text-[#94A3B8] font-semibold uppercase block">Comissão Disk</span>
-                            <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {event.diskFee.toLocaleString('pt-BR')}</span>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-[#1E293B] border border-white/5 rounded-xl flex flex-col sm:flex-row justify-between items-center">
-                          <div>
-                            <span className="text-xs text-[#94A3B8] font-semibold block">Repasse Líquido à Produtora:</span>
-                            <span className="text-2xl font-mono font-bold text-white mt-1 block">
-                              R$ {event.netPayout.toLocaleString('pt-BR')}
-                            </span>
-                          </div>
-                          
-                          {event.status === 'Aprovado' ? (
-                            <div className="text-center sm:text-right mt-3 sm:mt-0">
-                              <span className="text-[9px] text-[#94A3B8] font-semibold block">Autorizado por:</span>
-                              <span className="text-[#22C55E] text-xs font-semibold block">{event.authorizedBy}</span>
-                            </div>
-                          ) : (
-                            <button 
-                              onClick={() => handleAuthorizeBordero(event.id)}
-                              className="mt-3 sm:mt-0 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
-                            >
-                              Liberar Repasse Financeiro
-                            </button>
-                          )}
+                        <div className="text-right">
+                          <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block font-mono`}>Fechamento</span>
+                          <span className={`text-xs font-mono font-semibold ${textBody} block`}>{activeEvent.dateClosed}</span>
                         </div>
                       </div>
-                    );
-                  })()}
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
+                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Ingressos</span>
+                          <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>{activeEvent.ticketsSold}</span>
+                        </div>
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
+                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Receita Bruta</span>
+                          <span className={`text-sm font-mono font-semibold ${textTitle} mt-1 block`}>R$ {activeEvent.grossRevenue.toLocaleString('pt-BR')}</span>
+                        </div>
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
+                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Gateway (Vindi)</span>
+                          <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.gatewayFee.toLocaleString('pt-BR')}</span>
+                        </div>
+                        <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} rounded-lg`}>
+                          <span className={`text-[9px] ${textSec} font-semibold uppercase block`}>Comissão Disk</span>
+                          <span className="text-sm font-mono font-semibold text-[#EF4444] mt-1 block">- R$ {activeEvent.diskFee.toLocaleString('pt-BR')}</span>
+                        </div>
+                      </div>
+
+                      <div className={`p-4 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} border ${borderCol} rounded-xl flex flex-col sm:flex-row justify-between items-center`}>
+                        <div>
+                          <span className={`text-xs ${textSec} font-semibold block`}>Repasse Líquido à Produtora:</span>
+                          <span className={`text-2xl font-mono font-bold ${textTitle} mt-1 block`}>
+                            R$ {activeEvent.netPayout.toLocaleString('pt-BR')}
+                          </span>
+                        </div>
+                        
+                        {activeEvent.status === 'Aprovado' ? (
+                          <div className="text-center sm:text-right mt-3 sm:mt-0">
+                            <span className={`text-[9px] ${textSec} font-semibold block`}>Autorizado por:</span>
+                            <span className="text-[#22C55E] text-xs font-semibold block">{activeEvent.authorizedBy}</span>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => handleAuthorizeBordero(activeEvent.id)}
+                            className="mt-3 sm:mt-0 px-4 py-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold rounded-lg transition-all"
+                          >
+                            Liberar Repasse Financeiro
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Sub-Tab 2: Notas Fiscais a Emitir */}
               {accountingSubTab === 'notas' && (
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn">
-                  <div className="border-b border-white/5 pb-3 flex justify-between items-center">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6 animate-fadeIn`}>
+                  <div className={`border-b ${borderCol} pb-3 flex justify-between items-center`}>
                     <div className="flex items-center space-x-2">
                       <Receipt className="w-5 h-5 text-[#3B82F6]" />
-                      <h3 className="text-sm font-semibold text-slate-205">Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
+                      <h3 className={`text-sm font-semibold ${textTitle}`}>Emissão de Notas Fiscais Eletrônicas (NFe)</h3>
                     </div>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-[#CBD5E1] border-collapse">
+                    <table className={`w-full text-xs ${textBody} border-collapse`}>
                       <thead>
-                        <tr className="border-b border-white/5 text-[#94A3B8] font-semibold text-[10px] uppercase text-left">
+                        <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
                           <th className="p-3">ID Nota</th>
                           <th className="p-3">Razão Social</th>
                           <th className="p-3">CNPJ / CPF</th>
@@ -1644,24 +1682,24 @@ export default function App() {
                       </thead>
                       <tbody>
                         {invoices.map(inv => (
-                          <tr key={inv.id} className="border-b border-white/5/40 hover:bg-white/5">
-                            <td className="p-3 font-mono font-semibold text-white uppercase">{inv.id}</td>
-                            <td className="p-3 font-semibold text-[#F8FAFC]">{inv.client}</td>
-                            <td className="p-3 font-mono text-[#94A3B8]">{inv.doc}</td>
-                            <td className="p-3 text-[#94A3B8]">{inv.event}</td>
-                            <td className="p-3 font-mono text-[#94A3B8]">{inv.date}</td>
+                          <tr key={inv.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
+                            <td className={`p-3 font-mono font-semibold ${textTitle} uppercase`}>{inv.id}</td>
+                            <td className={`p-3 font-semibold ${textTitle}`}>{inv.client}</td>
+                            <td className={`p-3 font-mono ${textSec}`}>{inv.doc}</td>
+                            <td className={`p-3 ${textSec}`}>{inv.event}</td>
+                            <td className={`p-3 font-mono ${textSec}`}>{inv.date}</td>
                             <td className="p-3 text-right font-mono font-semibold text-[#3B82F6]">R$ {inv.amount.toLocaleString('pt-BR')}</td>
                             <td className="p-3 text-center">
                               {inv.status === 'Emitida' && (
                                 <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold">Autorizada</span>
                               )}
                               {inv.status === 'Processando' && (
-                                <span className="bg-[#1E293B] text-[#94A3B8] text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse">Enviando...</span>
+                                <span className={`bg-[#1E293B] ${textSec} text-[9px] px-2 py-0.5 rounded-full font-bold animate-pulse`}>Enviando...</span>
                               )}
                               {inv.status === 'Pendente' && (
                                 <button 
                                   onClick={() => handleEmitNFe(inv.id)}
-                                  className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[9px] font-semibold rounded animate-pulse"
+                                  className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[9px] font-semibold rounded"
                                 >
                                   Transmitir
                                 </button>
@@ -1678,17 +1716,17 @@ export default function App() {
               {/* Sub-Tab 3: DRE & Fechamentos */}
               {accountingSubTab === 'fechamento' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-6">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-6`}>
+                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
                       <div className="flex items-center space-x-2">
                         <Calculator className="w-5 h-5 text-[#3B82F6]" />
-                        <h3 className="text-sm font-semibold text-white">Demonstrativo DRE por Competência</h3>
+                        <h3 className={`text-sm font-semibold ${textTitle}`}>Demonstrativo DRE por Competência</h3>
                       </div>
                       
                       <select 
                         value={invoiceMonth}
                         onChange={(e) => setInvoiceMonth(e.target.value)}
-                        className="bg-[#111827] border border-white/5 p-1 rounded text-xs focus:outline-none focus:border-[#3B82F6] text-white"
+                        className={`${bgInput} border ${borderCol} p-1 rounded text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                       >
                         <option value="Julho">Julho 2026</option>
                         <option value="Junho">Junho 2026</option>
@@ -1696,44 +1734,44 @@ export default function App() {
                       </select>
                     </div>
 
-                    <div className="space-y-3 font-mono text-xs">
+                    <div className={`space-y-3 font-mono text-xs ${textBody}`}>
                       <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className="text-[#94A3B8]">Receitas de Vendas (Bilheteria)</span>
+                        <span className={textSec}>Receitas de Vendas (Bilheteria)</span>
                         <span className="text-[#22C55E] font-bold">R$ {invoiceMonth === 'Julho' ? '2.580.000' : invoiceMonth === 'Junho' ? '1.920.000' : '1.450.000'}</span>
                       </div>
                       <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className="text-[#94A3B8]">(-) Impostos Fiscais (Simples/NFe)</span>
+                        <span className={textSec}>(-) Impostos Fiscais (Simples/NFe)</span>
                         <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '154.800' : invoiceMonth === 'Junho' ? '115.200' : '87.000'}</span>
                       </div>
                       <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className="text-[#94A3B8]">(-) Spread e Comissões de Lançamento</span>
+                        <span className={textSec}>(-) Spread e Comissões de Lançamento</span>
                         <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '232.200' : invoiceMonth === 'Junho' ? '172.800' : '130.500'}</span>
                       </div>
                       <div className="flex justify-between p-2.5 hover:bg-white/5">
-                        <span className="text-[#94A3B8]">(-) Custos de Produção & Infraestrutura</span>
+                        <span className={textSec}>(-) Custos de Produção & Infraestrutura</span>
                         <span className="text-[#EF4444] font-semibold">-R$ {invoiceMonth === 'Julho' ? '1.713.000' : invoiceMonth === 'Junho' ? '1.272.000' : '960.000'}</span>
                       </div>
-                      <div className="border-t border-white/5 my-2 pt-2 flex justify-between p-2.5 bg-[#1E293B] rounded font-bold">
-                        <span className="text-white">Lucro Líquido Final</span>
+                      <div className={`border-t ${borderCol} my-2 pt-2 flex justify-between p-2.5 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} rounded font-bold`}>
+                        <span className={textTitle}>Lucro Líquido Final</span>
                         <span className="text-[#3B82F6]">R$ {invoiceMonth === 'Julho' ? '480.000' : invoiceMonth === 'Junho' ? '360.000' : '272.500'}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
                     <div className="space-y-4">
-                      <div className="flex items-center space-x-2 border-b border-white/5 pb-3">
+                      <div className={`flex items-center space-x-2 border-b ${borderCol} pb-3`}>
                         <FileText className="w-4 h-4 text-[#3B82F6]" />
-                        <h4 className="text-xs font-semibold text-white uppercase tracking-wider">Relatórios Recebimento</h4>
+                        <h4 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Relatórios Recebimento</h4>
                       </div>
-                      <p className="text-xs text-[#94A3B8] leading-relaxed">
+                      <p className={`text-xs ${textSec} leading-relaxed`}>
                         Exporte faturas contábeis e demonstrativos fiscais nos formatos oficiais requeridos pela Receita e Auditoria.
                       </p>
 
                       <div className="space-y-2 pt-2 text-xs">
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Pedido enviado para download.")}
-                          className="w-full text-left p-2.5 bg-[#111827] border border-white/5 hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all text-white"
+                          className={`w-full text-left p-2.5 ${bgInput} border ${borderCol} hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all ${textTitle}`}
                         >
                           <span>Recebimento por Pedido</span>
                           <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
@@ -1741,7 +1779,7 @@ export default function App() {
                         
                         <button 
                           onClick={() => triggerToast("Relatório Exportado", "Relatório de Recebimento de Vendas por Data enviado para download.")}
-                          className="w-full text-left p-2.5 bg-[#111827] border border-white/5 hover:border-slate-750 font-semibold rounded flex justify-between items-center transition-all text-white"
+                          className={`w-full text-left p-2.5 ${bgInput} border ${borderCol} hover:border-slate-700 font-semibold rounded flex justify-between items-center transition-all ${textTitle}`}
                         >
                           <span>Recebimento por Data</span>
                           <Download className="w-3.5 h-3.5 text-[#3B82F6]" />
@@ -1767,8 +1805,8 @@ export default function App() {
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">CRM de Vendas</h2>
-                  <p className="text-sm text-[#94A3B8]">Gerencie leads, prospecção e contatos de novos produtores de eventos.</p>
+                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>CRM de Vendas</h2>
+                  <p className={`text-sm ${textSec}`}>Gerencie leads, prospecção e contatos de novos produtores de eventos.</p>
                 </div>
                 <div className="flex space-x-2">
                   <button 
@@ -1786,27 +1824,27 @@ export default function App() {
                 {['prospect', 'qualified', 'negotiation', 'won'].map(stage => {
                   const stageLabels = { prospect: 'Prospecção', qualified: 'Qualificado', negotiation: 'Negociação', won: 'Fechado/Ganho' };
                   return (
-                    <div key={stage} className="bg-[#111827]/50 border border-white/5 rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]">
-                      <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                        <span className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">{stageLabels[stage]}</span>
-                        <span className="text-[10px] bg-[#1E293B] px-2 py-0.5 rounded-full text-white font-bold font-mono">
+                    <div key={stage} className={`bg-slate-800/10 border ${borderCol} rounded-xl p-4 flex flex-col space-y-3 min-h-[350px]`}>
+                      <div className={`flex items-center justify-between border-b ${borderCol} pb-2`}>
+                        <span className={`text-xs font-semibold ${textSec} uppercase tracking-wider`}>{stageLabels[stage]}</span>
+                        <span className={`text-[10px] ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} px-2 py-0.5 rounded-full ${textTitle} font-bold font-mono`}>
                           {leads.filter(l => l.stage === stage).length}
                         </span>
                       </div>
                       <div className="space-y-3 flex-1 overflow-y-auto">
                         {leads.filter(l => l.stage === stage).map(lead => (
-                          <div key={lead.id} className="bg-[#131C2D] border border-white/5 hover:border-[#3B82F6]/20 p-3 rounded-lg shadow space-y-2 group transition-all">
+                          <div key={lead.id} className={`${bgCard} border ${borderCol} hover:border-[#3B82F6]/20 p-3 rounded-lg shadow space-y-2 group transition-all`}>
                             <span className="text-[8px] bg-blue-500/10 text-[#3B82F6] font-bold px-1.5 py-0.5 rounded uppercase">{lead.tag}</span>
                             <div>
-                              <h4 className="text-xs font-bold text-[#F8FAFC]">{lead.name}</h4>
-                              <p className="text-[10px] text-[#94A3B8]">{lead.company}</p>
+                              <h4 className={`text-xs font-bold ${textTitle}`}>{lead.name}</h4>
+                              <p className={`text-[10px] ${textSec}`}>{lead.company}</p>
                             </div>
-                            <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                              <span className="text-[10px] font-mono font-semibold text-white">R$ {lead.value.toLocaleString()}</span>
+                            <div className={`flex justify-between items-center pt-2 border-t ${borderCol}`}>
+                              <span className={`text-[10px] font-mono font-semibold ${textTitle}`}>R$ {lead.value.toLocaleString()}</span>
                               {stage !== 'won' && (
                                 <button 
                                   onClick={() => moveLeadStage(lead.id, lead.stage)}
-                                  className="p-1 bg-white/5 hover:bg-[#2563EB] hover:text-white rounded text-[#94A3B8] transition-all"
+                                  className={`p-1 ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'} hover:bg-[#2563EB] hover:text-white rounded ${textSec} transition-all`}
                                 >
                                   <ChevronRight className="w-3 h-3" />
                                 </button>
@@ -1828,15 +1866,15 @@ export default function App() {
               
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">Mkt & Campanhas</h2>
-                  <p className="text-sm text-[#94A3B8]">Ative cupons, dispare notificações e analise métricas de conversão.</p>
+                  <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Mkt & Campanhas</h2>
+                  <p className={`text-sm ${textSec}`}>Ative cupons, dispare notificações e analise métricas de conversão.</p>
                 </div>
                 
-                <div className="flex bg-[#111827] border border-white/5 p-1 rounded-lg space-x-1 text-xs">
+                <div className={`flex ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
                   <button 
                     onClick={() => setMarketingSubTab('campanhas')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'campanhas' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      marketingSubTab === 'campanhas' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     Disparos & Campanhas
@@ -1844,7 +1882,7 @@ export default function App() {
                   <button 
                     onClick={() => setMarketingSubTab('cupons')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'cupons' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      marketingSubTab === 'cupons' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     Cupons
@@ -1852,7 +1890,7 @@ export default function App() {
                   <button 
                     onClick={() => setMarketingSubTab('performance')}
                     className={`px-3 py-1.5 rounded-md font-medium transition-all ${
-                      marketingSubTab === 'performance' ? 'bg-[#1E293B] text-white' : 'text-[#94A3B8] hover:text-white'
+                      marketingSubTab === 'performance' ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} hover:text-slate-205`
                     }`}
                   >
                     Métricas & ROI
@@ -1865,9 +1903,9 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
                   
                   {/* Campaign List */}
-                  <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <h3 className="text-sm font-semibold text-white">Histórico de Disparos</h3>
+                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
+                      <h3 className={`text-sm font-semibold ${textTitle}`}>Histórico de Disparos</h3>
                       <button 
                         onClick={() => setShowAddCampaignModal(true)}
                         className="px-2.5 py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
@@ -1877,9 +1915,9 @@ export default function App() {
                     </div>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full text-xs text-[#CBD5E1] border-collapse">
+                      <table className={`w-full text-xs ${textBody} border-collapse`}>
                         <thead>
-                          <tr className="border-b border-white/5 text-[#94A3B8] font-semibold text-[10px] uppercase text-left">
+                          <tr className={`border-b ${borderCol} ${textSec} font-semibold text-[10px] uppercase text-left`}>
                             <th className="p-3">Nome da Campanha</th>
                             <th className="p-3">Canal</th>
                             <th className="p-3">Data</th>
@@ -1890,21 +1928,21 @@ export default function App() {
                         </thead>
                         <tbody>
                           {campaigns.map(camp => (
-                            <tr key={camp.id} className="border-b border-white/5 hover:bg-white/5">
+                            <tr key={camp.id} className={`border-b ${borderCol}/40 hover:bg-white/5`}>
                               <td className="p-3">
                                 <div>
-                                  <span className="font-semibold text-white block">{camp.name}</span>
-                                  {camp.sent > 0 && <span className="text-[10px] text-[#94A3B8] font-mono">Enviados: {camp.sent.toLocaleString()}</span>}
+                                  <span className={`font-semibold ${textTitle} block`}>{camp.name}</span>
+                                  {camp.sent > 0 && <span className={`text-[10px] ${textSec} font-mono`}>Enviados: {camp.sent.toLocaleString()}</span>}
                                 </div>
                               </td>
-                              <td className="p-3 font-mono text-[#94A3B8]">{camp.channel}</td>
-                              <td className="p-3 font-mono text-[#94A3B8]">{camp.date}</td>
+                              <td className={`p-3 font-mono ${textSec}`}>{camp.channel}</td>
+                              <td className={`p-3 font-mono ${textSec}`}>{camp.date}</td>
                               <td className="p-3 text-center">
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                                   camp.status === 'Concluída' 
                                     ? 'bg-[#22C55E]/12 text-[#4ADE80]' 
                                     : camp.status === 'Disparando' 
-                                    ? 'bg-[#1E293B] text-[#3B82F6] animate-pulse'
+                                    ? `bg-[#1E293B] text-[#3B82F6] animate-pulse`
                                     : 'bg-[#F59E0B]/12 text-[#FB923C]'
                                 }`}>
                                   {camp.status}
@@ -1940,18 +1978,18 @@ export default function App() {
                   </div>
 
                   {/* Campaign tips & performance panel */}
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4 h-fit">
-                    <h3 className="text-sm font-semibold text-white border-b border-white/5 pb-3">Dicas de Conversão</h3>
-                    <p className="text-xs text-[#94A3B8] leading-relaxed">
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4 h-fit`}>
+                    <h3 className={`text-sm font-semibold ${textTitle} border-b ${borderCol} pb-3`}>Dicas de Conversão</h3>
+                    <p className={`text-xs ${textSec} leading-relaxed`}>
                       Disparos via WhatsApp possuem uma taxa de clique média de 18.5%, contra 6.4% em campanhas de E-mail de reengajamento.
                     </p>
                     
-                    <div className="p-3 bg-[#111827] rounded-lg border border-white/5 space-y-2">
-                      <div className="flex justify-between text-[10px] text-[#94A3B8] font-mono">
+                    <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} rounded-lg border ${borderCol} space-y-2`}>
+                      <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
                         <span>Audiência Estimada:</span>
-                        <span className="text-white font-bold">54.000 Compradores</span>
+                        <span className={`${textTitle} font-bold`}>54.000 Compradores</span>
                       </div>
-                      <div className="flex justify-between text-[10px] text-[#94A3B8] font-mono">
+                      <div className={`flex justify-between text-[10px] ${textSec} font-mono`}>
                         <span>Média Conversão:</span>
                         <span className="text-[#22C55E] font-bold">3.2% global</span>
                       </div>
@@ -1964,9 +2002,9 @@ export default function App() {
               {/* Sub-Tab 2: Cupons */}
               {marketingSubTab === 'cupons' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className="lg:col-span-2 bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                      <h3 className="text-sm font-semibold text-slate-200">Cupons Ativos</h3>
+                  <div className={`lg:col-span-2 ${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm space-y-4`}>
+                    <div className={`flex justify-between items-center border-b ${borderCol} pb-3`}>
+                      <h3 className={`text-sm font-semibold ${textTitle}`}>Cupons Ativos</h3>
                       <button 
                         onClick={() => setShowAddCouponModal(true)}
                         className="px-2.5 py-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-semibold rounded"
@@ -1977,20 +2015,20 @@ export default function App() {
 
                     <div className="space-y-3">
                       {coupons.map(coupon => (
-                        <div key={coupon.id} className="flex items-center justify-between p-3 rounded-lg bg-[#111827]/60 border border-white/5">
+                        <div key={coupon.id} className={`flex items-center justify-between p-3 rounded-lg ${theme === 'dark' ? 'bg-[#111827]/60' : 'bg-slate-50'} border ${borderCol}`}>
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded bg-[#1E293B] text-slate-350 font-bold flex items-center justify-center text-xs">
+                            <div className={`w-10 h-10 rounded ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec} font-bold flex items-center justify-center text-xs`}>
                               {coupon.discount}%
                             </div>
                             <div>
-                              <span className="text-xs font-mono font-semibold text-white tracking-wider block">{coupon.code}</span>
-                              <span className="text-[9px] text-[#94A3B8]">{coupon.event}</span>
+                              <span className={`text-xs font-mono font-semibold ${textTitle} tracking-wider block`}>{coupon.code}</span>
+                              <span className={`text-[9px] ${textSec}`}>{coupon.event}</span>
                             </div>
                           </div>
                           <div className="flex items-center space-x-4">
-                            <span className="text-[10px] text-[#94A3B8] font-mono">Usos: {coupon.usages}</span>
+                            <span className={`text-[10px] ${textSec} font-mono`}>Usos: {coupon.usages}</span>
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                              coupon.status === 'Ativo' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : 'bg-[#1E293B] text-[#94A3B8]'
+                              coupon.status === 'Ativo' ? 'bg-[#22C55E]/12 text-[#4ADE80]' : `bg-[#1E293B] ${textSec}`
                             }`}>{coupon.status}</span>
                           </div>
                         </div>
@@ -2003,16 +2041,16 @@ export default function App() {
               {/* Sub-Tab 3: Métricas & ROI */}
               {marketingSubTab === 'performance' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-5 shadow-sm">
-                    <span className="text-[9px] text-[#94A3B8] uppercase tracking-widest font-semibold block">Faturamento Campanhas</span>
-                    <span className="text-xl font-mono font-bold text-white mt-1 block">R$ {campaigns.reduce((acc, c) => acc + c.revenue, 0).toLocaleString('pt-BR')}</span>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
+                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Faturamento Campanhas</span>
+                    <span className={`text-xl font-mono font-bold ${textTitle} mt-1 block`}>R$ {campaigns.reduce((acc, c) => acc + c.revenue, 0).toLocaleString('pt-BR')}</span>
                   </div>
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-5 shadow-sm">
-                    <span className="text-[9px] text-[#94A3B8] uppercase tracking-widest font-semibold block">Taxa Média de Abertura</span>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
+                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Taxa Média de Abertura</span>
                     <span className="text-xl font-mono font-bold text-[#3B82F6] mt-1 block">47.6%</span>
                   </div>
-                  <div className="bg-[#131C2D] border border-white/5 rounded-xl p-5 shadow-sm">
-                    <span className="text-[9px] text-[#94A3B8] uppercase tracking-widest font-semibold block">Total Ingressos Vendidos</span>
+                  <div className={`${bgCard} border ${borderCol} rounded-xl p-5 shadow-sm`}>
+                    <span className={`text-[9px] ${textSec} uppercase tracking-widest font-semibold block`}>Total Ingressos Vendidos</span>
                     <span className="text-xl font-mono font-bold text-[#F59E0B] mt-1 block">{campaigns.reduce((acc, c) => acc + c.conversions, 0)}</span>
                   </div>
                 </div>
@@ -2025,8 +2063,8 @@ export default function App() {
           {currentTab === 'appstore' && (
             <div className="space-y-8 animate-fadeIn">
               <div>
-                <h2 className="text-2xl font-bold text-[#F8FAFC] tracking-tight">Central de Aplicativos</h2>
-                <p className="text-sm text-[#94A3B8]">Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
+                <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Central de Aplicativos</h2>
+                <p className={`text-sm ${textSec}`}>Instale ou adquira módulos integrados de acordo com o plano do seu ecossistema.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2039,16 +2077,16 @@ export default function App() {
                   return (
                     <div 
                       key={app.id} 
-                      className={`bg-[#131C2D] border rounded-xl p-6 flex flex-col justify-between transition-all duration-200 ${
+                      className={`${bgCard} border rounded-xl p-6 flex flex-col justify-between transition-all duration-200 ${
                         eligible 
-                          ? 'border-white/5 hover:border-[#3B82F6]/20' 
-                          : 'border-white/5 opacity-80'
+                          ? `${borderCol} hover:border-[#3B82F6]/25` 
+                          : `${borderCol} opacity-80`
                       }`}
                     >
                       <div>
                         <div className="flex items-start justify-between mb-4">
                           <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                            eligible ? 'bg-blue-500/10 text-[#3B82F6]' : 'bg-[#1E293B] text-[#94A3B8]'
+                            eligible ? 'bg-blue-500/10 text-[#3B82F6]' : `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textSec}`
                           }`}>
                             <IconComponent className="w-6 h-6" />
                           </div>
@@ -2064,19 +2102,19 @@ export default function App() {
                                 <span>Requer {app.planRequired}</span>
                               </span>
                             )}
-                            <span className="text-[8px] text-[#94A3B8] uppercase tracking-widest font-bold font-mono">{app.category}</span>
+                            <span className={`text-[8px] ${textSec} uppercase tracking-widest font-bold font-mono`}>{app.category}</span>
                           </div>
                         </div>
 
-                        <h3 className="text-base font-bold text-slate-200">{app.name}</h3>
-                        <p className="text-xs text-[#94A3B8] mt-1.5 leading-relaxed">{app.desc}</p>
+                        <h3 className={`text-base font-bold ${textTitle}`}>{app.name}</h3>
+                        <p className={`text-xs ${textSec} mt-1.5 leading-relaxed`}>{app.desc}</p>
                       </div>
 
-                      <div className="mt-6 pt-4 border-t border-white/5">
+                      <div className={`mt-6 pt-4 border-t ${borderCol}`}>
                         {installed ? (
                           <button 
                             disabled 
-                            className="w-full py-2 bg-[#111827] text-[#64748B] text-xs font-semibold rounded-lg cursor-not-allowed flex items-center justify-center space-x-1"
+                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-[#64748B] text-xs font-semibold rounded-lg cursor-not-allowed flex items-center justify-center space-x-1`}
                           >
                             <CheckCircle className="w-3.5 h-3.5" />
                             <span>Módulo Ativo no Menu</span>
@@ -2084,7 +2122,7 @@ export default function App() {
                         ) : installing ? (
                           <button 
                             disabled 
-                            className="w-full py-2 bg-[#111827] text-slate-400 text-xs font-semibold rounded-lg flex items-center justify-center space-x-2"
+                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} text-slate-400 text-xs font-semibold rounded-lg flex items-center justify-center space-x-2`}
                           >
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             <span>Instalando...</span>
@@ -2102,7 +2140,7 @@ export default function App() {
                               setCurrentTab('marketplace');
                               triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
                             }}
-                            className="w-full py-2 bg-[#1E293B] hover:bg-slate-700 text-[#CBD5E1] text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1"
+                            className={`w-full py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} hover:bg-slate-700 text-[#CBD5E1] text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1`}
                           >
                             <Sparkles className="w-3.5 h-3.5 text-[#F59E0B]" />
                             <span>Fazer Upgrade no Plano</span>
@@ -2120,47 +2158,47 @@ export default function App() {
           {currentTab === 'marketplace' && (
             <div className="space-y-8 animate-fadeIn text-center">
               <div className="max-w-2xl mx-auto space-y-2">
-                <h2 className="text-3xl font-bold text-white tracking-tight">Assinaturas & Recursos Contábeis</h2>
-                <p className="text-sm text-[#94A3B8]">Liberte o copiloto fiscal e ferramentas de vendas físicas em escala de alta performance.</p>
+                <h2 className={`text-3xl font-bold ${textTitle} tracking-tight`}>Assinaturas & Recursos Contábeis</h2>
+                <p className={`text-sm ${textSec}`}>Liberte o copiloto fiscal e ferramentas de vendas físicas em escala de alta performance.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6 max-w-5xl mx-auto text-left">
                 {/* Standard */}
-                <div className={`bg-[#131C2D] border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
-                  plan === 'standard' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : 'border-white/5'
+                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-slate-700 transition-all ${
+                  plan === 'standard' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
                 }`}>
                   {plan === 'standard' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
-                    <span className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest block">Iniciante</span>
-                    <h3 className="text-2xl font-bold text-white mt-2">Standard</h3>
-                    <p className="text-xs text-[#94A3B8] mt-2">Gestão financeira básica, extratos de contas e conciliação manual.</p>
+                    <span className={`text-xs font-bold ${textSec} uppercase tracking-widest block`}>Iniciante</span>
+                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Standard</h3>
+                    <p className={`text-xs ${textSec} mt-2`}>Gestão financeira básica, extratos de contas e conciliação manual.</p>
                     
-                    <hr className="border-white/5 my-6" />
+                    <hr className={`${borderCol} my-6`} />
                     
-                    <ul className="space-y-4 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-4 text-xs ${textBody}`}>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Financeiro ERP Básico</span></li>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Borderô Contábil Simples</span></li>
                       <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Módulos de Operações (PDV/Bar)</span></li>
                       <li className="flex items-center space-x-3 text-[#64748B]"><X className="w-4 h-4" /><span>Sem Módulos Comerciais (CRM/Mkt)</span></li>
                     </ul>
                   </div>
-                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className="mt-8 w-full py-3 bg-[#1E293B] text-[#64748B] text-sm font-semibold rounded-xl cursor-not-allowed">Plano Atual</button>
+                  <button disabled={plan==='standard'} onClick={()=>handleUpgradePlan('standard', 'Standard')} className={`mt-8 w-full py-3 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} text-[#64748B] text-sm font-semibold rounded-xl cursor-not-allowed`}>Plano Atual</button>
                 </div>
 
                 {/* Advanced */}
-                <div className={`bg-[#131C2D] border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
-                  plan === 'advanced' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : 'border-white/5'
+                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
+                  plan === 'advanced' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
                 }`}>
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F97316] text-white text-[10px] px-4 py-1 rounded-full font-semibold tracking-widest shadow-md">RECOMENDADO</div>
                   {plan === 'advanced' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
                     <span className="text-xs font-bold text-[#3B82F6] uppercase tracking-widest block">Profissional</span>
-                    <h3 className="text-2xl font-bold text-white mt-2">Advanced</h3>
-                    <p className="text-xs text-[#94A3B8] mt-2">Libera CRM comercial, campanhas de Marketing e gestão de PDVs externos.</p>
+                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Advanced</h3>
+                    <p className={`text-xs ${textSec} mt-2`}>Libera CRM comercial, campanhas de Marketing e gestão de PDVs externos.</p>
                     
-                    <hr className="border-white/5 my-6" />
+                    <hr className={`${borderCol} my-6`} />
                     
-                    <ul className="space-y-4 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-4 text-xs ${textBody}`}>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Unlocks CRM de Vendas & Mkt</span></li>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Unlocks Gestão de PDVs & Logística</span></li>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Automação Contábil Completa</span></li>
@@ -2170,19 +2208,19 @@ export default function App() {
                   <button disabled={plan==='advanced'} onClick={()=>handleUpgradePlan('advanced', 'Advanced')} className="mt-8 w-full py-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-semibold rounded-xl transition-all">Assinar Advanced</button>
                 </div>
 
-                {/* Expert - Uses orange brand color for premium tier as per request */}
-                <div className={`bg-[#131C2D] border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
-                  plan === 'expert' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : 'border-white/5'
+                {/* Expert */}
+                <div className={`${bgCard} border rounded-2xl p-8 flex flex-col justify-between relative hover:border-[#3B82F6] transition-all ${
+                  plan === 'expert' ? 'border-[#3B82F6] shadow-[0_0_20px_rgba(59,130,246,0.20)]' : borderCol
                 }`}>
                   {plan === 'expert' && <div className="absolute top-4 right-4 bg-[#22C55E]/12 text-[#4ADE80] text-[10px] px-3 py-1 rounded-full font-bold">ATIVO</div>}
                   <div>
                     <span className="text-xs font-bold text-[#F97316] uppercase tracking-widest block">Alta Escala</span>
-                    <h3 className="text-2xl font-bold text-white mt-2">Expert</h3>
-                    <p className="text-xs text-[#94A3B8] mt-2">Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
+                    <h3 className={`text-2xl font-bold ${textTitle} mt-2`}>Expert</h3>
+                    <p className={`text-xs ${textSec} mt-2`}>Disk AI Copilot, emissor de notas fiscais SEFAZ ilimitado e auditoria de spreads.</p>
                     
-                    <hr className="border-white/5 my-6" />
+                    <hr className={`${borderCol} my-6`} />
                     
-                    <ul className="space-y-4 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-4 text-xs ${textBody}`}>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Libera Disk AI Copilot & Open Finance</span></li>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Libera Módulos de Bar, Insumos & POS</span></li>
                       <li className="flex items-center space-x-3"><CheckCircle className="w-4 h-4 text-[#22C55E]" /><span>Notas fiscais e Borderôs Ilimitados</span></li>
@@ -2198,20 +2236,20 @@ export default function App() {
           {currentTab === 'roadmap' && (
             <div className="space-y-8 animate-fadeIn">
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">Status & Roadmap do Projeto</h2>
-                <p className="text-sm text-[#94A3B8]">Acompanhe as fases de desenvolvimento do novo ecossistema ERP/CRM.</p>
+                <h2 className={`text-2xl font-bold ${textTitle} tracking-tight`}>Status & Roadmap do Projeto</h2>
+                <p className={`text-sm ${textSec}`}>Acompanhe as fases de desenvolvimento do novo ecossistema ERP/CRM.</p>
               </div>
 
               {/* Progress Summary */}
-              <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm space-y-4">
+              <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-md space-y-4`}>
                 <div className="flex justify-between items-center text-xs font-semibold uppercase tracking-wider">
                   <span className="text-[#3B82F6]">Progresso Geral do Protótipo (Fases 1 e 2)</span>
-                  <span className="text-white">100% Concluído</span>
+                  <span className={textTitle}>100% Concluído</span>
                 </div>
-                <div className="w-full bg-[#111827] rounded-full h-3 border border-white/5 overflow-hidden p-0.5">
+                <div className={`w-full ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-200'} rounded-full h-3 border ${borderCol} overflow-hidden p-0.5`}>
                   <div className="bg-[#3B82F6] h-full rounded-full w-full"></div>
                 </div>
-                <p className="text-xs text-[#94A3B8] leading-relaxed">
+                <p className={`text-xs ${textSec} leading-relaxed`}>
                   Todas as especificações de navegação simulada, layouts multibanco, gestão de borderôs e comissionamento foram entregues como protótipo interativo e modular.
                 </p>
               </div>
@@ -2220,13 +2258,13 @@ export default function App() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Phase 1 */}
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
                   <div>
-                    <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-                      <h3 className="text-xs font-semibold text-white uppercase tracking-wider">Fase 1: Demonstração</h3>
+                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
+                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 1: Demonstração</h3>
                       <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-3 text-xs ${textBody}`}>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Dashboard navegável estruturado</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Marketplace de módulos comercializáveis</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Níveis de Planos (Standard, Advanced, Expert)</span></li>
@@ -2237,13 +2275,13 @@ export default function App() {
                 </div>
 
                 {/* Phase 2 */}
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
                   <div>
-                    <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-                      <h3 className="text-xs font-semibold text-white uppercase tracking-wider">Fase 2: Protótipo Funcional</h3>
+                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
+                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 2: Protótipo Funcional</h3>
                       <span className="bg-[#22C55E]/12 text-[#4ADE80] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">Entregue</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-3 text-xs ${textBody}`}>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Navegação completa entre abas e módulos</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Banco de dados em memória React dinâmico</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" /><span>Dashboards interativos com atualizações</span></li>
@@ -2254,13 +2292,13 @@ export default function App() {
                 </div>
 
                 {/* Phase 3 */}
-                <div className="bg-[#131C2D] border border-white/5 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+                <div className={`${bgCard} border ${borderCol} rounded-xl p-6 shadow-sm flex flex-col justify-between`}>
                   <div>
-                    <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-                      <h3 className="text-xs font-semibold text-white uppercase tracking-wider">Fase 3: Sistema de Produção</h3>
+                    <div className={`flex items-center justify-between mb-4 border-b ${borderCol} pb-3`}>
+                      <h3 className={`text-xs font-semibold ${textTitle} uppercase tracking-wider`}>Fase 3: Sistema de Produção</h3>
                       <span className="bg-[#3B82F6]/10 text-[#3B82F6] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">Planejado</span>
                     </div>
-                    <ul className="space-y-3 text-xs text-[#CBD5E1]">
+                    <ul className={`space-y-3 text-xs ${textBody}`}>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" /><span>Migração de rotas estáticas para React + Vite</span></li>
                       <li className="flex items-start space-x-2"><CheckCircle className="w-4 h-4 text-[#3B82F6] shrink-0 mt-0.5" /><span>Implementação de CSS utilitário com Tailwind CSS</span></li>
                       <li className="flex items-start space-x-2 text-[#64748B]"><Lock className="w-4 h-4 shrink-0 mt-0.5" /><span>Banco de dados relacional (Firebase / MySQL)</span></li>
@@ -2279,13 +2317,13 @@ export default function App() {
 
         {/* NOTIFICATION TOAST */}
         {toast.show && (
-          <div className="fixed bottom-6 left-6 z-50 bg-[#131C2D] border border-white/5 text-slate-100 px-5 py-4 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 animate-slideUp">
+          <div className={`fixed bottom-6 left-6 z-50 ${bgCard} border ${borderCol} ${textTitle} px-5 py-4 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 animate-slideUp`}>
             <div className="p-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded-lg shrink-0">
               <CheckCircle className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-xs font-semibold text-white">{toast.title}</h4>
-              <p className="text-[10px] text-[#94A3B8] mt-0.5">{toast.body}</p>
+              <p className={`text-[10px] ${textSec} mt-0.5`}>{toast.body}</p>
             </div>
           </div>
         )}
@@ -2294,22 +2332,22 @@ export default function App() {
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             
           {chatOpen && (
-            <div className="w-96 max-h-[500px] bg-[#131C2D] border border-white/5 rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-305 origin-bottom-right">
+            <div className={`w-96 max-h-[500px] ${bgCard} border ${borderCol} rounded-2xl shadow-2xl flex flex-col overflow-hidden mb-4 transition-all duration-305 origin-bottom-right`}>
               {/* Chat Header */}
-              <div className="p-4 bg-[#111827] border-b border-white/5 flex items-center justify-between">
+              <div className={`p-4 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-100'} border-b ${borderCol} flex items-center justify-between`}>
                 <div className="flex items-center space-x-2.5">
                   <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shadow-lg shadow-blue-500/10">
                     <Brain className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-semibold text-white">Disk AI Copilot</h3>
+                    <h3 className={`text-xs font-semibold ${textTitle}`}>Disk AI Copilot</h3>
                     <p className="text-[9px] text-[#22C55E] font-medium flex items-center">
                       <span className="w-1.5 h-1.5 bg-[#22C55E] rounded-full inline-block mr-1"></span>
                       Online & Ativo
                     </p>
                   </div>
                 </div>
-                <button onClick={() => setChatOpen(false)} className="text-[#94A3B8] hover:text-white">
+                <button onClick={() => setChatOpen(false)} className={`${textSec} hover:text-white`}>
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -2326,7 +2364,7 @@ export default function App() {
                     <div className={`p-3 rounded-r-xl rounded-bl-xl max-w-[80%] border text-[11px] leading-relaxed ${
                       msg.sender === 'user' 
                         ? 'bg-[#2563EB] border-transparent text-white rounded-l-xl rounded-br-none' 
-                        : 'bg-[#111827] border border-white/5 text-[#CBD5E1]'
+                        : `${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-550'} border ${borderCol} ${textBody}`
                     }`}>
                       <p>{msg.text}</p>
                       {msg.htmlResponse && msg.htmlResponse}
@@ -2336,10 +2374,10 @@ export default function App() {
                 
                 {isTyping && (
                   <div className="flex items-start space-x-2.5">
-                    <div className="w-6.5 h-6.5 rounded bg-blue-500/10 border border-white/5 text-[#3B82F6] flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
+                    <div className="w-6.5 h-6.5 rounded bg-blue-500/10 border border-[#1e2533] text-[#3B82F6] flex items-center justify-center font-bold text-[10px] p-1.5 shrink-0">
                       AI
                     </div>
-                    <div className="bg-[#111827] border border-white/5 p-3 rounded-r-xl rounded-bl-xl max-w-[80%]">
+                    <div className={`${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} p-3 rounded-r-xl rounded-bl-xl max-w-[80%]`}>
                       <div className="flex space-x-1">
                         <div className="w-1.5 h-1.5 bg-[#94A3B8] rounded-full animate-bounce"></div>
                         <div className="w-1.5 h-1.5 bg-[#94A3B8] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -2353,32 +2391,32 @@ export default function App() {
               </div>
 
               {/* Quick Actions Grid inside Chat */}
-              <div className="p-3 bg-[#111827] border-t border-white/5">
-                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wider font-semibold mb-2">Comandos Rápidos</p>
+              <div className={`p-3 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border-t ${borderCol}`}>
+                <p className={`text-[9px] ${textSec} uppercase tracking-wider font-semibold mb-2`}>Comandos Rápidos</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <button onClick={() => triggerAIResponse('conciliacao')} className="px-2.5 py-2 text-[10px] font-medium bg-[#131C2D] border border-white/5 hover:border-[#3B82F6] text-white rounded text-left truncate transition-all">
+                  <button onClick={() => triggerAIResponse('conciliacao')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
                     🔍 Fazer Conciliação
                   </button>
-                  <button onClick={() => triggerAIResponse('dre')} className="px-2.5 py-2 text-[10px] font-medium bg-[#131C2D] border border-white/5 hover:border-[#3B82F6] text-white rounded text-left truncate transition-all">
+                  <button onClick={() => triggerAIResponse('dre')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
                     📊 Gerar DRE
                   </button>
-                  <button onClick={() => triggerAIResponse('nfe')} className="px-2.5 py-2 text-[10px] font-medium bg-[#131C2D] border border-white/5 hover:border-[#3B82F6] text-white rounded text-left truncate transition-all">
+                  <button onClick={() => triggerAIResponse('nfe')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
                     🧾 Notas Pendentes
                   </button>
-                  <button onClick={() => triggerAIResponse('borderos')} className="px-2.5 py-2 text-[10px] font-medium bg-[#131C2D] border border-white/5 hover:border-[#3B82F6] text-white rounded text-left truncate transition-all">
+                  <button onClick={() => triggerAIResponse('borderos')} className={`px-2.5 py-2 text-[10px] font-medium ${bgCard} border ${borderCol} hover:border-[#3B82F6] hover:bg-[#3B82F6]/5 ${textTitle} rounded text-left truncate transition-all`}>
                     📋 Status Borderôs
                   </button>
                 </div>
               </div>
 
               {/* Chat Input */}
-              <form onSubmit={handleSendCustomText} className="p-2.5 bg-[#131C2D] border-t border-white/5 flex space-x-2">
+              <form onSubmit={handleSendCustomText} className={`p-2.5 ${bgCard} border-t ${borderCol} flex space-x-2`}>
                 <input 
                   type="text" 
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
                   placeholder="Pergunte sobre DRE, borderô, NFe..."
-                  className="flex-1 bg-[#111827] border border-white/5 rounded px-2.5 py-1 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`flex-1 ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} rounded px-2.5 py-1 text-xs focus:outline-none focus:border-[#3B82F6] ${textBody}`}
                 />
                 <button type="submit" className="p-1 bg-[#2563EB] hover:bg-[#1D4ED8] rounded text-white active:scale-95 transition-all">
                   <Send className="w-4 h-4" />
@@ -2403,57 +2441,57 @@ export default function App() {
       {/* 1. ADD LEAD MODAL */}
       {showAddLeadModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#131C2D] border border-white/5 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#131C2D]">
+          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
               <h3 className="text-sm font-semibold text-white">Adicionar Lead ao Funil</h3>
-              <button onClick={() => setShowAddLeadModal(false)} className="text-[#94A3B8] hover:text-white">
+              <button onClick={() => setShowAddLeadModal(false)} className={`${textSec} hover:text-white`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
             <form onSubmit={handleCreateLead} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome do Lead *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome do Lead *</label>
                 <input 
                   type="text" 
                   value={newLead.name}
                   onChange={(e) => setNewLead(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Roberto Alencar"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome da Produtora / Empresa *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Produtora / Empresa *</label>
                 <input 
                   type="text" 
                   value={newLead.company}
                   onChange={(e) => setNewLead(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="Ex: Prime Show Eventos"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Valor Estimado (R$) *</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Valor Estimado (R$) *</label>
                   <input 
                     type="number" 
                     value={newLead.value}
                     onChange={(e) => setNewLead(prev => ({ ...prev, value: e.target.value }))}
                     placeholder="Ex: 85000"
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                     required
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Fase Inicial *</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Fase Inicial *</label>
                   <select 
                     value={newLead.stage}
                     onChange={(e) => setNewLead(prev => ({ ...prev, stage: e.target.value }))}
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
                   >
                     <option value="prospect">Prospecção</option>
                     <option value="qualified">Qualificado</option>
@@ -2466,7 +2504,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddLeadModal(false)}
-                  className="px-4 py-2 bg-[#1E293B] hover:bg-slate-805 text-white text-xs font-semibold rounded-lg transition-all"
+                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2485,47 +2523,47 @@ export default function App() {
       {/* 2. CADASTRAR CLIENTE MODAL */}
       {showAddClientModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#131C2D] border border-white/5 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#131C2D]">
+          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
               <h3 className="text-sm font-semibold text-white">Cadastrar Cliente Contato</h3>
-              <button onClick={() => setShowAddClientModal(false)} className="text-[#94A3B8] hover:text-white">
+              <button onClick={() => setShowAddClientModal(false)} className={`${textSec} hover:text-white`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
             <form onSubmit={handleCreateClient} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome Completo *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome Completo *</label>
                 <input 
                   type="text" 
                   value={newClient.name}
                   onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Felipe Silveira"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome da Empresa *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Empresa *</label>
                 <input 
                   type="text" 
                   value={newClient.company}
                   onChange={(e) => setNewClient(prev => ({ ...prev, company: e.target.value }))}
                   placeholder="Ex: Prime Eventos Ltda"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">E-mail de Contato *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>E-mail de Contato *</label>
                 <input 
                   type="email" 
                   value={newClient.email}
                   onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="felipe@empresa.com.br"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1] font-mono"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   required
                 />
               </div>
@@ -2534,7 +2572,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddClientModal(false)}
-                  className="px-4 py-2 bg-[#1E293B] hover:bg-slate-805 text-white text-xs font-semibold rounded-lg transition-all"
+                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2553,35 +2591,35 @@ export default function App() {
       {/* 3. CREATE COUPON MODAL */}
       {showAddCouponModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#131C2D] border border-white/5 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#131C2D]">
+          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
               <h3 className="text-sm font-semibold text-white">Criar Cupom de Desconto</h3>
-              <button onClick={() => setShowAddCouponModal(false)} className="text-[#94A3B8] hover:text-white">
+              <button onClick={() => setShowAddCouponModal(false)} className={`${textSec} hover:text-white`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
             <form onSubmit={handleCreateCoupon} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Código do Cupom *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Código do Cupom *</label>
                 <input 
                   type="text" 
                   value={newCoupon.code}
                   onChange={(e) => setNewCoupon(prev => ({ ...prev, code: e.target.value }))}
                   placeholder="Ex: PROMO20"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1] uppercase tracking-wider font-mono"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} uppercase tracking-wider font-mono`}
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Percentual de Desconto (%) *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Percentual de Desconto (%) *</label>
                 <input 
                   type="number" 
                   value={newCoupon.discount}
                   onChange={(e) => setNewCoupon(prev => ({ ...prev, discount: e.target.value }))}
                   placeholder="Ex: 20"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1] font-mono"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   min="1"
                   max="100"
                   required
@@ -2592,7 +2630,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCouponModal(false)}
-                  className="px-4 py-2 bg-[#1E293B] hover:bg-slate-805 text-white text-xs font-semibold rounded-lg transition-all"
+                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2611,46 +2649,46 @@ export default function App() {
       {/* 4. ADD PDV MODAL */}
       {showAddPdvModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#131C2D] border border-white/5 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#131C2D]">
+          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
               <h3 className="text-sm font-semibold text-white">Ativar Ponto de Venda (PDV)</h3>
-              <button onClick={() => setShowAddPdvModal(false)} className="text-[#94A3B8] hover:text-white">
+              <button onClick={() => setShowAddPdvModal(false)} className={`${textSec} hover:text-white`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
             <form onSubmit={handleCreatePdv} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome do PDV *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome do PDV *</label>
                 <input 
                   type="text" 
                   value={newPdv.name}
                   onChange={(e) => setNewPdv(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Bilheteria Principal - Portão B"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Operador Responsável *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Operador Responsável *</label>
                 <input 
                   type="text" 
                   value={newPdv.manager}
                   onChange={(e) => setNewPdv(prev => ({ ...prev, manager: e.target.value }))}
                   placeholder="Ex: Sandra Costa"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Tipo de PDV</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Tipo de PDV</label>
                   <select 
                     value={newPdv.type}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
                   >
                     <option value="Local">Local</option>
                     <option value="Físico Externo">Físico Externo</option>
@@ -2658,13 +2696,13 @@ export default function App() {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Saldo Inicial (R$)</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Saldo Inicial (R$)</label>
                   <input 
                     type="number" 
                     value={newPdv.balance}
                     onChange={(e) => setNewPdv(prev => ({ ...prev, balance: e.target.value }))}
                     placeholder="0"
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1] font-mono"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                   />
                 </div>
               </div>
@@ -2673,7 +2711,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddPdvModal(false)}
-                  className="px-4 py-2 bg-[#1E293B] hover:bg-slate-805 text-white text-xs font-semibold rounded-lg transition-all"
+                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
@@ -2692,34 +2730,34 @@ export default function App() {
       {/* 5. ADD CAMPAIGN MODAL */}
       {showAddCampaignModal && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#131C2D] border border-white/5 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-[#131C2D]">
+          <div className={`${bgCard} border ${borderCol} rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-scaleUp`}>
+            <div className={`p-6 border-b ${borderCol} flex justify-between items-center ${bgCard}`}>
               <h3 className="text-sm font-semibold text-white">Criar Nova Campanha de Marketing</h3>
-              <button onClick={() => setShowAddCampaignModal(false)} className="text-[#94A3B8] hover:text-white">
+              <button onClick={() => setShowAddCampaignModal(false)} className={`${textSec} hover:text-white`}>
                 <X className="w-4 h-4" />
               </button>
             </div>
             
             <form onSubmit={handleCreateCampaign} className="p-6 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Nome da Campanha *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Nome da Campanha *</label>
                 <input 
                   type="text" 
                   value={newCampaign.name}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ex: Pré-venda Festival de Inverno"
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Canal de Disparo</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Canal de Disparo</label>
                   <select 
                     value={newCampaign.channel}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, channel: e.target.value }))}
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-white font-medium`}
                   >
                     <option value="E-mail">E-mail</option>
                     <option value="WhatsApp">WhatsApp</option>
@@ -2727,26 +2765,26 @@ export default function App() {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Data de Envio *</label>
+                  <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Data de Envio *</label>
                   <input 
                     type="text" 
                     value={newCampaign.date}
                     onChange={(e) => setNewCampaign(prev => ({ ...prev, date: e.target.value }))}
                     placeholder="20/07/2026"
-                    className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1] font-mono"
+                    className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle} font-mono`}
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-[#94A3B8] uppercase">Assunto / Conteúdo Notificação *</label>
+                <label className={`text-[10px] font-semibold ${textSec} uppercase`}>Assunto / Conteúdo Notificação *</label>
                 <input 
                   type="text" 
                   value={newCampaign.subject}
                   onChange={(e) => setNewCampaign(prev => ({ ...prev, subject: e.target.value }))}
                   placeholder="Ex: Não perca! Lote exclusivo com 20% de desconto..."
-                  className="w-full bg-[#111827] border border-white/5 rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] text-[#CBD5E1]"
+                  className={`w-full ${bgInput} border ${borderCol} rounded-lg p-2 text-xs focus:outline-none focus:border-[#3B82F6] ${textTitle}`}
                   required
                 />
               </div>
@@ -2755,7 +2793,7 @@ export default function App() {
                 <button 
                   type="button" 
                   onClick={() => setShowAddCampaignModal(false)}
-                  className="px-4 py-2 bg-[#1E293B] hover:bg-slate-805 text-white text-xs font-semibold rounded-lg transition-all"
+                  className={`px-4 py-2 ${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-100'} hover:bg-slate-805 text-[#CBD5E1] text-xs font-semibold rounded-lg transition-all`}
                 >
                   Cancelar
                 </button>
