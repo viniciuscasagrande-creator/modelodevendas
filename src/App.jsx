@@ -159,17 +159,17 @@ export default function App() {
   };
 
   // Theme-based class mapping (Limitless CSS styles)
-  const bgMain = theme === 'dark' ? 'bg-[#0f172a] text-[#cbd5e1]' : 'bg-[#f4f6f9] text-[#333333]';
-  const sidebarClass = theme === 'dark' ? 'sidebar-dark bg-[#111827]' : 'sidebar-light bg-white border-right border-slate-200';
-  const cardClass = theme === 'dark' ? 'bg-[#131c2d] border border-white/5 shadow-sm' : 'bg-white border border-slate-200 shadow-sm';
-  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/5 bg-[#111827]/40' : 'border-b border-slate-100 bg-[#fafafa]';
-  const inputClass = theme === 'dark' ? 'bg-[#111827] border-white/5 text-white' : 'bg-white border-slate-300 text-slate-900';
-  const headerClass = theme === 'dark' ? 'bg-[#111827] border-b border-white/5' : 'bg-white border-b border-slate-200';
+  const bgMain = theme === 'dark' ? 'bg-[#090d16] text-[#e2e8f0]' : 'bg-[#f8fafc] text-slate-800';
+  const sidebarClass = theme === 'dark' ? 'sidebar-dark bg-[#0c101b]' : 'sidebar-light bg-white border-right border-slate-200';
+  const cardClass = theme === 'dark' ? 'bg-[#101424] border border-white/5 shadow-sm' : 'bg-white border border-slate-100 shadow-sm';
+  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/5 bg-[#0c101b]/40' : 'border-b border-slate-100 bg-[#fafafa]';
+  const inputClass = theme === 'dark' ? 'bg-[#0c101b] border-white/5 text-white' : 'bg-white border-slate-200 text-slate-900';
+  const headerClass = theme === 'dark' ? 'bg-[#0c101b] border-b border-white/5' : 'bg-white border-b border-slate-200';
   
   const borderCol = theme === 'dark' ? 'border-white/5' : 'border-slate-200';
-  const textTitle = theme === 'dark' ? 'text-[#f8fafc]' : 'text-slate-950 font-bold';
+  const textTitle = theme === 'dark' ? 'text-[#f8fafc]' : 'text-slate-900 font-bold';
   const textSec = theme === 'dark' ? 'text-[#94a3b8]' : 'text-slate-500';
-  const textBody = theme === 'dark' ? 'text-[#cbd5e1]' : 'text-slate-800';
+  const textBody = theme === 'dark' ? 'text-[#e2e8f0]' : 'text-slate-700';
   const selectThemeText = theme === 'dark' ? 'text-white font-medium' : 'text-slate-900 font-semibold';
   
   const btnSecondary = theme === 'dark' ? 'btn-secondary bg-[#1e293b] text-white hover:bg-[#273449]' : 'btn-light bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200';
@@ -1262,7 +1262,7 @@ export default function App() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <button className={`p-2 ${textSec} hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40' : 'bg-slate-100'} rounded border ${borderCol} relative transition-all`}>
+            <button className={`p-2 ${textSec} hover:text-slate-900 dark:hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40' : 'bg-slate-100'} rounded border ${borderCol} relative transition-all`}>
               <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#3B82F6] rounded-full"></span>
               <Bell className="w-4 h-4" />
             </button>

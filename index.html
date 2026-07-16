@@ -18,27 +18,117 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #f8fafc;
+            --border-color: #e2e8f0;
+            --th-bg: #f8fafc;
+            --text-sec: #64748b;
+            --row-striped: rgba(241, 245, 249, 0.5);
+            --row-hover: rgba(241, 245, 249, 0.9);
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --card-hover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+            --scrollbar-track: #f1f5f9;
+            --scrollbar-thumb: #cbd5e1;
+            --scrollbar-thumb-hover: #94a3b8;
+        }
+
+        .dark {
+            --bg-main: #090d16;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --th-bg: #0d111d;
+            --text-sec: #94a3b8;
+            --row-striped: rgba(255, 255, 255, 0.01);
+            --row-hover: rgba(255, 255, 255, 0.02);
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+            --card-hover-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+            --scrollbar-track: #090d16;
+            --scrollbar-thumb: #1e293b;
+            --scrollbar-thumb-hover: #334155;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            transition: background-color 0.25s ease;
         }
+
         /* Custom scrollbar for webkit */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #c2c5c3;
+            background: var(--scrollbar-track);
         }
         ::-webkit-scrollbar-thumb {
-            background: #125864;
-            border-radius: 4px;
+            background: var(--scrollbar-thumb);
+            border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #6366f1;
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        /* Modern Table styling overrides */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            background: transparent !important;
+        }
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1rem !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            background: var(--th-bg) !important;
+            color: var(--text-sec) !important;
+        }
+        .table td {
+            padding: 0.85rem 1rem !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            vertical-align: middle;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: var(--row-striped) !important;
+        }
+        .table-hover tbody tr:hover {
+            background-color: var(--row-hover) !important;
+        }
+
+        /* Premium Transitions */
+        .card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: var(--card-shadow) !important;
+            border-radius: 12px !important;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-hover-shadow) !important;
+        }
+
+        /* Input overrides */
+        .form-control {
+            border-radius: 8px !important;
+            transition: all 0.15s ease-in-out !important;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15) !important;
+            border-color: #3b82f6 !important;
+        }
+
+        /* Active animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
     </style>
   </head>
-  <body class="bg-slate-950 text-slate-100 min-h-screen flex overflow-hidden">
+  <body class="min-h-screen flex overflow-hidden">
     <div id="root" class="flex-1 flex overflow-hidden"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
