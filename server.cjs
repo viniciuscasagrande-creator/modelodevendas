@@ -193,7 +193,42 @@ const defaultDb = {
   audit_logs: [
     { id: 'aud-1', type: 'Sucesso', msg: 'Integração Financeira ➔ Contábil realizada para lote de faturamento #982.', date: '15/07/2026' },
     { id: 'aud-2', type: 'Alerta', msg: 'Lançamento manual de ajuste na conta 1.1.02 sem documento fiscal anexado.', date: '14/07/2026' }
-  ]
+  ],
+  campaigns: [
+    { id: 'camp-1', name: 'Black Friday Antecipado', channel: 'E-mail', sent: 25000, openRate: 28.4, clickRate: 11.2, conversions: 840, revenue: 84000, status: 'Concluída', date: '10/07/2026', roi: 450, audience: 'Compradores de 2025' },
+    { id: 'camp-2', name: 'Pré-Venda Metal Fest 2026', channel: 'WhatsApp', sent: 12000, openRate: 94.2, clickRate: 18.5, conversions: 490, revenue: 58800, status: 'Concluída', date: '12/07/2026', roi: 580, audience: 'Base Fãs de Rock' },
+    { id: 'camp-3', name: 'Reengajamento Ingressos Inverno', channel: 'E-mail', sent: 8000, openRate: 19.8, clickRate: 6.4, conversions: 120, revenue: 14400, status: 'Concluída', date: '15/07/2026', roi: 210, audience: 'Carrinho Abandonado' },
+    { id: 'camp-4', name: 'Promoção Relâmpago Embafeste', channel: 'SMS', sent: 5000, openRate: 88.0, clickRate: 14.2, conversions: 240, revenue: 36000, status: 'Ativa', date: '16/07/2026', roi: 320, audience: 'VIPs Locais' },
+    { id: 'camp-5', name: 'Dia dos Namorados Combo Casal', channel: 'Instagram Ads', sent: 30000, openRate: 45.1, clickRate: 8.9, conversions: 620, revenue: 93000, status: 'Concluída', date: '12/06/2026', roi: 420, audience: 'Casais 18-35 anos' },
+    { id: 'camp-6', name: 'Cupom Influencer - Gabi Reis', channel: 'TikTok', sent: 45000, openRate: 58.2, clickRate: 12.4, conversions: 1150, revenue: 172500, status: 'Ativa', date: '01/07/2026', roi: 650, audience: 'Seguidores da Gabi' },
+    { id: 'camp-7', name: 'Remarketing Google Search', channel: 'Google Ads', sent: 15000, openRate: 35.0, clickRate: 9.2, conversions: 310, revenue: 46500, status: 'Ativa', date: '05/07/2026', roi: 290, audience: 'Visitantes Recentes' },
+    { id: 'camp-8', name: 'Sorteio Ingressos Rádio FM', channel: 'Rádio & Social', sent: 10000, openRate: 70.0, clickRate: 15.0, conversions: 80, revenue: 12000, status: 'Concluída', date: '28/06/2026', roi: 150, audience: 'Ouvintes Locais' },
+    { id: 'camp-9', name: 'Lote VIP Relâmpago 48h', channel: 'WhatsApp', sent: 8000, openRate: 96.5, clickRate: 22.4, conversions: 410, revenue: 123000, status: 'Concluída', date: '08/07/2026', roi: 720, audience: 'Clientes Recorrentes' },
+    { id: 'camp-10', name: 'Ingresso Solidário Campanha Social', channel: 'E-mail', sent: 18000, openRate: 25.4, clickRate: 7.8, conversions: 320, revenue: 48000, status: 'Concluída', date: '02/07/2026', roi: 310, audience: 'Base Geral' }
+  ],
+  coupons: [
+    { id: 'coup-1', code: 'INVERNO15', discount: 15, event: 'Festival de Inverno Curitiba', status: 'Ativo', usages: 342 },
+    { id: 'coup-2', code: 'METAL20', discount: 20, event: 'Metal Fest 2026', status: 'Ativo', usages: 198 },
+    { id: 'coup-3', code: 'EMBAFESTE10', discount: 10, event: 'Embafeste Premium', status: 'Inativo', usages: 45 }
+  ],
+  influencers: [
+    { id: 'inf-1', name: 'Gabriela Pugliesi', genre: 'LifeStyle & Fitness', followers: '4.5M', cachet: 12000, activeCampaign: 'Metal Fest 2026', coupon: 'PUGLIMETAL', roi: '340%', codeSales: 410, hired: true },
+    { id: 'inf-2', name: 'Felipe Castanhari', genre: 'Curiosidades & Pop Culture', followers: '13.2M', cachet: 25000, activeCampaign: 'Nenhum', coupon: 'CASTANHARI10', roi: '0%', codeSales: 0, hired: false },
+    { id: 'inf-3', name: 'Alok Petrillo', genre: 'Música Eletrônica', followers: '28.1M', cachet: 85000, activeCampaign: 'Electronic Carnival 2026', coupon: 'ALOKPARTY', roi: '520%', codeSales: 1850, hired: true },
+    { id: 'inf-4', name: 'Larissa Manoela', genre: 'Teatro & Cinema', followers: '49.8M', cachet: 60000, activeCampaign: 'Festival de Inverno Curitiba', coupon: 'LARISSAINVERNO', roi: '180%', codeSales: 890, hired: true },
+    { id: 'inf-5', name: 'Whindersson Nunes', genre: 'Humor & Stand-up', followers: '58.4M', cachet: 75000, activeCampaign: 'Nenhum', coupon: 'WHIND25', roi: '0%', codeSales: 0, hired: false }
+  ],
+  loyaltyRules: {
+    cashbackPercentage: 2,
+    pointsPerReal: 1,
+    vipClubName: 'Clube DiskVIP',
+    minimumRedeemPoints: 500,
+    missions: [
+      { id: 'mis-1', title: 'Fã de Carteirinha', desc: 'Compre ingressos para 3 eventos no mesmo mês.', reward: '100 pontos + Tag VIP', status: 'Ativa' },
+      { id: 'mis-2', title: 'Divulgador Oficial', desc: 'Compartilhe 5 eventos nas suas redes sociais.', reward: 'Cupom de 10% de desconto', status: 'Ativa' },
+      { id: 'mis-3', title: 'Grupo Fechado', desc: 'Compre 4 ingressos tipo Combo Família.', reward: 'Estacionamento Grátis', status: 'Inativa' }
+    ]
+  }
 };
 
 function readDb() {
@@ -508,6 +543,120 @@ app.post('/api/eventos/pdv', (req, res) => {
   });
   writeDb(db);
   res.status(201).json(newSale);
+});
+
+// ================= FASE 5: MARKETING & CAMPANHAS ENDPOINTS =================
+app.get('/api/marketing/campaigns', (req, res) => {
+  res.json(readDb().campaigns || []);
+});
+
+app.post('/api/marketing/campaigns', (req, res) => {
+  const db = readDb();
+  if (!db.campaigns) db.campaigns = [];
+  const newCamp = {
+    id: `camp-${Date.now()}`,
+    name: req.body.name,
+    channel: req.body.channel,
+    sent: parseInt(req.body.sent) || 0,
+    openRate: parseFloat(req.body.openRate) || 0,
+    clickRate: parseFloat(req.body.clickRate) || 0,
+    conversions: parseInt(req.body.conversions) || 0,
+    revenue: parseFloat(req.body.revenue) || 0,
+    status: req.body.status || 'Agendada',
+    date: req.body.date,
+    roi: parseInt(req.body.roi) || 0,
+    audience: req.body.audience || 'Público Geral'
+  };
+  db.campaigns.push(newCamp);
+  writeDb(db);
+  res.status(201).json(newCamp);
+});
+
+app.post('/api/marketing/campaigns/:id/trigger', (req, res) => {
+  const db = readDb();
+  const { id } = req.params;
+  const { conversions, revenue, openRate, clickRate } = req.body;
+  
+  db.campaigns = db.campaigns.map(c => {
+    if (c.id === id) {
+      return {
+        ...c,
+        status: 'Concluída',
+        conversions: parseInt(conversions) || 0,
+        revenue: parseFloat(revenue) || 0,
+        openRate: parseFloat(openRate) || 0,
+        clickRate: parseFloat(clickRate) || 0,
+        roi: c.roi || Math.floor(Math.random() * 400) + 150
+      };
+    }
+    return c;
+  });
+  
+  // also add launch ledger entry
+  const revenueVal = parseFloat(revenue) || 0;
+  const campName = db.campaigns.find(c => c.id === id)?.name || 'Marketing';
+  
+  db.accounting_entries.unshift({
+    id: `lan-${Date.now()}`,
+    date: new Date().toISOString().substring(0, 10),
+    accountDeb: '1.1.01 (Caixa/Bancos)',
+    accountCred: '3.1.01 (Receita Ingressos)',
+    amount: revenueVal,
+    desc: `Conversões Campanhas: ${campName}`,
+    costCenter: 'Marketing',
+    user: 'Gisele Lima'
+  });
+  
+  writeDb(db);
+  res.json({ success: true, message: 'Campanha disparada com sucesso.' });
+});
+
+app.get('/api/marketing/coupons', (req, res) => {
+  res.json(readDb().coupons || []);
+});
+
+app.post('/api/marketing/coupons', (req, res) => {
+  const db = readDb();
+  if (!db.coupons) db.coupons = [];
+  const newCoup = {
+    id: `coup-${Date.now()}`,
+    code: req.body.code.toUpperCase(),
+    discount: parseInt(req.body.discount) || 0,
+    event: req.body.event,
+    status: req.body.status || 'Ativo',
+    usages: 0
+  };
+  db.coupons.push(newCoup);
+  writeDb(db);
+  res.status(201).json(newCoup);
+});
+
+app.get('/api/marketing/influencers', (req, res) => {
+  res.json(readDb().influencers || []);
+});
+
+app.post('/api/marketing/influencers/:id/hire', (req, res) => {
+  const db = readDb();
+  const { id } = req.params;
+  db.influencers = db.influencers.map(inf => {
+    if (inf.id === id) {
+      return { ...inf, hired: !inf.hired };
+    }
+    return inf;
+  });
+  writeDb(db);
+  res.json({ success: true, message: 'Status do influenciador atualizado.' });
+});
+
+app.get('/api/marketing/loyalty', (req, res) => {
+  res.json(readDb().loyaltyRules || {});
+});
+
+app.post('/api/marketing/loyalty', (req, res) => {
+  const db = readDb();
+  db.loyaltyRules = req.body;
+  writeDb(db);
+  res.json({ success: true, message: 'Regras de fidelidade atualizadas.' });
 });
 
 // Serve frontend build static files (optional, for unified deployment)

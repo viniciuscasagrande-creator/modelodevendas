@@ -51,1180 +51,118 @@ import {
   Music,
   Globe,
   Terminal,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Settings,
+  Home,
+  Tag
 } from 'lucide-react';
 import PlansPage from './pages/PlansPage';
+import { DiskHubProvider, useDiskHub, usersDatabase } from './context/DiskHubContext';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import Dashboard from './pages/Dashboard';
 
-export default function App() {
-  // Navigation & General configuration
-  const [currentTab, setCurrentTab] = useState('dashboard');
-  const [financeSubTab, setFinanceSubTab] = useState('dashboard');
-  const [accountingSubTab, setAccountingSubTab] = useState('dashboard');
-  const [marketingSubTab, setMarketingSubTab] = useState('licensing');
-  const [crmSubTab, setCrmSubTab] = useState('dashboard');
-
-  // Phase 2 states
-  const [receivables, setReceivables] = useState([
-    { id: 'rec-1', desc: 'Venda de Ingressos - Lote 1 Inverno', amount: 154000.00, method: 'Cartão', due: '2026-07-20', status: 'Recebido' },
-    { id: 'rec-2', desc: 'Patrocínio Master - Itaú', amount: 150000.00, method: 'PIX', due: '2026-07-22', status: 'Pendente' },
-    { id: 'rec-3', desc: 'Venda de Camarotes - Metal Fest', amount: 25000.00, method: 'Boleto', due: '2026-07-15', status: 'Atrasado' },
-  ]);
-  const [payables, setPayables] = useState([
-    { id: 'pay-1', desc: 'Repasse Produtor - Lote 1 Inverno', amount: 120000.00, due: '2026-07-25', status: 'Agendado', category: 'Repasse', costCenter: 'Eventos' },
-    { id: 'pay-2', desc: 'Aluguel de Palco - Curitiba Arena', amount: 15000.00, due: '2026-07-18', status: 'Pendente', category: 'Infraestrutura', costCenter: 'Operacional' },
-    { id: 'pay-3', desc: 'Impostos Federais DAS Junho', amount: 8400.00, due: '2026-07-10', status: 'Pago', category: 'Impostos', costCenter: 'Administrativo' },
-  ]);
-  const [costCenters, setCostCenters] = useState([
-    { id: 'cc-1', name: 'Eventos', budget: 500000 },
-    { id: 'cc-2', name: 'Marketing', budget: 150000 },
-    { id: 'cc-3', name: 'Operacional', budget: 200000 },
-    { id: 'cc-4', name: 'Logística', budget: 100000 },
-    { id: 'cc-5', name: 'Administrativo', budget: 80000 },
-  ]);
-  const [newReceivable, setNewReceivable] = useState({ desc: '', amount: '', method: 'PIX', due: '2026-07-20' });
-  const [newPayable, setNewPayable] = useState({ desc: '', amount: '', category: 'Fornecedor', due: '2026-07-20', costCenter: 'Eventos' });
-
-  // Contabilidade states
-  const [contabilPlanoContas, setContabilPlanoContas] = useState([
-    { code: '1.1.01', name: 'Caixa e Equivalentes de Caixa', type: 'Ativo', balance: 950000 },
-    { code: '1.1.02', name: 'Clientes a Receber', type: 'Ativo', balance: 179000 },
-    { code: '2.1.01', name: 'Fornecedores a Pagar', type: 'Passivo', balance: 135000 },
-    { code: '2.1.02', name: 'Impostos a Recolher', type: 'Passivo', balance: 8400 },
-    { code: '3.1.01', name: 'Receita com Venda de Ingressos', type: 'Receitas', balance: 2580000 },
-    { code: '4.1.01', name: 'Custos de Eventos / Produção', type: 'Custos', balance: 620000 },
-    { code: '4.1.02', name: 'Despesas com Pessoal / Fixas', type: 'Despesas', balance: 1480000 },
-  ]);
-  const [contabilLancamentos, setContabilLancamentos] = useState([
-    { id: 'cl-1', date: '15/07/2026', debit: '1.1.01', credit: '3.1.01', amount: 45000, desc: 'Reconhecimento de Receita - Festival de Inverno' },
-    { id: 'cl-2', date: '14/07/2026', debit: '4.1.01', credit: '2.1.01', amount: 18000, desc: 'Lançamento de Despesa de Segurança Terceirizada' },
-    { id: 'cl-3', date: '12/07/2026', debit: '4.1.01', credit: '1.1.01', amount: 35000, desc: 'PGTO de Aluguel de LED - Lançamento Automático' },
-  ]);
-  const [contabilAuditorias, setContabilAuditorias] = useState([
-    { id: 'aud-1', type: 'Sucesso', msg: 'Integração Financeira ➔ Contábil realizada para lote de faturamento #982.', date: '15/07/2026' },
-    { id: 'aud-2', type: 'Alerta', msg: 'Lançamento manual de ajuste na conta 1.1.02 sem documento fiscal anexado.', date: '14/07/2026' },
-  ]);
-
-  const [plan, setPlan] = useState('essencial');
-  const [theme, setTheme] = useState('light'); // 'dark' or 'light'
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [spotlightOpen, setSpotlightOpen] = useState(false);
-  const [spotlightQuery, setSpotlightQuery] = useState('');
-  const [eventWizardStep, setEventWizardStep] = useState(1);
-  const [wizardInputs, setWizardInputs] = useState({ name: '', category: 'Show / Festival', date: '', time: '', city: '', venue: '', capacity: '', producer: '', organizer: '', ticketsPrice: '150', marketingPlan: 'start' });
-  const [isListening, setIsListening] = useState(false);
-  
-  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'annual'
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState(0); // e.g. 0.20 for 20%
-  const [additionalUsersCount, setAdditionalUsersCount] = useState(0);
-  const [selectedAddons, setSelectedAddons] = useState([]);
-  const [paymentSimulationOpen, setPaymentSimulationOpen] = useState(false);
-  const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState(null);
-  const [activeTrial, setActiveTrial] = useState(false);
-
-  // App store installation simulation state
-  const [installedApps, setInstalledApps] = useState({
-    financeiro: true,
-    contabilidade: true,
-    crm: true,
-    mkt: true,
-    pdv: true,
-    logistica: true,
-    bar: true,
-    patrimonio: false,
-    ai: false,
-    eventos: true
-  });
-
-  const [logisticsBatches, setLogisticsBatches] = useState([
-    { id: 'batch-1', event: 'Festival de Inverno Curitiba', type: 'Ingressos VIP', qty: 3000, printed: 3000, status: 'Enviado', tracking: 'BR-9821-XQ' },
-    { id: 'batch-2', event: 'Festival de Inverno Curitiba', type: 'Pista Lote 1', qty: 15000, printed: 15000, status: 'Entregue', tracking: 'BR-8122-ZP' },
-    { id: 'batch-3', event: 'Metal Fest 2026', type: 'Pista Lote 1', qty: 10000, printed: 6000, status: 'Imprimindo', tracking: 'Em processamento' },
-  ]);
-
-  const [barInventory, setBarInventory] = useState([
-    { id: 'inv-1', name: 'Cerveja Spaten Lata 350ml', stock: 12000, maxStock: 15000, price: 12.00, sold: 1840 },
-    { id: 'inv-2', name: 'Água Mineral sem Gás 500ml', stock: 8500, maxStock: 10000, price: 6.00, sold: 920 },
-    { id: 'inv-3', name: 'Refrigerante Coca-Cola Lata', stock: 6100, maxStock: 8000, price: 8.00, sold: 450 },
-    { id: 'inv-4', name: 'Combo Energético + Vodka', stock: 2400, maxStock: 3000, price: 45.00, sold: 290 },
-  ]);
-
-  const [posTerminals, setPosTerminals] = useState([
-    { id: 'pos-1', serial: 'PAX-A920-8912', event: 'Festival de Inverno Curitiba', operator: 'Sandra Costa', battery: 94, status: 'Em uso' },
-    { id: 'pos-2', serial: 'PAX-A920-8913', event: 'Festival de Inverno Curitiba', operator: 'Daniel Santos', battery: 85, status: 'Em uso' },
-    { id: 'pos-3', serial: 'PAX-A920-8914', event: 'Metal Fest 2026', operator: 'Aguardando', battery: 100, status: 'Disponível' },
-    { id: 'pos-4', serial: 'PAX-S920-4122', event: 'Manutenção Geral', operator: 'N/A', battery: 42, status: 'Manutenção' },
-  ]);
-  
-  // Toast notifications state
-  const [toast, setToast] = useState({ show: false, title: '', body: '', type: 'success' });
-  
-  // Marketplace states
-  const [mktSearch, setMktSearch] = useState('');
-  const [mktCategory, setMktCategory] = useState('Todos');
-  const [mktPlan, setMktPlan] = useState('Todos');
-  const [mktSort, setMktSort] = useState('Popular');
-  const [selectedApp, setSelectedApp] = useState(null);
-  const [appDetailTab, setAppDetailTab] = useState('overview');
-  
-  // AI Chat states
-  const [chatOpen, setChatOpen] = useState(false);
-  const [userInput, setUserInput] = useState('');
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 1,
-      sender: 'ai',
-      text: 'Olá **Vinicius**! 👋 Sou o Disk AI Copilot. Auditor financeiro e contábil do seu ecossistema. Consigo extrair borderôs, emitir NFes, conciliar contas e gerar DREs completas do sistema. O que deseja auditar?',
-      timestamp: '13:45'
-    }
-  ]);
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+export function AppContent() {
+  const {
+    currentUser, setCurrentUser,
+    currentTab, setCurrentTab,
+    financeSubTab, setFinanceSubTab,
+    accountingSubTab, setAccountingSubTab,
+    marketingSubTab, setMarketingSubTab,
+    crmSubTab, setCrmSubTab,
+    selectedAiEvent, setSelectedAiEvent,
+    aiOutputs, setAiOutputs,
+    receivables, setReceivables,
+    payables, setPayables,
+    costCenters, setCostCenters,
+    newReceivable, setNewReceivable,
+    newPayable, setNewPayable,
+    contabilPlanoContas, setContabilPlanoContas,
+    contabilLancamentos, setContabilLancamentos,
+    contabilAuditorias, setContabilAuditorias,
+    plan, setPlan,
+    theme, setTheme,
+    mobileSidebarOpen, setMobileSidebarOpen,
+    sidebarCollapsed, setSidebarCollapsed,
+    spotlightOpen, setSpotlightOpen,
+    spotlightQuery, setSpotlightQuery,
+    eventWizardStep, setEventWizardStep,
+    wizardInputs, setWizardInputs,
+    isListening, setIsListening,
+    billingCycle, setBillingCycle,
+    couponCode, setCouponCode,
+    appliedDiscount, setAppliedDiscount,
+    additionalUsersCount, setAdditionalUsersCount,
+    selectedAddons, setSelectedAddons,
+    paymentSimulationOpen, setPaymentSimulationOpen,
+    selectedPlanForCheckout, setSelectedPlanForCheckout,
+    activeTrial, setActiveTrial,
+    installedApps, setInstalledApps,
+    logisticsBatches, setLogisticsBatches,
+    barInventory, setBarInventory,
+    posTerminals, setPosTerminals,
+    toast, setToast, triggerToast,
+    mktSearch, setMktSearch,
+    mktCategory, setMktCategory,
+    mktPlan, setMktPlan,
+    mktSort, setMktSort,
+    selectedApp, setSelectedApp,
+    appDetailTab, setAppDetailTab,
+    chatOpen, setChatOpen,
+    userInput, setUserInput,
+    chatMessages, setChatMessages,
+    isTyping, setIsTyping,
+    messagesEndRef,
+    users, setUsers,
+    invoices, setInvoices,
+    borderos, setBorderos,
+    leads, setLeads,
+    clients, setClients,
+    companies, setCompanies,
+    appointments, setAppointments,
+    proposals, setProposals,
+    contracts, setContracts,
+    goals, setGoals,
+    commissions, setCommissions,
+    events, setEvents,
+    venues, setVenues,
+    sectors, setSectors,
+    ticketBatches, setTicketBatches,
+    issuedTickets, setIssuedTickets,
+    pdvSales, setPdvSales,
+    checkins, setCheckins,
+    credencials, setCredencials,
+    turnstiles, setTurnstiles,
+    stocks, setStocks,
+    eventLogs, setEventLogs,
+    campaigns, setCampaigns,
+    coupons, setCoupons,
+    influencers, setInfluencers,
+    loyaltyRules, setLoyaltyRules,
+    marketingActivePlan, setMarketingActivePlan,
+    marketingModulesStatus, setMarketingModulesStatus,
+    showAddCampaignModal, setShowAddCampaignModal,
+    newCampaign, setNewCampaign,
+    showAddCouponModal, setShowAddCouponModal,
+    newCoupon, setNewCoupon,
+    financialStats, setFinancialStats,
+    accounts, setAccounts,
+    lancamentos, setLancamentos,
+    conciliationItems, setConciliationItems,
+    transfer, setTransfer,
+    newLancamento, setNewLancamento,
+    backendConnected, setBackendConnected,
+    handleTriggerCampaign,
+    handleCreateCampaign,
+    handleCreateCoupon,
+    bgMain, sidebarClass, cardClass, bgCard, cardHeaderClass, inputClass, headerClass, borderCol, textTitle, textSec, textBody, bgInput, selectThemeText
+  } = useDiskHub();
 
   const selectTab = (tabName) => {
     setCurrentTab(tabName);
     setMobileSidebarOpen(false);
   };
 
-  // Theme-based class mapping (Disk Hub Design System - DHDS)
-  const bgMain = theme === 'dark' ? 'bg-[#0F172A] text-[#F8FAFC]' : 'bg-[#F5F7FB] text-[#111827]';
-  const sidebarClass = theme === 'dark' ? 'bg-[#111827] border-r border-[#1F2937]' : 'bg-white border-r border-[#E2E8F0]';
-  const cardClass = theme === 'dark' ? 'bg-[#111827] border border-[#1F2937] shadow-sm rounded-[18px]' : 'bg-white border border-[#E2E8F0] shadow-sm rounded-[18px]';
-  const cardHeaderClass = theme === 'dark' ? 'border-b border-[#1F2937] bg-[#111827]/40 px-4 py-3' : 'border-b border-[#E2E8F0] bg-slate-50/50 px-4 py-3';
-  const inputClass = theme === 'dark' ? 'bg-[#0F172A] border-[#1F2937] text-white focus:ring-2 focus:ring-[#2563EB]/40' : 'bg-white border-[#E2E8F0] text-[#111827] focus:ring-2 focus:ring-[#2563EB]/40';
-  const headerClass = theme === 'dark' ? 'bg-[#111827] border-b border-[#1F2937]' : 'bg-white border-b border-[#E2E8F0]';
-  
-  const borderCol = theme === 'dark' ? 'border-[#1F2937]' : 'border-[#E2E8F0]';
-  const textTitle = theme === 'dark' ? 'text-[#F8FAFC] font-semibold' : 'text-[#111827] font-semibold';
-  const textSec = theme === 'dark' ? 'text-[#94A3B8]' : 'text-[#64748B]';
-  const textBody = theme === 'dark' ? 'text-[#F8FAFC]/90' : 'text-[#111827]/90';
-  const selectThemeText = theme === 'dark' ? 'text-[#F8FAFC] font-medium' : 'text-[#111827] font-semibold';
-  
-  const btnSecondary = theme === 'dark' ? 'btn-secondary bg-[#1F2937] text-white hover:bg-[#374151] border-0' : 'btn-light bg-slate-100 text-slate-800 border border-slate-200 hover:bg-slate-200';
-
-  // Commercial App Catalog mapped to Plan Requirements
-  const appsCatalog = [
-    { 
-      id: 'financeiro', 
-      name: 'Financeiro (ERP)', 
-      desc: 'Gestão de contas, saldo, fluxo de caixa e conciliação bancária.', 
-      category: 'Finanças', 
-      planRequired: 'standard', 
-      icon: CreditCard,
-      rating: 4.8,
-      downloads: 4120,
-      features: ['Fluxo de Caixa', 'Contas a Pagar/Receber', 'PIX Direto', 'Conciliação Bancária', 'Relatórios Financeiros'],
-      benefits: ['Audite todas as entradas e saídas de caixa em tempo real', 'Automatize conciliações e evite erros operacionais', 'Gestão unificada de contas em múltiplos bancos'],
-      detailedDesc: 'O módulo Financeiro ERP é o coração da gestão do seu negócio. Ele consolida contas correntes, caixas físicos e carteiras digitais em um painel unificado, permitindo conciliação automatizada de PIX, cartões e boletos de forma contínua.'
-    },
-    { 
-      id: 'contabilidade', 
-      name: 'Contabilidade Disk', 
-      desc: 'Borderôs oficiais, notas fiscais, DRE e relatórios fiscais.', 
-      category: 'Fiscal', 
-      planRequired: 'standard', 
-      icon: Receipt,
-      rating: 4.9,
-      downloads: 2431,
-      features: ['Emissão de NF-e e NFS-e', 'DRE Contábil por Competência', 'Fechamento de Borderôs', 'Relatórios Fiscais', 'Auditoria de Gateways'],
-      benefits: ['Transmita NFes diretamente para a SEFAZ em lote', 'Calcule lucros por competência automaticamente', 'Reduza custos tributários com relatórios organizados'],
-      detailedDesc: 'A Contabilidade Disk oferece uma solução robusta para o controle contábil e fiscal do seu negócio. Desenvolvida para auditar e organizar todas as obrigações fiscais decorrentes das vendas de ingressos, emissões de notas e fechamento de borderôs de produtores.'
-    },
-    { 
-      id: 'crm', 
-      name: 'CRM de Vendas', 
-      desc: 'Contatos de novos produtores, funil de vendas e metas comerciais.', 
-      category: 'Vendas', 
-      planRequired: 'advanced', 
-      icon: Users,
-      rating: 4.7,
-      downloads: 1850,
-      features: ['Pipeline Kanban Customizável', 'Cadastro de Contatos e Leads', 'Gestão de Oportunidades', 'Histórico de Interações', 'Metas Comerciais'],
-      benefits: ['Acompanhe a evolução de novos produtores no funil', 'Nunca perca o timing de uma negociação comercial', 'Métricas de conversão de leads integradas'],
-      detailedDesc: 'O CRM de Vendas permite a você gerenciar o relacionamento com produtores e organizadores de eventos de forma inteligente. Com o funil Kanban reativo, você consegue arrastar as oportunidades de vendas e identificar gargalos na prospecção comercial.'
-    },
-    { 
-      id: 'mkt', 
-      name: 'Marketing Automação', 
-      desc: 'Disparo de e-mails em massa e gerador de cupons de desconto.', 
-      category: 'Marketing', 
-      planRequired: 'advanced', 
-      icon: Mail,
-      rating: 4.6,
-      downloads: 1240,
-      features: ['Disparo de Campanhas Massivas', 'Disparos via WhatsApp e SMS', 'Criador de Cupons de Desconto', 'Analytics de ROI e Métricas', 'Filtro de Clientes'],
-      benefits: ['Aumente o engajamento com campanhas direcionadas', 'Crie cupons dinâmicos para eventos e lotes', 'Métricas de retorno sobre o investimento em publicidade'],
-      detailedDesc: 'O módulo de Automação de Marketing foi desenhado para maximizar a conversão das vendas de ingressos. Com ferramentas para envio de e-mails em lote, cupons dinâmicos e disparo integrado via WhatsApp e SMS, você alcança sua base de forma cirúrgica.'
-    },
-    { 
-      id: 'pdv', 
-      name: 'Gestão de PDVs', 
-      desc: 'Controle de pontos de venda, monitor de caixas e sangrias.', 
-      category: 'Operações', 
-      planRequired: 'advanced', 
-      icon: ShoppingBag,
-      rating: 4.8,
-      downloads: 980,
-      features: ['Monitor de Terminais Físicos', 'Fechamento de Caixa Cego', 'Gestão de Sangrias de Dinheiro', 'Configuração de Taxas locais', 'Histórico de Lançamentos'],
-      benefits: ['Gerencie bilheterias locais e quiosques externos', 'Realize recolhimentos rápidos e seguros de valores', 'Evite quebras de caixa com auditoria contínua'],
-      detailedDesc: 'A Gestão de PDVs é ideal para organizadores que realizam vendas de ingressos físicas em bilheterias de eventos, teatros ou pontos credenciados. Permite abertura e fechamento de caixas controlados e sangrias de valores direto para o caixa geral.'
-    },
-    { 
-      id: 'logistica', 
-      name: 'Logística & Impressão', 
-      desc: 'Montagem de ingressos físicos, períodos de entrega e layouts.', 
-      category: 'Logística', 
-      planRequired: 'advanced', 
-      icon: Briefcase,
-      rating: 4.5,
-      downloads: 710,
-      features: ['Lotes de Impressão de Ingressos', 'Layouts Físicos Personalizados', 'Controle de Estoque de Papel', 'Monitor de Entregas e Rastreio', 'Validação de Códigos de Barra'],
-      benefits: ['Imprima lotes de ingressos físicos com segurança', 'Monitore o envio de ingressos para bilheterias locais', 'Evite fraudes de ingressos e clonagens'],
-      detailedDesc: 'O módulo de Logística & Impressão coordena toda a cadeia de suprimentos de ingressos físicos e credenciais dos eventos. Crie layouts personalizados, controle os lotes de impressão por setor e acompanhe o status de transporte dos lotes.'
-    },
-    { 
-      id: 'bar', 
-      name: 'Sistema de Bar & Estoque', 
-      desc: 'Cardápios digitais, controle de insumos e consumo local.', 
-      category: 'Operações', 
-      planRequired: 'expert', 
-      icon: Layers,
-      rating: 4.9,
-      downloads: 1100,
-      features: ['Frente de Caixa POS Bar', 'Controle de Estoque de Bebidas', 'Cardápio Digital Customizável', 'Inventário por Caixa', 'Dashboard de ROI do Bar'],
-      benefits: ['Acelere o atendimento em filas de bar de eventos', 'Deduza do estoque automaticamente a cada copo vendido', 'Gestão de combos e promoções locais'],
-      detailedDesc: 'O Bar & Estoque é a ferramenta definitiva para gestão de consumo nos eventos. Integre os caixas de bar ao ERP contábil principal, monitore o nível de insumos em tempo real e realize vendas rápidas com um POS otimizado para celulares e maquininhas.'
-    },
-    { 
-      id: 'patrimonio', 
-      name: 'Gestão de Patrimônio & POS', 
-      desc: 'Controle de POS físicos em eventos e remessa de máquinas.', 
-      category: 'Patrimônio', 
-      planRequired: 'expert', 
-      icon: Landmark,
-      rating: 4.6,
-      downloads: 620,
-      features: ['Cadastro de Máquinas POS', 'Status de Conectividade e Bateria', 'Remessa e Recebimento de POS', 'Controle de Contratos com Adquirentes', 'Histórico de Manutenções'],
-      benefits: ['Monitore a saúde física das maquininhas do evento', 'Organize remessas seguras para múltiplos locais', 'Evite perdas e roubos de POS nos eventos'],
-      detailedDesc: 'A Gestão de Patrimônio & POS organiza os ativos tecnológicos de cobrança física do seu ecossistema. Monitore os números de série das maquininhas PAX ativas, carga da bateria, operadores de caixa e status de envio.'
-    },
-    { 
-      id: 'ai', 
-      name: 'Disk AI Copilot', 
-      desc: 'Copiloto de IA para análises de margens e auditoria contábil.', 
-      category: 'Inteligência', 
-      planRequired: 'expert', 
-      icon: Brain,
-      rating: 4.9,
-      downloads: 3200,
-      features: ['Auditoria Fiscal Autônoma', 'Detecção de Anomalias em Borderôs', 'Assistente Conversacional Contábil', 'Previsão de Fluxo de Caixa', 'Cálculo de Spread do Gateway'],
-      benefits: ['Encontre divergências tributárias em segundos', 'Tire dúvidas fiscais através de linguagem natural', 'Previsão de recebíveis de vendas futuras'],
-      detailedDesc: 'O Disk AI Copilot traz inteligência generativa e preditiva para a gestão do seu negócio. Ele atua como um auditor residente 24 horas por dia, analisando faturas de gateways, detectando quebras em fechamentos e prevendo fluxo de caixa.'
-    },
-  ];
-
-  const isPlanEligible = (required) => {
-    if (required === 'standard') return true;
-    if (required === 'advanced' || required === 'Marketing') {
-      return plan === 'profissional' || plan === 'premium' || plan === 'enterprise' || plan === 'omnichannel' || plan === 'advanced' || plan === 'expert';
-    }
-    if (required === 'expert') {
-      return plan === 'premium' || plan === 'enterprise' || plan === 'omnichannel' || plan === 'expert';
-    }
-    return false;
-  };
-
-  // ================= 1. FINANCEIRO (ERP) DATA & STATE =================
-  const [financialStats, setFinancialStats] = useState({
-    receita: 2580000,
-    saldo: 950000,
-    repasses: 620000,
-    lucro: 480000
-  });
-
-  const [accounts, setAccounts] = useState([
-    { id: 'acc-1', name: 'Banco Itaú - Conta Corrente', type: 'Bancária', balance: 420000 },
-    { id: 'acc-2', name: 'Disk Digital - Antecipações', type: 'Digital', balance: 380000 },
-    { id: 'acc-3', name: 'Caixa Geral (PDV Físico)', type: 'Caixa', balance: 150000 }
-  ]);
-
-  const [lancamentos, setLancamentos] = useState([
-    { id: 'lan-1', type: 'receita', desc: 'Ingressos - Festival de Inverno L1', amount: 45000, category: 'Venda Ingressos', costCenter: 'Eventos', date: '15/07/2026', status: 'Recebido' },
-    { id: 'lan-2', type: 'despesa', desc: 'Segurança Executiva e Grades', amount: 18000, category: 'Serviços de Terceiros', costCenter: 'Operacional', date: '15/07/2026', status: 'Pago' },
-    { id: 'lan-3', type: 'receita', desc: 'Patrocínio Master - Itaú', amount: 150000, category: 'Patrocínio', costCenter: 'Comercial', date: '14/07/2026', status: 'Recebido' },
-    { id: 'lan-4', type: 'despesa', desc: 'Locação de Painéis de LED', amount: 35000, category: 'Locação Equipamentos', costCenter: 'Logística', date: '12/07/2026', status: 'Pendente' },
-    { id: 'lan-5', type: 'despesa', desc: 'Mídia e Impulsionamento Social', amount: 12500, category: 'Publicidade', costCenter: 'Marketing', date: '10/07/2026', status: 'Pago' }
-  ]);
-
-  const [conciliationItems, setConciliationItems] = useState([
-    { id: 'conc-1', date: '15/07/2026', desc: 'PIX Recebido - Ingressos Lote 1', type: 'in', amount: 45000, matched: false, matchInvoice: 'NF-8921 (Festival Inverno)' },
-    { id: 'conc-2', date: '15/07/2026', desc: 'TED Recebida - Patrocínio Master', type: 'in', amount: 150000, matched: false, matchInvoice: 'NF-8919 (Prime Show)' },
-    { id: 'conc-3', date: '14/07/2026', desc: 'PGTO - Taxa Gateway DiskIngressos', type: 'out', amount: 12500, matched: false, matchInvoice: 'Fatura Gate-450' },
-    { id: 'conc-4', date: '13/07/2026', desc: 'Transferência Pix - Repasse Parcial', type: 'out', amount: 620000, matched: false, matchInvoice: 'Repasse ID-998 (Metal Fest)' },
-    { id: 'conc-5', date: '12/07/2026', desc: 'TED Recebida - Venda PDV Físico', type: 'in', amount: 82000, matched: false, matchInvoice: 'NF-8915 (Embafeste)' }
-  ]);
-
-  // Transfer state
-  const [transfer, setTransfer] = useState({ from: 'acc-2', to: 'acc-1', amount: '' });
-  // Manual post state
-  const [newLancamento, setNewLancamento] = useState({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
-
-  // Gateway rates configurations
-  const gatewayRates = {
-    pix: { name: 'PIX Direto', rate: 0.8, fixed: 0.0 },
-    cartao_vista: { name: 'Cartão à Vista', rate: 2.3, fixed: 0.4 },
-    cartao_parcelado: { name: 'Cartão Parcelado (até 12x)', rate: 4.8, fixed: 0.4 },
-    boleto: { name: 'Boleto Bancário', rate: 0.0, fixed: 2.50 }
-  };
-
-  // ================= 2. CONTABILIDADE DISK DATA & STATE =================
-  const [invoiceMonth, setInvoiceMonth] = useState('Julho');
-  const [activeBorderoEvent, setActiveBorderoEvent] = useState('event-1');
-
-  const [borderos, setBorderos] = useState([
-    {
-      id: 'event-1',
-      name: 'Festival de Inverno Curitiba',
-      location: 'Parque Jaime Lerner',
-      ticketsSold: 12500,
-      grossRevenue: 1250000,
-      gatewayFee: 37500,
-      diskFee: 125000,
-      netPayout: 1087500,
-      status: 'Aprovado',
-      authorizedBy: 'Vinicius (Finanças)',
-      dateClosed: '14/07/2026'
-    },
-    {
-      id: 'event-2',
-      name: 'Metal Fest 2026',
-      location: 'Video Promo e Live Show',
-      ticketsSold: 8200,
-      grossRevenue: 820000,
-      gatewayFee: 24600,
-      diskFee: 82000,
-      netPayout: 713400,
-      status: 'Em Fechamento',
-      authorizedBy: 'Aguardando Aprovação',
-      dateClosed: 'Pendente'
-    },
-    {
-      id: 'event-3',
-      name: 'Embafeste Premium',
-      location: 'Showroom Comercial',
-      ticketsSold: 5100,
-      grossRevenue: 510000,
-      gatewayFee: 15300,
-      diskFee: 51000,
-      netPayout: 443700,
-      status: 'Pendente',
-      authorizedBy: 'Sem Autorização',
-      dateClosed: 'Pendente'
-    }
-  ]);
-
-  const [invoices, setInvoices] = useState([
-    { id: 'nf-8921', client: 'Associação Festival Inverno', doc: '12.345.678/0001-90', event: 'Festival de Inverno Curitiba', amount: 45000, type: 'Emissão Serviço', status: 'Emitida', date: '15/07/2026' },
-    { id: 'nf-8920', client: 'Metal Show Produções', doc: '98.765.432/0001-10', event: 'Metal Fest 2026', amount: 82000, type: 'Emissão Bilheteria', status: 'Emitida', date: '15/07/2026' },
-    { id: 'nf-8922', client: 'Prime Show Eventos Ltda', doc: '44.555.666/0001-22', event: 'Prime Show Eventos', amount: 150000, type: 'Patrocínio', status: 'Pendente', date: '14/07/2026' },
-    { id: 'nf-8923', client: 'Arena Music Curitiba', doc: '33.222.111/0001-44', event: 'Arena Music', amount: 12500, type: 'Taxa Serviço', status: 'Pendente', date: '13/07/2026' }
-  ]);
-
-  const activeEvent = borderos.find(b => b.id === activeBorderoEvent);
-
-  // ================= 3. CRM DE VENDAS DATA & STATE =================
-  const [leads, setLeads] = useState([
-    { id: 'lead-1', name: 'Roberto Alencar', company: 'Prime Show Eventos', value: 120000, stage: 'prospect', date: '10 Jul', tag: 'VIP' },
-    { id: 'lead-2', name: 'Ana Beatriz Souza', company: 'Festival Sertanejo', value: 85000, stage: 'prospect', date: '12 Jul', tag: 'Quente' },
-    { id: 'lead-3', name: 'Carlos Henrique', company: 'Sunset Lounge Bar', value: 45000, stage: 'qualified', date: '08 Jul', tag: 'Novo' },
-    { id: 'lead-4', name: 'Mariana Costa', company: 'Arena Music Curitiba', value: 150000, stage: 'qualified', date: '14 Jul', tag: 'Corporate' },
-    { id: 'lead-5', name: 'Felipe Dias', company: 'Expo Agro 2026', value: 210000, stage: 'negotiation', date: '05 Jul', tag: 'Alta Margem' },
-    { id: 'lead-6', name: 'Juliana Vieira', company: 'Embafeste Premium', value: 510000, stage: 'won', date: '01 Jul', tag: 'Fechado' }
-  ]);
-  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
-  const [newLead, setNewLead] = useState({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
-
-  const [clients, setClients] = useState([
-    { id: 'c-1', name: 'Juliana Vieira', company: 'Embafeste Premium', email: 'juliana@embafeste.com', phone: '(41) 99888-7766', spend: 510000, status: 'Ativo' },
-    { id: 'c-2', name: 'Roberto Alencar', company: 'Prime Show Eventos', email: 'roberto@primeshow.com.br', phone: '(41) 98765-4321', spend: 120000, status: 'Em Negociação' },
-    { id: 'c-3', name: 'Mariana Costa', company: 'Arena Music Curitiba', email: 'mariana@arenamusic.com', phone: '(41) 99111-2222', spend: 150000, status: 'Ativo' }
-  ]);
-  const [showAddClientModal, setShowAddClientModal] = useState(false);
-  const [newClient, setNewClient] = useState({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
-
-  // ================= 3B. EVENTS MANAGEMENT DATA & STATE (FASE 4) =================
-  const [eventsSubTab, setEventsSubTab] = useState('dashboard');
-  
-  // eventos (events)
-  const [events, setEvents] = useState([
-    { id: 'ev-1', name: 'Metal Fest Curitiba 2026', category: 'Show / Festival', date: '2026-09-12', time: '18:00', city: 'Curitiba', venue: 'Pedreira Paulo Leminski', capacity: 25000, producer: 'Prime Show Eventos', organizer: 'Associação de Criadores do Sul', banner: 'metal_fest_banner.jpg', status: 'Ativo' },
-    { id: 'ev-2', name: 'Festival de Inverno 2026', category: 'Show / Festival', date: '2026-08-05', time: '17:00', city: 'Curitiba', venue: 'Teatro Positivo', capacity: 2400, producer: 'Gisele Produções', organizer: 'Curitiba Eventos e Convenções', banner: 'festival_inverno.jpg', status: 'Ativo' },
-    { id: 'ev-3', name: 'Sunset Lounge Party', category: 'Festa / Balada', date: '2026-07-25', time: '22:00', city: 'Balneário Camboriú', venue: 'Sunset Beach Club', capacity: 1500, producer: 'Rodrigo Festas Som', organizer: 'Sunset Lounge Bar', banner: 'sunset_party.jpg', status: 'Ativo' },
-    { id: 'ev-4', name: 'Expo Agro Regional 2026', category: 'Feira / Exposição', date: '2026-10-18', time: '10:00', city: 'Londrina', venue: 'Parque de Exposições Londrina', capacity: 50000, producer: 'Expo Agro Lda', organizer: 'Associação de Criadores do Sul', banner: 'expo_agro.jpg', status: 'Pendente' }
-  ]);
-
-  // eventos_locais (venues)
-  const [venues, setVenues] = useState([
-    { id: 'ven-1', name: 'Pedreira Paulo Leminski', capacity: 25000, accessibility: 'Total', parking: '500 vagas', backstage: 'Grande (5 camarins)', infrastructure: 'Excelente' },
-    { id: 'ven-2', name: 'Teatro Positivo', capacity: 2400, accessibility: 'Total', parking: '1000 vagas', backstage: 'Profissional', infrastructure: 'Excelente' },
-    { id: 'ven-3', name: 'Sunset Beach Club', capacity: 1500, accessibility: 'Parcial', parking: 'Rua / Conveniado', backstage: 'Médio (2 camarins)', infrastructure: 'Boa' },
-    { id: 'ven-4', name: 'Parque de Exposições Londrina', capacity: 50000, accessibility: 'Total', parking: '5000 vagas', backstage: 'Espaço Aberto / Salas VIP', infrastructure: 'Industrial' }
-  ]);
-
-  // eventos_setores (sectors)
-  const [sectors, setSectors] = useState([
-    { id: 'sec-1', eventId: 'ev-1', name: 'Arena', capacity: 18000, price: 120 },
-    { id: 'sec-2', eventId: 'ev-1', name: 'VIP', capacity: 4000, price: 250 },
-    { id: 'sec-3', eventId: 'ev-1', name: 'Camarote', capacity: 2000, price: 450 },
-    { id: 'sec-4', eventId: 'ev-1', name: 'Front Stage', capacity: 1000, price: 350 },
-    { id: 'sec-5', eventId: 'ev-2', name: 'Plateia A', capacity: 1000, price: 180 },
-    { id: 'sec-6', eventId: 'ev-2', name: 'Plateia B', capacity: 1200, price: 140 },
-    { id: 'sec-7', eventId: 'ev-2', name: 'Área PCD', capacity: 200, price: 70 }
-  ]);
-
-  // eventos_lotes (ticket batches)
-  const [ticketBatches, setTicketBatches] = useState([
-    { id: 'lot-1', eventId: 'ev-1', sectorId: 'sec-1', name: 'Lote 1', autoSwitch: true, qty: 10000, price: 120, fee: 12, status: 'Encerrado' },
-    { id: 'lot-2', eventId: 'ev-1', sectorId: 'sec-1', name: 'Lote 2', autoSwitch: true, qty: 8000, price: 140, fee: 14, status: 'Ativo' },
-    { id: 'lot-3', eventId: 'ev-1', sectorId: 'sec-2', name: 'Lote Promocional', autoSwitch: false, qty: 1000, price: 200, fee: 20, status: 'Encerrado' },
-    { id: 'lot-4', eventId: 'ev-1', sectorId: 'sec-2', name: 'Lote 1', autoSwitch: true, qty: 3000, price: 250, fee: 25, status: 'Ativo' },
-    { id: 'lot-5', eventId: 'ev-2', sectorId: 'sec-5', name: 'Lote único', autoSwitch: false, qty: 1000, price: 180, fee: 18, status: 'Ativo' }
-  ]);
-
-  // eventos_ingressos (tickets issued/sold)
-  const [issuedTickets, setIssuedTickets] = useState([
-    { id: 'tix-1', eventId: 'ev-1', sectorId: 'sec-1', batchId: 'lot-1', type: 'Inteira', price: 120, barcode: '789123456001', qrCode: 'TIX-EV1-SEC1-LOT1-001', status: 'Checkin', customerName: 'Juliana Vieira', checkinTime: '2026-09-12 18:30' },
-    { id: 'tix-2', eventId: 'ev-1', sectorId: 'sec-1', batchId: 'lot-1', type: 'Meia', price: 60, barcode: '789123456002', qrCode: 'TIX-EV1-SEC1-LOT1-002', status: 'Checkin', customerName: 'Roberto Alencar', checkinTime: '2026-09-12 18:45' },
-    { id: 'tix-3', eventId: 'ev-1', sectorId: 'sec-2', batchId: 'lot-4', type: 'VIP', price: 250, barcode: '789123456003', qrCode: 'TIX-EV1-SEC2-LOT4-003', status: 'Pendente', customerName: 'Mariana Costa', checkinTime: null },
-    { id: 'tix-4', eventId: 'ev-2', sectorId: 'sec-5', batchId: 'lot-5', type: 'Cortesia', price: 0, barcode: '789123456004', qrCode: 'TIX-EV2-SEC5-LOT5-004', status: 'Pendente', customerName: 'Sandra Costa', checkinTime: null },
-    { id: 'tix-5', eventId: 'ev-1', sectorId: 'sec-3', batchId: 'lot-3', type: 'Imprensa', price: 0, barcode: '789123456005', qrCode: 'TIX-EV1-SEC3-LOT3-005', status: 'Pendente', customerName: 'Carlos Henrique', checkinTime: null }
-  ]);
-
-  // eventos_pdv (sales transactions)
-  const [pdvSales, setPdvSales] = useState([
-    { id: 'sale-1', eventId: 'ev-1', pdvId: 'pdv-1', operator: 'Sandra Costa', amount: 240, paymentMethod: 'PIX', type: 'Ingresso', status: 'Aprovado', date: '2026-07-15' },
-    { id: 'sale-2', eventId: 'ev-1', pdvId: 'pdv-1', operator: 'Sandra Costa', amount: 80, paymentMethod: 'Dinheiro', type: 'Consumo', status: 'Aprovado', date: '2026-07-16' },
-    { id: 'sale-3', eventId: 'ev-2', pdvId: 'pdv-2', operator: 'Daniel Santos', amount: 350, paymentMethod: 'Cartão', type: 'Ingresso', status: 'Aprovado', date: '2026-07-17' },
-    { id: 'sale-4', eventId: 'ev-1', pdvId: 'pdv-1', operator: 'Sandra Costa', amount: 120, paymentMethod: 'Cartão', type: 'Ingresso', status: 'Cancelado', date: '2026-07-16' }
-  ]);
-
-  // eventos_checkin (check-in events records)
-  const [checkins, setCheckins] = useState([
-    { id: 'chk-1', ticketId: 'tix-1', timestamp: '2026-09-12 18:30:15', method: 'QR Code', status: 'Sucesso' },
-    { id: 'chk-2', ticketId: 'tix-2', timestamp: '2026-09-12 18:45:22', method: 'Código de Barras', status: 'Sucesso' }
-  ]);
-
-  // eventos_credenciamento (staff/artist credentials)
-  const [credencials, setCredencials] = useState([
-    { id: 'crd-1', name: 'Ana Souza', cpf: '111.222.333-44', type: 'Staff', company: 'DiskHub', item: 'Crachá + Pulseira', status: 'Entregue' },
-    { id: 'crd-2', name: 'Thiaguinho do Pagode', cpf: '555.444.333-22', type: 'Artistas', company: 'Thiaguinho Produções', item: 'Pulseira VIP', status: 'Entregue' },
-    { id: 'crd-3', name: 'Marcos Jornalista', cpf: '999.888.777-66', type: 'Imprensa', company: 'Gazeta do Sul', item: 'Crachá Imprensa', status: 'Pendente' },
-    { id: 'crd-4', name: 'Paulo Silva Stage', cpf: '222.333.444-55', type: 'Fornecedores', company: 'Master Luz Som', item: 'Pulseira Staff', status: 'Pendente' }
-  ]);
-
-  // eventos_catracas (turnstiles/gates)
-  const [turnstiles, setTurnstiles] = useState([
-    { id: 'cat-1', name: 'Catraca Principal A', type: 'Entrada', status: 'Ativo', logsCount: 1540, alertasCount: 2 },
-    { id: 'cat-2', name: 'Catraca VIP Sul', type: 'Entrada', status: 'Ativo', logsCount: 420, alertasCount: 0 },
-    { id: 'cat-3', name: 'Catraca Imprensa / Staff', type: 'Entrada', status: 'Ativo', logsCount: 88, alertasCount: 0 },
-    { id: 'cat-4', name: 'Catraca Saída Pista', type: 'Saída', status: 'Ativo', logsCount: 1200, alertasCount: 0 },
-    { id: 'cat-5', name: 'Catraca Portão C (Inoperante)', type: 'Entrada', status: 'Inativo', logsCount: 0, alertasCount: 5 }
-  ]);
-
-  // eventos_estoque (bar and material stock)
-  const [stocks, setStocks] = useState([
-    { id: 'stk-1', item: 'Pulseiras VIP', qty: 2500, minQty: 500, status: 'OK' },
-    { id: 'stk-2', item: 'Bobinas de Impressão PDV', qty: 15, minQty: 20, status: 'Baixo' },
-    { id: 'stk-3', item: 'Credenciais Staff', qty: 450, minQty: 100, status: 'OK' },
-    { id: 'stk-4', item: 'Lata de Cerveja Heineken', qty: 80, minQty: 500, status: 'Crítico' },
-    { id: 'stk-5', item: 'Água Mineral 500ml', qty: 1200, minQty: 800, status: 'OK' },
-    { id: 'stk-6', item: 'Refrigerante Cola Lata', qty: 150, minQty: 300, status: 'Baixo' }
-  ]);
-
-  // eventos_logs (operational activity logs)
-  const [eventLogs, setEventLogs] = useState([
-    { id: 'log-1', timestamp: '2026-07-17 10:45:00', type: 'Check-in', message: 'Ingresso TIX-EV1-SEC1-LOT1-001 validado na Catraca Principal A (Sucesso).' },
-    { id: 'log-2', timestamp: '2026-07-17 10:48:12', type: 'Venda PDV', message: 'Venda #sale-1 (R$ 240,00) de 2 ingressos realizada por Sandra Costa no Caixa Portão A.' },
-    { id: 'log-3', timestamp: '2026-07-17 10:50:35', type: 'Catraca', message: 'Alerta: Catraca Portão C perdeu a conexão com o servidor de validação offline.' },
-    { id: 'log-4', timestamp: '2026-07-17 10:55:10', type: 'Credenciamento', message: 'Credencial de Artista entregue para Gisele Lima (Thiaguinho do Pagode).' }
-  ]);
-
-  // State for companies (Empresas)
-  const [companies, setCompanies] = useState([
-    { id: 'emp-1', name: 'Prime Show Eventos LTDA', cnpj: '12.345.678/0001-90', industry: 'Entretenimento', employees: 45, city: 'Curitiba', phone: '(41) 3322-1100' },
-    { id: 'emp-2', name: 'Sunset Lounge Bar', cnpj: '98.765.432/0001-10', industry: 'Alimentação', employees: 12, city: 'Balneário Camboriú', phone: '(47) 3211-9988' },
-    { id: 'emp-3', name: 'Arena Music Curitiba', cnpj: '55.444.333/0001-22', industry: 'Eventos / Shows', employees: 28, city: 'Curitiba', phone: '(41) 3044-5566' }
-  ]);
-  const [showAddCompanyModal, setShowAddCompanyModal] = useState(false);
-  const [newCompany, setNewCompany] = useState({ name: '', cnpj: '', industry: 'Entretenimento', employees: '', city: '', phone: '' });
-
-  // State for Agenda (Appointments)
-  const [appointments, setAppointments] = useState([
-    { id: 'apt-1', title: 'Reunião de Proposta - Prime Show', date: '2026-07-18', time: '14:00', host: 'Roberto Carlos', client: 'Roberto Alencar', type: 'Reunião Presencial', status: 'Confirmado' },
-    { id: 'apt-2', title: 'Visita Técnica - Arena Music Curitiba', date: '2026-07-20', time: '10:30', host: 'Maria Silva', client: 'Mariana Costa', type: 'Visita Local', status: 'Pendente' },
-    { id: 'apt-3', title: 'Call de Alinhamento - Sunset Lounge', date: '2026-07-19', time: '16:00', host: 'Fernanda Lima', client: 'Ana Beatriz Souza', type: 'Videoconferência', status: 'Confirmado' }
-  ]);
-  const [showAddAptModal, setShowAddAptModal] = useState(false);
-  const [newApt, setNewApt] = useState({ title: '', date: '', time: '', host: '', client: '', type: 'Reunião Presencial', status: 'Pendente' });
-
-  // State for Propostas (Proposals)
-  const [proposals, setProposals] = useState([
-    { id: 'prop-1', title: 'Patrocínio Master Metal Fest 2026', value: 85000, client: 'Prime Show Eventos', validUntil: '2026-08-15', status: 'Aceita', date: '2026-07-10' },
-    { id: 'prop-2', title: 'Locação de Equipamentos - Sunset Lounge', value: 45000, client: 'Sunset Lounge Bar', validUntil: '2026-07-30', status: 'Em Negociação', date: '2026-07-12' },
-    { id: 'prop-3', title: 'Projeto de Marketing - Festival de Inverno', value: 150000, client: 'Arena Music Curitiba', validUntil: '2026-08-01', status: 'Enviada', date: '2026-07-14' }
-  ]);
-  const [showAddProposalModal, setShowAddProposalModal] = useState(false);
-  const [newProposal, setNewProposal] = useState({ title: '', value: '', client: '', validUntil: '', status: 'Enviada' });
-
-  // State for Contratos (Contracts)
-  const [contracts, setContracts] = useState([
-    { id: 'con-1', title: 'Contrato Geral de Parceria - Prime Show', value: 120000, client: 'Prime Show Eventos', startDate: '2026-07-01', endDate: '2027-07-01', status: 'Ativo' },
-    { id: 'con-2', title: 'Contrato de Fomento de Eventos - Arena Music', value: 150000, client: 'Arena Music Curitiba', startDate: '2026-07-10', endDate: '2026-12-31', status: 'Ativo' },
-    { id: 'con-3', title: 'Termo de Encerramento - Embafeste Premium', value: 510000, client: 'Embafeste Premium', startDate: '2025-07-01', endDate: '2026-07-01', status: 'Finalizado' }
-  ]);
-  const [showAddContractModal, setShowAddContractModal] = useState(false);
-  const [newContract, setNewContract] = useState({ title: '', value: '', client: '', startDate: '', endDate: '', status: 'Em Assinatura' });
-
-  // State for Metas (Goals)
-  const [goals, setGoals] = useState([
-    { id: 'goal-1', seller: 'Roberto Carlos', target: 200000, achieved: 120000, period: 'Julho 2026' },
-    { id: 'goal-2', seller: 'Maria Silva', target: 150000, achieved: 150000, period: 'Julho 2026' },
-    { id: 'goal-3', seller: 'Fernanda Lima', target: 100000, achieved: 45000, period: 'Julho 2026' }
-  ]);
-  const [showAddGoalModal, setShowAddGoalModal] = useState(false);
-  const [newGoal, setNewGoal] = useState({ seller: '', target: '', achieved: '', period: 'Julho 2026' });
-
-  // State for Comissões (Commissions)
-  const [commissions, setCommissions] = useState([
-    { id: 'com-1', seller: 'Roberto Carlos', dealValue: 120000, rate: 5, commission: 6000, paymentStatus: 'Pago', date: '2026-07-10' },
-    { id: 'com-2', seller: 'Maria Silva', dealValue: 510000, rate: 5, commission: 25500, paymentStatus: 'Pago', date: '2026-07-01' },
-    { id: 'com-3', seller: 'Fernanda Lima', dealValue: 150000, rate: 4, commission: 6000, paymentStatus: 'Pendente', date: '2026-07-14' }
-  ]);
-  const [showAddCommissionModal, setShowAddCommissionModal] = useState(false);
-  const [newCommission, setNewCommission] = useState({ seller: '', dealValue: '', rate: '', paymentStatus: 'Pendente', date: '2026-07-17' });
-
-  // Phase 4 Eventos view state hooks moved to top level
-  const [eventsSearch, setEventsSearch] = useState('');
-  const [showEventsForm, setShowEventsForm] = useState(false);
-  const [apiRoute, setApiRoute] = useState('GET_EVENTOS');
-  const [apiLoading, setApiLoading] = useState(false);
-  const [apiResponse, setApiResponse] = useState(null);
-  const [qrCodeInput, setQrCodeInput] = useState('');
-  const [apiEventInputs, setApiEventInputs] = useState({
-    name: '',
-    category: 'Show / Festival',
-    date: '',
-    time: '',
-    city: '',
-    venue: '',
-    capacity: '',
-    producer: '',
-    organizer: '',
-    status: 'Ativo'
-  });
-  const [apiCheckinInputs, setApiCheckinInputs] = useState({
-    qrCode: '',
-    method: 'QR Code'
-  });
-  const [apiPdvInputs, setApiPdvInputs] = useState({
-    eventId: 'ev-1',
-    pdvId: 'pdv-1',
-    operator: 'Sandra Costa',
-    amount: '',
-    paymentMethod: 'PIX',
-    type: 'Ingresso'
-  });
-
-  // CRM view state hooks moved to top level
-  const [crmSearch, setCrmSearch] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [crmApiRoute, setCrmApiRoute] = useState('GET_DASHBOARD');
-  const [crmApiLoading, setCrmApiLoading] = useState(false);
-  const [crmApiResponse, setCrmApiResponse] = useState(null);
-  const [crmApiInputs, setCrmApiInputs] = useState({
-    name: '',
-    company: '',
-    email: '',
-    phone: '',
-    status: 'Ativo'
-  });
-
-  // CRM Eventos States
-  // Produtores
-  const [producers, setProducers] = useState([
-    { id: 'prod-1', name: 'Rodrigo Festas Som', eventsCount: 35, rating: 4.8, contact: 'rodrigo@festassom.com', specialty: 'Shows Nacionais' },
-    { id: 'prod-2', name: 'Gisele Produções Executivas', eventsCount: 52, rating: 4.9, contact: 'gisele@producoes.com', specialty: 'Eventos Corporativos' }
-  ]);
-  const [showAddProducerModal, setShowAddProducerModal] = useState(false);
-  const [newProducer, setNewProducer] = useState({ name: '', eventsCount: '', rating: '5.0', contact: '', specialty: 'Shows Nacionais' });
-
-  // Organizadores
-  const [organizers, setOrganizers] = useState([
-    { id: 'org-1', name: 'Associação de Criadores do Sul', region: 'Paraná / Santa Catarina', contact: 'contato@criadoressul.org', activeEvents: 5 },
-    { id: 'org-2', name: 'Curitiba Eventos e Convenções', region: 'Curitiba Metropolitana', contact: 'comercial@curitibaconv.com.br', activeEvents: 3 }
-  ]);
-  const [showAddOrganizerModal, setShowAddOrganizerModal] = useState(false);
-  const [newOrganizer, setNewOrganizer] = useState({ name: '', region: '', contact: '', activeEvents: '' });
-
-  // Artistas
-  const [artists, setArtists] = useState([
-    { id: 'art-1', name: 'Thiaguinho do Pagode', genre: 'Pagode', cachet: 120000, contact: 'shows@thiaguinho.com.br' },
-    { id: 'art-2', name: 'DJ Alok Curitiba Project', genre: 'Eletrônica', cachet: 250000, contact: 'booking@alokproject.com' }
-  ]);
-  const [showAddArtistModal, setShowAddArtistModal] = useState(false);
-  const [newArtist, setNewArtist] = useState({ name: '', genre: '', cachet: '', contact: '' });
-
-  // Bandas
-  const [bands, setBands] = useState([
-    { id: 'band-1', name: 'Os Heraldo Rock', membersCount: 4, genre: 'Rock Clássico', cachet: 15000, contact: 'heraldo@rockband.com' },
-    { id: 'band-2', name: 'Banda Capital Inicial Cover', membersCount: 5, genre: 'Pop Rock', cachet: 8000, contact: 'capitalcover@gmail.com' }
-  ]);
-  const [showAddBandModal, setShowAddBandModal] = useState(false);
-  const [newBand, setNewBand] = useState({ name: '', membersCount: '', genre: '', cachet: '', contact: '' });
-
-  // Patrocinadores
-  const [sponsors, setSponsors] = useState([
-    { id: 'spon-1', company: 'Cervejaria Heineken do Brasil', sponsoredEvent: 'Metal Fest 2026', value: 85000, contact: 'patrocinios@heineken.com.br' },
-    { id: 'spon-2', company: 'Coca-Cola FEMSA', sponsoredEvent: 'Festival de Inverno Curitiba', value: 120000, contact: 'marketing@cocacolafemsa.com' }
-  ]);
-  const [showAddSponsorModal, setShowAddSponsorModal] = useState(false);
-  const [newSponsor, setNewSponsor] = useState({ company: '', sponsoredEvent: 'Metal Fest 2026', value: '', contact: '' });
-
-  // Fornecedores
-  const [suppliers, setSuppliers] = useState([
-    { id: 'sup-1', name: 'Luz & Som Master Curitiba', service: 'Som e Iluminação', rating: 4.7, contact: 'contato@luzsommaster.com' },
-    { id: 'sup-2', name: 'Segurança Armada Cia', service: 'Segurança e Portaria', rating: 4.9, contact: 'comercial@segarmada.com.br' },
-    { id: 'sup-3', name: 'Buffet Delícias & Cia', service: 'Alimentação e Bebidas', rating: 4.6, contact: 'contato@deliciascia.com' }
-  ]);
-  const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
-  const [newSupplier, setNewSupplier] = useState({ name: '', service: 'Som e Iluminação', rating: '5.0', contact: '' });
-
-  // ================= 4. PDVS (PONTOS DE VENDA) STATE =================
-  const [pdvs, setPdvs] = useState([
-    { id: 'pdv-1', name: 'Bilheteria Principal - Portão A', manager: 'Sandra Costa', type: 'Local', balance: 35000, status: 'Aberto' },
-    { id: 'pdv-2', name: 'Quiosque Shopping Mueller', manager: 'Daniel Santos', type: 'Físico Externo', balance: 82000, status: 'Aberto' },
-    { id: 'pdv-3', name: 'Ponto de Venda - Teatro Guaíra', manager: 'Guilherme Lima', type: 'Teatro', balance: 33000, status: 'Fechado' }
-  ]);
-  const [showAddPdvModal, setShowAddPdvModal] = useState(false);
-  const [newPdv, setNewPdv] = useState({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
-
-  // ================= 5. MARKETING CAMPAIGNS & COUPONS STATE =================
-  const [campaigns, setCampaigns] = useState([
-    { id: 'camp-1', name: 'Black Friday Antecipado', channel: 'E-mail', sent: 25000, openRate: 28.4, clickRate: 11.2, conversions: 840, revenue: 84000, status: 'Concluída', date: '10/07/2026' },
-    { id: 'camp-2', name: 'Pré-Venda Metal Fest 2026', channel: 'WhatsApp', sent: 12000, openRate: 94.2, clickRate: 18.5, conversions: 490, revenue: 58800, status: 'Concluída', date: '12/07/2026' },
-    { id: 'camp-3', name: 'Reengajamento Ingressos Inverno', channel: 'E-mail', sent: 8000, openRate: 19.8, clickRate: 6.4, conversions: 120, revenue: 14400, status: 'Concluída', date: '15/07/2026' },
-    { id: 'camp-4', name: 'Promoção Relâmpago Embafeste', channel: 'SMS', sent: 5000, openRate: 88.0, clickRate: 14.2, conversions: 0, revenue: 0, status: 'Agendada', date: '20/07/2026' }
-  ]);
-  
-  const [showAddCampaignModal, setShowAddCampaignModal] = useState(false);
-  const [newCampaign, setNewCampaign] = useState({ name: '', channel: 'E-mail', subject: '', date: '18/07/2026', targetEvent: 'Festival de Inverno Curitiba' });
-
-  const [coupons, setCoupons] = useState([
-    { id: 'coup-1', code: 'INVERNO15', discount: 15, event: 'Festival de Inverno Curitiba', status: 'Ativo', usages: 342 },
-    { id: 'coup-2', code: 'METAL20', discount: 20, event: 'Metal Fest 2026', status: 'Ativo', usages: 198 },
-    { id: 'coup-3', code: 'EMBAFESTE10', discount: 10, event: 'Embafeste Premium', status: 'Inativo', usages: 45 }
-  ]);
-  const [showAddCouponModal, setShowAddCouponModal] = useState(false);
-  const [newCoupon, setNewCoupon] = useState({ code: '', discount: '', event: 'Festival de Inverno Curitiba', status: 'Ativo' });
-
-  // MaaS (Marketing as a Service) states
-  const [marketingActivePlan, setMarketingActivePlan] = useState('profissional');
-  const [marketingModulesStatus, setMarketingModulesStatus] = useState({
-    1: true, 2: true, // Essencial
-    3: true, 4: true, 5: true, // Profissional
-    6: false, 7: false, 8: false, 9: false, 10: false, 11: false, 12: false, // Premium & Enterprise
-    13: false, 14: false, 15: false, 16: false, 17: false, // Enterprise
-    18: false, 19: false, 20: false, 21: false // Omnichannel
-  });
-  const [influencers, setInfluencers] = useState([
-    { id: 'inf-1', name: 'Gabriela Pugliesi', genre: 'LifeStyle & Fitness', followers: '4.5M', cachet: 12000, activeCampaign: 'Metal Fest 2026', coupon: 'PUGLIMETAL', roi: '340%', codeSales: 410, hired: true },
-    { id: 'inf-2', name: 'Felipe Castanhari', genre: 'Curiosidades & Pop Culture', followers: '13.2M', cachet: 25000, activeCampaign: 'Nenhum', coupon: 'CASTANHARI10', roi: '0%', codeSales: 0, hired: false },
-    { id: 'inf-3', name: 'Alok Petrillo', genre: 'Música Eletrônica', followers: '28.1M', cachet: 85000, activeCampaign: 'Electronic Carnival 2026', coupon: 'ALOKPARTY', roi: '520%', codeSales: 1850, hired: true },
-    { id: 'inf-4', name: 'Larissa Manoela', genre: 'Teatro & Cinema', followers: '49.8M', cachet: 60000, activeCampaign: 'Festival de Inverno Curitiba', coupon: 'LARISSAINVERNO', roi: '180%', codeSales: 890, hired: true },
-    { id: 'inf-5', name: 'Whindersson Nunes', genre: 'Humor & Stand-up', followers: '58.4M', cachet: 75000, activeCampaign: 'Nenhum', coupon: 'WHIND25', roi: '0%', codeSales: 0, hired: false }
-  ]);
-  const [loyaltyRules, setLoyaltyRules] = useState({
-    cashbackPercentage: 2,
-    pointsPerReal: 1,
-    vipClubName: 'Clube DiskVIP',
-    minimumRedeemPoints: 500,
-    missions: [
-      { id: 'mis-1', title: 'Fã de Carteirinha', desc: 'Compre ingressos para 3 eventos no mesmo mês.', reward: '100 pontos + Tag VIP', status: 'Ativa' },
-      { id: 'mis-2', title: 'Divulgador Oficial', desc: 'Compartilhe 5 eventos nas suas redes sociais.', reward: 'Cupom de 10% de desconto', status: 'Ativa' },
-      { id: 'mis-3', title: 'Grupo Fechado', desc: 'Compre 4 ingressos tipo Combo Família.', reward: 'Estacionamento Grátis', status: 'Inativa' }
-    ]
-  });
-
-  // Backend local REST API integration state
-  const [backendConnected, setBackendConnected] = useState(false);
-
-  useEffect(() => {
-    // Check if the backend server is running
-    fetch('http://localhost:3001/api/health')
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'OK') {
-          setBackendConnected(true);
-          // Load database state from backend
-          fetch('http://localhost:3001/api/db')
-            .then(r => r.json())
-            .then(db => {
-              if (db.users) setUsers(db.users);
-              if (db.receivables) setReceivables(db.receivables);
-              if (db.payables) setPayables(db.payables);
-              if (db.invoices) setInvoices(db.invoices);
-              if (db.borderos) setBorderos(db.borderos);
-              if (db.leads) setLeads(db.leads);
-              if (db.clients) setClients(db.clients);
-              if (db.companies) setCompanies(db.companies);
-              if (db.appointments) setAppointments(db.appointments);
-              if (db.proposals) setProposals(db.proposals);
-              if (db.contracts) setContracts(db.contracts);
-              if (db.goals) setGoals(db.goals);
-              if (db.commissions) setCommissions(db.commissions);
-              if (db.events) setEvents(db.events);
-              if (db.venues) setVenues(db.venues);
-              if (db.sectors) setSectors(db.sectors);
-              if (db.ticket_batches) setTicketBatches(db.ticket_batches);
-              if (db.issued_tickets) setIssuedTickets(db.issued_tickets);
-              if (db.pdv_sales) setPdvSales(db.pdv_sales);
-              if (db.checkins) setCheckins(db.checkins);
-              if (db.credencials) setCredencials(db.credencials);
-              if (db.turnstiles) setTurnstiles(db.turnstiles);
-              if (db.stocks) setStocks(db.stocks);
-              if (db.event_logs) setEventLogs(db.event_logs);
-              console.log('Successfully connected to DiskHub REST API backend & synced database!');
-            });
-        }
-      })
-      .catch(err => {
-        console.log('REST API backend not running. Running in standalone simulated mode.');
-      });
-  }, []);
-
-  // Sync theme class on HTML element for external scripts/components
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
-
-  // Toast helper
-  const triggerToast = (title, body, type = 'success') => {
-    setToast({ show: true, title, body, type });
-    setTimeout(() => {
-      setToast(prev => ({ ...prev, show: false }));
-    }, 4000);
-  };
-
-  // Fake Install Application
-  const handleInstallApp = (appId, appName) => {
-    setInstalledApps(prev => ({ ...prev, [appId]: 'installing' }));
-    
-    setTimeout(() => {
-      setInstalledApps(prev => ({ ...prev, [appId]: true }));
-      triggerToast(
-        "Módulo Ativado!",
-        `O módulo de ${appName} foi instalado com sucesso. Uma nova aba foi adicionada à sua barra lateral!`
-      );
-    }, 1800);
-  };
-
-  // Switch Plan Upgrade
-  const handleUpgradePlan = (planId, planName) => {
-    setPlan(planId);
-    triggerToast(
-      "Upgrade Concluído! 🎉",
-      `Sua conta DiskHub foi atualizada para o plano ${planName} com sucesso. Verifique a Central de Apps para liberar novos recursos.`
-    );
-  };
-
-  // ================= CONTROLLER SIMULATION LÓGICA =================
-  
-  // 1. Transferência entre Contas (Financeiro)
-  const handleAccountTransfer = (e) => {
-    e.preventDefault();
-    const amountVal = parseFloat(transfer.amount);
-    if (!amountVal || amountVal <= 0) return;
-
-    const sourceAcc = accounts.find(a => a.id === transfer.from);
-    if (sourceAcc.balance < amountVal) {
-      triggerToast("Saldo Insuficiente", `A conta ${sourceAcc.name} não possui saldo suficiente para esta transferência.`, "warning");
-      return;
-    }
-
-    setAccounts(prev => prev.map(a => {
-      if (a.id === transfer.from) return { ...a, balance: a.balance - amountVal };
-      if (a.id === transfer.to) return { ...a, balance: a.balance + amountVal };
-      return a;
-    }));
-
-    const entry = {
-      id: `lan-${Date.now()}`,
-      type: 'despesa',
-      desc: `Transf. de ${accounts.find(a=>a.id === transfer.from).name} para ${accounts.find(a=>a.id === transfer.to).name}`,
-      amount: amountVal,
-      category: 'Transferência',
-      costCenter: 'Interno',
-      date: 'Hoje',
-      status: 'Pago'
-    };
-    setLancamentos(prev => [entry, ...prev]);
-    setTransfer(prev => ({ ...prev, amount: '' }));
-    triggerToast("Transferência Efetuada", `R$ ${amountVal.toLocaleString('pt-BR')} transferidos.`);
-  };
-
-  // 2. Lançamento Financeiro Manual (Financeiro)
-  const handleCreateLancamento = (e) => {
-    e.preventDefault();
-    const amountVal = parseFloat(newLancamento.amount);
-    if (!newLancamento.desc || !amountVal) return;
-
-    const added = {
-      id: `lan-${Date.now()}`,
-      ...newLancamento,
-      amount: amountVal,
-      status: newLancamento.type === 'receita' ? 'Recebido' : 'Pendente'
-    };
-
-    setLancamentos(prev => [added, ...prev]);
-
-    setFinancialStats(prev => {
-      const isInc = added.type === 'receita';
-      return {
-        ...prev,
-        receita: isInc ? prev.receita + amountVal : prev.receita,
-        saldo: isInc ? prev.saldo + amountVal : prev.saldo - amountVal,
-        lucro: isInc ? prev.lucro + amountVal : prev.lucro - amountVal
-      };
-    });
-
-    setNewLancamento({ type: 'receita', desc: '', amount: '', category: 'Venda Ingressos', costCenter: 'Eventos', date: '16/07/2026' });
-    triggerToast("Lançamento Registrado", `Entrada de ${added.desc} gravada.`);
-  };
-
-  // 3. Efetuar Fechamento de Caixa / Borderô (Contabilidade)
-  const handleAuthorizeBordero = (borderoId) => {
-    setBorderos(prev => prev.map(b => {
-      if (b.id === borderoId) {
-        setFinancialStats(stats => ({
-          ...stats,
-          repasses: stats.repasses + b.netPayout,
-          saldo: stats.saldo - b.netPayout
-        }));
-        return { 
-          ...b, 
-          status: 'Aprovado', 
-          authorizedBy: 'Vinicius (Finanças)', 
-          dateClosed: new Date().toLocaleDateString('pt-BR') 
-        };
-      }
-      return b;
-    }));
-    triggerToast("Repasse Autorizado", "Borderô de evento fechado e fundos liberados para pagamento.");
-  };
-
-  // 4. Emissão de NFe Individual (Contabilidade)
-  const handleEmitNFe = (invoiceId) => {
-    setInvoices(prev => prev.map(inv => {
-      if (inv.id === invoiceId) return { ...inv, status: 'Processando' };
-      return inv;
-    }));
-
-    triggerToast("Solicitação de Emissão", "Enviando dados da nota à SEFAZ...");
-
-    setTimeout(() => {
-      setInvoices(prev => prev.map(inv => {
-        if (inv.id === invoiceId) return { ...inv, status: 'Emitida' };
-        return inv;
-      }));
-      triggerToast("NFe Autorizada! 🧾", `Nota fiscal emitida na SEFAZ com sucesso.`);
-    }, 1800);
-  };
-
-  // 5. Sangria de Caixa em PDV (Operações / PDV)
-  const handlePdvBleeding = (pdvId, amountToBleed) => {
-    const bleedVal = parseFloat(amountToBleed);
-    if (!bleedVal || bleedVal <= 0) return;
-
-    const pdv = pdvs.find(p => p.id === pdvId);
-    if (pdv.balance < bleedVal) {
-      triggerToast("Saldo Insuficiente", `O PDV não possui saldo acumulado suficiente para esta sangria.`, "warning");
-      return;
-    }
-
-    setPdvs(prev => prev.map(p => {
-      if (p.id === pdvId) return { ...p, balance: p.balance - bleedVal };
-      return p;
-    }));
-
-    setAccounts(prev => prev.map(a => {
-      if (a.id === 'acc-3') return { ...a, balance: a.balance + bleedVal };
-      return a;
-    }));
-
-    const entry = {
-      id: `lan-${Date.now()}`,
-      type: 'receita',
-      desc: `Sangria de Caixa: ${pdv.name}`,
-      amount: bleedVal,
-      category: 'Venda Ingressos',
-      costCenter: 'Operacional',
-      date: 'Hoje',
-      status: 'Recebido'
-    };
-    setLancamentos(prev => [entry, ...prev]);
-    triggerToast("Sangria Concluída 💸", `R$ ${bleedVal.toLocaleString('pt-BR')} recolhidos e transferidos para o Caixa Geral.`);
-  };
-
-  // Create Pdv physical point
-  const handleCreatePdv = (e) => {
-    e.preventDefault();
-    if (!newPdv.name || !newPdv.manager) return;
-    const addedPdv = {
-      id: `pdv-${Date.now()}`,
-      name: newPdv.name,
-      manager: newPdv.manager,
-      type: newPdv.type,
-      balance: newPdv.balance ? parseFloat(newPdv.balance) : 0,
-      status: newPdv.status
-    };
-    setPdvs(prev => [...prev, addedPdv]);
-    setShowAddPdvModal(false);
-    setNewPdv({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
-    triggerToast("Sucesso", "Novo ponto de venda física (PDV) ativo.");
-  };
-
-  // 6. Disparar / Simular Disparo de Campanha (Marketing)
-  const handleTriggerCampaign = (campaignId) => {
-    setCampaigns(prev => prev.map(c => {
-      if (c.id === campaignId) return { ...c, status: 'Disparando' };
-      return c;
-    }));
-
-    triggerToast("Disparando Campanha 🚀", "Os contatos e leads segmentados começaram a receber as notificações.");
-
-    setTimeout(() => {
-      const conversionsVal = Math.floor(Math.random() * 200) + 50;
-      const revenueVal = conversionsVal * 120; // Average ticket
-
-      setCampaigns(prev => prev.map(c => {
-        if (c.id === campaignId) {
-          return {
-            ...c,
-            status: 'Concluída',
-            conversions: conversionsVal,
-            revenue: revenueVal,
-            openRate: parseFloat((Math.random() * 25 + 15).toFixed(1)),
-            clickRate: parseFloat((Math.random() * 8 + 3).toFixed(1))
-          };
-        }
-        return c;
-      }));
-
-      // Update global accounts & statistics
-      setFinancialStats(stats => ({
-        ...stats,
-        receita: stats.receita + revenueVal,
-        saldo: stats.saldo + revenueVal,
-        lucro: stats.lucro + revenueVal
-      }));
-
-      setAccounts(accounts => accounts.map(a => {
-        if (a.id === 'acc-2') return { ...a, balance: a.balance + revenueVal };
-        return a;
-      }));
-
-      // Add to Ledger (Lançamento)
-      const entry = {
-        id: `lan-${Date.now()}`,
-        type: 'receita',
-        desc: `Conversões Campanhas: ${campaigns.find(cp => cp.id === campaignId)?.name || 'Marketing'}`,
-        amount: revenueVal,
-        category: 'Venda Ingressos',
-        costCenter: 'Marketing',
-        date: 'Hoje',
-        status: 'Recebido'
-      };
-      setLancamentos(prev => [entry, ...prev]);
-
-      triggerToast("Disparo Concluído! 🎉", `A campanha gerou R$ ${revenueVal.toLocaleString('pt-BR')} em novas vendas de ingressos.`);
-    }, 2500);
-  };
-
-  // Create Marketing Campaign
-  const handleCreateCampaign = (e) => {
-    e.preventDefault();
-    if (!newCampaign.name || !newCampaign.subject) return;
-    const addedCampaign = {
-      id: `camp-${Date.now()}`,
-      name: newCampaign.name,
-      channel: newCampaign.channel,
-      sent: Math.floor(Math.random() * 10000) + 1500,
-      openRate: 0,
-      clickRate: 0,
-      conversions: 0,
-      revenue: 0,
-      status: 'Agendada',
-      date: newCampaign.date
-    };
-    setCampaigns(prev => [...prev, addedCampaign]);
-    setShowAddCampaignModal(false);
-    setNewCampaign({ name: '', channel: 'E-mail', subject: '', date: '18/07/2026', targetEvent: 'Festival de Inverno Curitiba' });
-    triggerToast("Campanha Agendada", `A campanha "${addedCampaign.name}" foi agendada para ${addedCampaign.date}.`);
-  };
-
-  // Reconcile item
-  const handleReconcile = (itemId) => {
-    setConciliationItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        setFinancialStats(stats => {
-          const isIncoming = item.type === 'in';
-          const val = item.amount;
-          return {
-            ...stats,
-            saldo: isIncoming ? stats.saldo + val : stats.saldo - val
-          };
-        });
-        return { ...item, matched: true };
-      }
-      return item;
-    }));
-    triggerToast("Conciliação Confirmada", "Transação bancária vinculada.");
-  };
-
-  // CRM Kanban lead progression bidirectional
-  const moveLeadStage = (leadId, currentStage, direction = 'forward') => {
-    const stages = ['prospect', 'qualified', 'proposal', 'negotiation', 'won'];
-    const currentIndex = stages.indexOf(currentStage);
-    if (direction === 'forward' && currentIndex < stages.length - 1) {
-      const nextStage = stages[currentIndex + 1];
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: nextStage } : l));
-      
-      if (nextStage === 'won') {
-        const lead = leads.find(l => l.id === leadId);
-        if (lead) {
-          const newClientItem = {
-            id: `c-${Date.now()}`,
-            name: lead.name,
-            company: lead.company,
-            email: `${lead.name.toLowerCase().replace(' ', '.')}@${lead.company.toLowerCase().replace(' ', '')}.com`,
-            phone: '(41) 99999-0000',
-            spend: lead.value,
-            status: 'Ativo'
-          };
-          setClients(prev => [...prev, newClientItem]);
-          triggerToast("Contrato Assinado! 🏆", `${lead.name} convertido em cliente ativo!`);
-        }
-      } else {
-        triggerToast("Progresso de Venda", `Lead avançado para ${nextStage.toUpperCase()}`);
-      }
-    } else if (direction === 'backward' && currentIndex > 0) {
-      const prevStage = stages[currentIndex - 1];
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: prevStage } : l));
-      triggerToast("Recuo de Estágio", `Lead movido de volta para ${prevStage.toUpperCase()}`);
-    }
-  };
-
-  const handleCreateLead = (e) => {
-    e.preventDefault();
-    if (!newLead.name || !newLead.company || !newLead.value) return;
-    const addedLead = {
-      id: `lead-${Date.now()}`,
-      name: newLead.name,
-      company: newLead.company,
-      value: parseFloat(newLead.value),
-      stage: newLead.stage,
-      date: 'Hoje',
-      tag: newLead.tag
-    };
-    setLeads(prev => [...prev, addedLead]);
-    setShowAddLeadModal(false);
-    setNewLead({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
-    triggerToast("Sucesso", "Novo lead adicionado ao CRM.");
-  };
-
-  const downloadSimulatedCSV = (filename = 'fechamento_contabil.csv', headers = ['ID', 'Data', 'Tipo', 'Valor', 'Status'], dataRows = []) => {
-    let defaultRows = dataRows.length > 0 ? dataRows : [
-      ['tr-1', '2026-07-17', 'Venda Online', '850.00', 'Pago'],
-      ['tr-2', '2026-07-17', 'Fisico PDV B', '1200.00', 'Pago'],
-      ['tr-3', '2026-07-16', 'Reembolso', '-150.00', 'Estornado']
-    ];
-    let csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(','), ...defaultRows.map(r => r.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    triggerToast("Exportacao Sucesso 📥", `Arquivo ${filename} baixado.`);
-  };
-
-  const simulateVoiceInput = () => {
-    if (isListening) return;
-    setIsListening(true);
-    setUserInput("🎙️ Ouvindo...");
-    triggerToast("🎙️ Gravador Ativo", "Simulando transcrição de voz...");
-    
-    setTimeout(() => {
-      setUserInput("Qual o faturamento ");
-      setTimeout(() => {
-        setUserInput("Qual o faturamento consolidado ");
-        setTimeout(() => {
-          setUserInput("Qual o faturamento consolidado deste mês?");
-          setIsListening(false);
-          setTimeout(() => {
-            triggerToast("Voz Processada 🤖", "Enviando comando para o Disk AI...");
-            triggerAIResponse('dre');
-            setUserInput('');
-          }, 800);
-        }, 600);
-      }, 500);
-    }, 1200);
-  };
-
-  const handleCreateClient = (e) => {
-    e.preventDefault();
-    if (!newClient.name || !newClient.company || !newClient.email) return;
-    const addedClient = {
-      id: `c-${Date.now()}`,
-      name: newClient.name,
-      company: newClient.company,
-      email: newClient.email,
-      phone: newClient.phone || '(41) 99999-0000',
-      spend: 0,
-      status: newClient.status
-    };
-    setClients(prev => [addedClient, ...prev]);
-    setShowAddClientModal(false);
-    setNewClient({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
-    triggerToast("Sucesso", "Novo cliente cadastrado.");
-  };
-
-  const handleCreateCoupon = (e) => {
-    e.preventDefault();
-    if (!newCoupon.code || !newCoupon.discount) return;
-    const addedCoupon = {
-      id: `coup-${Date.now()}`,
-      code: newCoupon.code.toUpperCase(),
-      discount: parseInt(newCoupon.discount),
-      event: newCoupon.event,
-      status: newCoupon.status,
-      usages: 0
-    };
-    setCoupons(prev => [addedCoupon, ...prev]);
-    setShowAddCouponModal(false);
-    setNewCoupon({ code: '', discount: '', event: 'Festival de Inverno Curitiba', status: 'Ativo' });
-    triggerToast("Sucesso", "Cupom promocional gerado.");
-  };
-
-  // AI Chat simulation response
   const triggerAIResponse = (scenario) => {
     const prompts = {
       conciliacao: "🔍 Fazer Conciliação Automática",
@@ -1337,6 +275,312 @@ export default function App() {
     }, 1200);
   };
 
+  const handleAccountTransfer = (e) => {
+    e.preventDefault();
+    const amountVal = parseFloat(transfer.amount);
+    if (!amountVal || amountVal <= 0) return;
+
+    const sourceAcc = accounts.find(a => a.id === transfer.from);
+    if (sourceAcc.balance < amountVal) {
+      triggerToast("Saldo Insuficiente", `A conta ${sourceAcc.name} não possui saldo suficiente para esta transferência.`, "warning");
+      return;
+    }
+
+    setAccounts(prev => prev.map(a => {
+      if (a.id === transfer.from) return { ...a, balance: a.balance - amountVal };
+      if (a.id === transfer.to) return { ...a, balance: a.balance + amountVal };
+      return a;
+    }));
+
+    const entry = {
+      id: `lan-${Date.now()}`,
+      type: 'despesa',
+      desc: `Transf. de ${accounts.find(a=>a.id === transfer.from).name} para ${accounts.find(a=>a.id === transfer.to).name}`,
+      amount: amountVal,
+      category: 'Transferência',
+      costCenter: 'Interno',
+      date: 'Hoje',
+      status: 'Pago'
+    };
+    setLancamentos(prev => [entry, ...prev]);
+    setTransfer(prev => ({ ...prev, amount: '' }));
+    triggerToast("Transferência Efetuada", `R$ ${amountVal.toLocaleString('pt-BR')} transferidos.`);
+  };
+
+  const handlePdvBleeding = (pdvId, amountToBleed) => {
+    const bleedVal = parseFloat(amountToBleed);
+    if (!bleedVal || bleedVal <= 0) return;
+
+    const pdv = pdvs.find(p => p.id === pdvId);
+    if (pdv.balance < bleedVal) {
+      triggerToast("Saldo Insuficiente", `O PDV não possui saldo acumulado suficiente para esta sangria.`, "warning");
+      return;
+    }
+
+    setPdvs(prev => prev.map(p => {
+      if (p.id === pdvId) return { ...p, balance: p.balance - bleedVal };
+      return p;
+    }));
+
+    setAccounts(prev => prev.map(a => {
+      if (a.id === 'acc-3') return { ...a, balance: a.balance + bleedVal };
+      return a;
+    }));
+
+    const entry = {
+      id: `lan-${Date.now()}`,
+      type: 'receita',
+      desc: `Sangria de Caixa: ${pdv.name}`,
+      amount: bleedVal,
+      category: 'Venda Ingressos',
+      costCenter: 'Operacional',
+      date: 'Hoje',
+      status: 'Recebido'
+    };
+    setLancamentos(prev => [entry, ...prev]);
+    triggerToast("Sangria Concluída 💸", `R$ ${bleedVal.toLocaleString('pt-BR')} recolhidos e transferidos para o Caixa Geral.`);
+  };
+
+  const simulateVoiceInput = () => {
+    if (isListening) return;
+    setIsListening(true);
+    setUserInput("🎙️ Ouvindo...");
+    triggerToast("🎙️ Gravador Ativo", "Simulando transcrição de voz...");
+    
+    setTimeout(() => {
+      setUserInput("Qual o faturamento ");
+      setTimeout(() => {
+        setUserInput("Qual o faturamento consolidado ");
+        setTimeout(() => {
+          setUserInput("Qual o faturamento consolidado deste mês?");
+          setIsListening(false);
+          setTimeout(() => {
+            triggerToast("Voz Processada 🤖", "Enviando comando para o Disk AI...");
+            triggerAIResponse('dre');
+            setUserInput('');
+          }, 800);
+        }, 600);
+      }, 500);
+    }, 1200);
+  };
+
+  const handleCreateLead = (e) => {
+    e.preventDefault();
+    if (!newLead.name || !newLead.company || !newLead.value) return;
+    const addedLead = {
+      id: `lead-${Date.now()}`,
+      name: newLead.name,
+      company: newLead.company,
+      value: parseFloat(newLead.value),
+      stage: newLead.stage,
+      date: 'Hoje',
+      tag: newLead.tag
+    };
+    setLeads(prev => [...prev, addedLead]);
+    setShowAddLeadModal(false);
+    setNewLead({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
+    triggerToast("Sucesso", "Novo lead adicionado ao CRM.");
+  };
+
+  const handleCreateClient = (e) => {
+    e.preventDefault();
+    if (!newClient.name || !newClient.company || !newClient.email) return;
+    const addedClient = {
+      id: `c-${Date.now()}`,
+      name: newClient.name,
+      company: newClient.company,
+      email: newClient.email,
+      phone: newClient.phone || '(41) 99999-0000',
+      spend: 0,
+      status: newClient.status
+    };
+    setClients(prev => [addedClient, ...prev]);
+    setShowAddClientModal(false);
+    setNewClient({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
+    triggerToast("Sucesso", "Novo cliente cadastrado.");
+  };
+
+  const handleCreatePdv = (e) => {
+    e.preventDefault();
+    if (!newPdv.name || !newPdv.manager) return;
+    const addedPdv = {
+      id: `pdv-${Date.now()}`,
+      name: newPdv.name,
+      manager: newPdv.manager,
+      type: newPdv.type,
+      balance: newPdv.balance ? parseFloat(newPdv.balance) : 0,
+      status: newPdv.status
+    };
+    setPdvs(prev => [...prev, addedPdv]);
+    setShowAddPdvModal(false);
+    setNewPdv({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
+    triggerToast("Sucesso", "Novo ponto de venda física (PDV) ativo.");
+  };
+
+  const downloadSimulatedCSV = (filename = 'fechamento_contabil.csv', headers = ['ID', 'Data', 'Tipo', 'Valor', 'Status'], dataRows = []) => {
+    let defaultRows = dataRows.length > 0 ? dataRows : [
+      ['tr-1', '2026-07-17', 'Venda Online', '850.00', 'Pago'],
+      ['tr-2', '2026-07-17', 'Fisico PDV B', '1200.00', 'Pago'],
+      ['tr-3', '2026-07-16', 'Reembolso', '-150.00', 'Estornado']
+    ];
+    let csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...defaultRows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    triggerToast("Exportacao Sucesso 📥", `Arquivo ${filename} baixado.`);
+  };
+
+  const handleEmitNFe = (invoiceId) => {
+    setInvoices(prev => prev.map(inv => {
+      if (inv.id === invoiceId) return { ...inv, status: 'Processando' };
+      return inv;
+    }));
+
+    triggerToast("Solicitação de Emissão", "Enviando dados da nota à SEFAZ...");
+
+    setTimeout(() => {
+      setInvoices(prev => prev.map(inv => {
+        if (inv.id === invoiceId) return { ...inv, status: 'Emitida' };
+        return inv;
+      }));
+      triggerToast("NFe Autorizada! 🧾", `Nota fiscal emitida na SEFAZ com sucesso.`);
+    }, 1800);
+  };
+
+
+  const [invoiceMonth, setInvoiceMonth] = useState('Julho');
+  const [activeBorderoEvent, setActiveBorderoEvent] = useState('event-1');
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [newLead, setNewLead] = useState({ name: '', company: '', value: '', stage: 'prospect', tag: 'Novo' });
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClient, setNewClient] = useState({ name: '', company: '', email: '', phone: '', status: 'Ativo' });
+  const [eventsSubTab, setEventsSubTab] = useState('dashboard');
+  const [eventsSearch, setEventsSearch] = useState('');
+  const [showEventsForm, setShowEventsForm] = useState(false);
+  const [apiRoute, setApiRoute] = useState('GET_EVENTOS');
+  const [apiLoading, setApiLoading] = useState(false);
+  const [apiResponse, setApiResponse] = useState(null);
+  const [qrCodeInput, setQrCodeInput] = useState('');
+  const [apiEventInputs, setApiEventInputs] = useState({ name: '', category: 'Show / Festival', date: '', time: '', city: '', venue: '' });
+  const [apiCheckinInputs, setApiCheckinInputs] = useState({ ticketId: '', barcode: '', turnstileId: 'cat-1' });
+  const [apiPdvInputs, setApiPdvInputs] = useState({ eventId: 'ev-1', operator: 'Sandra Costa', amount: '120', paymentMethod: 'PIX' });
+  
+  const [crmSearch, setCrmSearch] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [crmApiRoute, setCrmApiRoute] = useState('GET_DASHBOARD');
+  const [crmApiLoading, setCrmApiLoading] = useState(false);
+  const [crmApiResponse, setCrmApiResponse] = useState(null);
+  const [crmApiInputs, setCrmApiInputs] = useState({ leadId: '', name: '', company: '', value: '' });
+
+  const [producers, setProducers] = useState([
+    { id: 'prod-1', name: 'Prime Show Eventos LTDA', eventsCount: 15, rating: '4.8', contact: 'roberto@primeshow.com.br', specialty: 'Shows Nacionais' },
+    { id: 'prod-2', name: 'Gisele Lima Produções', eventsCount: 8, rating: '4.9', contact: 'gisele@diskhub.com.br', specialty: 'Festivais' },
+    { id: 'prod-3', name: 'Arena Music Curitiba', eventsCount: 12, rating: '4.7', contact: 'contato@arenamusic.com.br', specialty: 'Eventos Corporativos' }
+  ]);
+  const [showAddProducerModal, setShowAddProducerModal] = useState(false);
+  const [newProducer, setNewProducer] = useState({ name: '', eventsCount: '', rating: '5.0', contact: '', specialty: 'Shows Nacionais' });
+
+  const [organizers, setOrganizers] = useState([
+    { id: 'org-1', name: 'Associação de Criadores do Sul', region: 'Paraná', contact: 'contato@criadoresdosul.com.br', activeEvents: 3 },
+    { id: 'org-2', name: 'Curitiba Eventos e Convenções', region: 'Curitiba', contact: 'comercial@curitibaeventos.com.br', activeEvents: 5 }
+  ]);
+  const [showAddOrganizerModal, setShowAddOrganizerModal] = useState(false);
+  const [newOrganizer, setNewOrganizer] = useState({ name: '', region: '', contact: '', activeEvents: '' });
+
+  const [artists, setArtists] = useState([
+    { id: 'art-1', name: 'Thiaguinho do Pagode', genre: 'Samba & Pagode', cachet: 150000, contact: 'agenda@thiaguinho.com.br' },
+    { id: 'art-2', name: 'Iron Maiden Tribute', genre: 'Heavy Metal', cachet: 45000, contact: 'tribute@ironmaiden.com' }
+  ]);
+  const [showAddArtistModal, setShowAddArtistModal] = useState(false);
+  const [newArtist, setNewArtist] = useState({ name: '', genre: '', cachet: '', contact: '' });
+
+  const [bands, setBands] = useState([
+    { id: 'band-1', name: 'Orquestra Sinfônica de Curitiba', membersCount: 45, genre: 'Clássica', cachet: 65000, contact: 'contato@orquestrasinfonica.org' }
+  ]);
+  const [showAddBandModal, setShowAddBandModal] = useState(false);
+  const [newBand, setNewBand] = useState({ name: '', membersCount: '', genre: '', cachet: '', contact: '' });
+
+  const [sponsors, setSponsors] = useState([
+    { id: 'spon-1', company: 'Itaú Unibanco', sponsoredEvent: 'Metal Fest 2026', value: 150000, contact: 'sponsorship@itau.com.br' },
+    { id: 'spon-2', company: 'Coca-Cola FEMSA', sponsoredEvent: 'Festival de Inverno Curitiba', value: 120000, contact: 'marketing@cocacolafemsa.com' }
+  ]);
+  const [showAddSponsorModal, setShowAddSponsorModal] = useState(false);
+  const [newSponsor, setNewSponsor] = useState({ company: '', sponsoredEvent: 'Metal Fest 2026', value: '', contact: '' });
+
+  const [suppliers, setSuppliers] = useState([
+    { id: 'sup-1', name: 'Master Luz Som e Imagem', service: 'Som e Iluminação', rating: '4.9', contact: 'comercial@masterluzsom.com.br' },
+    { id: 'sup-2', name: 'Grades e Estruturas Sul', service: 'Grades e Portarias', rating: '4.6', contact: 'grades@estruturassul.com.br' }
+  ]);
+  const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
+  const [newSupplier, setNewSupplier] = useState({ name: '', service: 'Som e Imagem', rating: '5.0', contact: '' });
+
+  const [pdvs, setPdvs] = useState([
+    { id: 'pdv-1', name: 'Bilheteria Teatro Positivo', manager: 'Sandra Costa', type: 'Local', balance: 150000, status: 'Aberto' },
+    { id: 'pdv-2', name: 'Quiosque ParkShoppingBarigüi', manager: 'Daniel Santos', type: 'Shopping', balance: 85000, status: 'Aberto' }
+  ]);
+  const [showAddPdvModal, setShowAddPdvModal] = useState(false);
+  const [newPdv, setNewPdv] = useState({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
+
+  const [showAddCompanyModal, setShowAddCompanyModal] = useState(false);
+  const [newCompany, setNewCompany] = useState({ name: '', cnpj: '', industry: 'Entretenimento', employees: '', city: '', phone: '' });
+
+  const [showAddAptModal, setShowAddAptModal] = useState(false);
+  const [newApt, setNewApt] = useState({ title: '', date: '', time: '', host: '', client: '', type: 'Reunião Presencial', status: 'Pendente' });
+
+  const [showAddProposalModal, setShowAddProposalModal] = useState(false);
+  const [newProposal, setNewProposal] = useState({ title: '', value: '', client: '', validUntil: '', status: 'Enviada' });
+
+  const [showAddContractModal, setShowAddContractModal] = useState(false);
+  const [newContract, setNewContract] = useState({ title: '', value: '', client: '', startDate: '', endDate: '', status: 'Em Assinatura' });
+
+  const [showAddGoalModal, setShowAddGoalModal] = useState(false);
+  const [newGoal, setNewGoal] = useState({ seller: '', target: '', achieved: '', period: 'Julho 2026' });
+
+  const [showAddCommissionModal, setShowAddCommissionModal] = useState(false);
+  const [newCommission, setNewCommission] = useState({ seller: '', dealValue: '', rate: '', paymentStatus: 'Pendente', date: '2026-07-17' });
+
+
+  const handleInstallApp = (appId, appName) => {
+    setInstalledApps(prev => ({ ...prev, [appId]: 'installing' }));
+    
+    setTimeout(() => {
+      setInstalledApps(prev => ({ ...prev, [appId]: true }));
+      triggerToast(
+        "Módulo Ativado!",
+        "O módulo de " + appName + " foi instalado com sucesso. Uma nova aba foi adicionada à sua barra lateral!"
+      );
+    }, 1800);
+  };
+
+  const handleUninstallApp = (appId) => {
+    setInstalledApps(prev => ({ ...prev, [appId]: false }));
+    triggerToast("Módulo Desativado", "O aplicativo foi removido.");
+  };
+
+  const handleToggleTrial = () => {
+    setActiveTrial(prev => !prev);
+    triggerToast("Período de Testes", !activeTrial ? "Avaliação de 14 dias iniciada!" : "Período de avaliação cancelado.");
+  };
+
+  const handleCheckoutPlan = (selectedPlan) => {
+    setSelectedPlanForCheckout(selectedPlan);
+    setPaymentSimulationOpen(true);
+  };
+
+  const handleSimulatePayment = () => {
+    setPaymentSimulationOpen(false);
+    if (selectedPlanForCheckout) {
+      setPlan(selectedPlanForCheckout);
+      triggerToast("Assinatura Ativada! 🚀", "Seu plano agora é " + selectedPlanForCheckout.toUpperCase() + ". Aproveite os novos recursos!");
+      setSelectedPlanForCheckout(null);
+    }
+  };
+
   const handleSendCustomText = (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
@@ -1346,454 +590,169 @@ export default function App() {
   };
 
   return (
-    <div className={`page-content flex-1 flex ${bgMain} min-h-screen overflow-hidden transition-colors duration-250`}>
+    <>
+      {!currentUser ? (
+        <div className="min-h-screen flex items-center justify-center bg-[#0B0D17] text-white p-4 relative overflow-hidden w-full">
+          {/* Glow Background Blobs */}
+          <div className="absolute top-[-20%] left-[-10%] w-96 h-96 rounded-full bg-[#F97316]/10 blur-[100px]"></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#4F46E5]/10 blur-[120px]"></div>
+
+          <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl p-8 space-y-6 relative z-10">
+            <div className="text-center">
+              <h1 className="text-3xl font-black tracking-tight text-white flex items-center justify-center mb-1">
+                Disk<span className="text-[#F97316] font-extrabold">Hub</span>
+              </h1>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Business Cloud ERP & CRM Enterprise</p>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const data = new FormData(e.target);
+              const email = data.get('email');
+              const password = data.get('password');
+              const foundUser = usersDatabase.find(u => u.email === email && u.password === password);
+              if (foundUser) {
+                setCurrentUser(foundUser);
+                setPlan(foundUser.plan);
+                if (foundUser.plan === 'omnichannel') {
+                  setMarketingModulesStatus({
+                    1: true, 2: true, 3: true, 4: true, 5: true,
+                    6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true,
+                    13: true, 14: true, 15: true, 16: true, 17: true,
+                    18: true, 19: true, 20: true, 21: true
+                  });
+                } else if (foundUser.plan === 'premium') {
+                  setMarketingModulesStatus({
+                    1: true, 2: true, 3: true, 4: true, 5: true,
+                    6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true,
+                    13: false, 14: false, 15: false, 16: false, 17: false,
+                    18: false, 19: false, 20: false, 21: false
+                  });
+                } else if (foundUser.plan === 'profissional') {
+                  setMarketingModulesStatus({
+                    1: true, 2: true, 3: true, 4: true, 5: true,
+                    6: false, 7: false, 8: false, 9: false, 10: false, 11: false, 12: false,
+                    13: false, 14: false, 15: false, 16: false, 17: false,
+                    18: false, 19: false, 20: false, 21: false
+                  });
+                } else {
+                  setMarketingModulesStatus({
+                    1: true, 2: true,
+                    3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false, 11: false, 12: false,
+                    13: false, 14: false, 15: false, 16: false, 17: false,
+                    18: false, 19: false, 20: false, 21: false
+                  });
+                }
+                triggerToast("Acesso Autorizado", `Bem-vindo de volta, ${foundUser.name}!`);
+              } else {
+                triggerToast("Erro de Acesso", "Usuário ou senha incorretos.", "error");
+              }
+            }} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">E-mail Corporativo</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  placeholder="nome@diskhub.com.br" 
+                  className="form-control bg-slate-950/40 border border-white/10 text-white text-xs p-3 rounded-lg w-full focus:ring-2 focus:ring-[#F97316]/50" 
+                  required 
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Senha de Acesso</label>
+                <input 
+                  type="password" 
+                  name="password" 
+                  placeholder="••••••••" 
+                  className="form-control bg-slate-950/40 border border-white/10 text-white text-xs p-3 rounded-lg w-full focus:ring-2 focus:ring-[#F97316]/50" 
+                  required 
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn btn-primary w-full py-3 bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold rounded-lg border-0 cursor-pointer transition-colors shadow-lg shadow-[#F97316]/20 mt-2"
+              >
+                Entrar no Sistema
+              </button>
+            </form>
+
+            {/* Quick login accounts card */}
+            <div className="pt-4 border-t border-white/5 space-y-3">
+              <span className="text-[10px] font-bold text-slate-400 uppercase block text-center">
+                💡 Contas de Demonstração (Clique para entrar)
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {usersDatabase.map((usr, uIdx) => (
+                  <button
+                    key={uIdx}
+                    type="button"
+                    onClick={() => {
+                      setCurrentUser(usr);
+                      setPlan(usr.plan);
+                      if (usr.plan === 'omnichannel') {
+                        setMarketingModulesStatus({
+                          1: true, 2: true, 3: true, 4: true, 5: true,
+                          6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true,
+                          13: true, 14: true, 15: true, 16: true, 17: true,
+                          18: true, 19: true, 20: true, 21: true
+                        });
+                      } else if (usr.plan === 'premium') {
+                        setMarketingModulesStatus({
+                          1: true, 2: true, 3: true, 4: true, 5: true,
+                          6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true,
+                          13: false, 14: false, 15: false, 16: false, 17: false,
+                          18: false, 19: false, 20: false, 21: false
+                        });
+                      } else if (usr.plan === 'profissional') {
+                        setMarketingModulesStatus({
+                          1: true, 2: true, 3: true, 4: true, 5: true,
+                          6: false, 7: false, 8: false, 9: false, 10: false, 11: false, 12: false,
+                          13: false, 14: false, 15: false, 16: false, 17: false,
+                          18: false, 19: false, 20: false, 21: false
+                        });
+                      } else {
+                        setMarketingModulesStatus({
+                          1: true, 2: true,
+                          3: false, 4: false, 5: false, 6: false, 7: false, 8: false, 9: false, 10: false, 11: false, 12: false,
+                          13: false, 14: false, 15: false, 16: false, 17: false,
+                          18: false, 19: false, 20: false, 21: false
+                        });
+                      }
+                      triggerToast("Acesso Autorizado", `Logado como ${usr.name} (${usr.role})`);
+                    }}
+                    className="p-2.5 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 text-left transition-all cursor-pointer flex flex-col justify-between h-20"
+                  >
+                    <div>
+                      <span className="text-[10px] font-bold text-white block">{usr.name.split(' ')[0]}</span>
+                      <span className="text-[9px] text-[#F97316] font-semibold block">{usr.role}</span>
+                    </div>
+                    <span className="badge bg-white/10 text-slate-300 text-[8px] font-bold uppercase tracking-wider py-0.5 px-1.5 rounded self-start mt-1">
+                      {usr.plan}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className={`page-content flex-1 flex ${bgMain} min-h-screen overflow-hidden transition-colors duration-250`}>
       
       {/* SIDEBAR NAVIGATION - DHDS Collapsible Layout */}
-      <aside className={`aside-sidebar flex flex-col justify-between shrink-0 z-30 transition-all duration-300 ${
-        sidebarCollapsed ? 'w-[72px]' : 'w-64'
-      } ${theme === 'dark' ? 'bg-[#111827] border-r border-[#1F2937]' : 'bg-white border-r border-[#E5E7EB]'} ${
-        mobileSidebarOpen ? 'sidebar-mobile-expanded' : ''
-      }`}>
-        <div>
-          {/* Logo Area */}
-          <div className={`p-4 border-b ${borderCol} flex items-center justify-between`}>
-            <div className="flex items-center space-x-3 overflow-hidden">
-              <div className="w-9 h-9 bg-[#2563EB] rounded flex items-center justify-center shadow shrink-0">
-                <Landmark className="w-5 h-5 text-white" />
-              </div>
-              {!sidebarCollapsed && (
-                <div className="animate-fadeIn">
-                  <h1 className={`text-md font-bold tracking-tight ${textTitle} flex items-center mb-0`}>
-                    DISK<span className="text-[#3B82F6] font-normal ml-0.5">HUB</span>
-                  </h1>
-                  <span className={`text-[9px] ${textSec} uppercase tracking-wider font-bold block whitespace-nowrap`}>ERP & CRM Enterprise</span>
-                </div>
-              )}
-            </div>
-            <button 
-              type="button"
-              onClick={() => setMobileSidebarOpen(false)}
-              className={`md:hidden p-1 rounded hover:bg-light/10 ${textSec} border-0 bg-transparent cursor-pointer`}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* User Profile / Menu */}
-          {!sidebarCollapsed && (
-            <div className={`p-3 border-b ${borderCol} bg-light/5 animate-fadeIn`}>
-              <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-sm shadow">
-                  V
-                </div>
-                <div>
-                  <h4 className={`text-xs font-bold ${textTitle} mb-0`}>Vinicius</h4>
-                  <p className={`text-[10px] ${textSec} mb-0 uppercase tracking-widest font-mono font-bold`}>
-                    Plano {plan.toUpperCase()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Nav Links */}
-          <div className="py-3 px-2 overflow-y-auto max-h-[calc(100vh-170px)]">
-            <ul className="nav nav-sidebar flex flex-col space-y-1 p-0 m-0 list-none">
-              {!sidebarCollapsed && (
-                <li className={`px-2 py-1 text-[9px] font-black uppercase tracking-widest ${textSec} mb-1 animate-fadeIn`}>
-                  Navegação Principal
-                </li>
-              )}
-
-              {[
-                { id: 'dashboard', label: 'Dashboard', icon: BarChart3, emoji: '🏠' },
-                { id: 'financeiro', label: 'Financeiro', icon: CreditCard, emoji: '💰' },
-                { id: 'contabilidade', label: 'Contabilidade', icon: Receipt, emoji: '🧾', badge: invoices.filter(inv => inv.status === 'Pendente').length },
-                { id: 'eventos', label: 'Eventos', icon: Calendar, emoji: '🎫', badge: events.filter(e => e.status === 'Ativo').length, condition: installedApps.eventos === true },
-                { id: 'crm', label: 'CRM de Vendas', icon: Users, emoji: '👥', badge: leads.filter(l => l.stage !== 'won').length, condition: installedApps.crm === true },
-                { id: 'marketing', label: 'Marketing & Campanhas', icon: Mail, emoji: '📈', condition: installedApps.mkt === true },
-                { id: 'pdv', label: 'Ponto de Venda', icon: ShoppingBag, emoji: '🛒', condition: installedApps.pdv === true },
-                { id: 'logistica', label: 'Logística & Ingressos', icon: Briefcase, emoji: '📦', condition: installedApps.logistica === true },
-                { id: 'bar', label: 'Bar & Estoque', icon: Layers, emoji: '🍹', condition: installedApps.bar === true },
-                { id: 'patrimonio', label: 'Patrimônio & POS', icon: Landmark, emoji: '🏛️', condition: installedApps.patrimonio === true },
-                { id: 'ai', label: 'Disk AI Analytics', icon: Brain, emoji: '🤖', condition: installedApps.ai === true }
-              ].map(item => {
-                if (item.condition === false) return null;
-                const active = currentTab === item.id;
-                return (
-                  <li key={item.id} className="w-full">
-                    <button 
-                      onClick={() => selectTab(item.id)} 
-                      className={`w-full text-left flex items-center justify-between px-3 py-2 text-xs transition-all rounded-lg border-0 ${
-                        active 
-                          ? `${theme === 'dark' ? 'bg-[#1E293B] text-white font-bold' : 'bg-slate-100 text-slate-900 font-bold'}` 
-                          : `${textSec} hover:bg-slate-100 dark:hover:bg-[#1E293B]/40 bg-transparent cursor-pointer`
-                      }`}
-                      title={sidebarCollapsed ? item.label : ''}
-                    >
-                      <div className="flex items-center space-x-3 overflow-hidden">
-                        <span className="text-sm shrink-0" role="img" aria-label={item.label}>{item.emoji}</span>
-                        {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
-                      </div>
-                      {!sidebarCollapsed && item.badge && (
-                        <span className="badge bg-[#3B82F6]/10 text-[#3B82F6] text-[8px] font-bold px-1.5 py-0.5 rounded-full">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-
-              {!sidebarCollapsed && (
-                <li className={`px-2 py-1 text-[9px] font-black uppercase tracking-widest ${textSec} mt-4 mb-1 animate-fadeIn`}>
-                  Configurações & Loja
-                </li>
-              )}
-
-              {[
-                { id: 'appstore', label: 'Central de Apps', icon: ShoppingBag, emoji: '📦' },
-                { id: 'marketplace', label: 'Planos & Upgrades', icon: Sparkles, emoji: '✨' },
-                { id: 'roadmap', label: 'Status & Roadmap', icon: ShieldCheck, emoji: '🗺️' }
-              ].map(item => {
-                const active = currentTab === item.id;
-                return (
-                  <li key={item.id} className="w-full">
-                    <button 
-                      onClick={() => selectTab(item.id)} 
-                      className={`w-full text-left flex items-center px-3 py-2 text-xs transition-all rounded-lg border-0 ${
-                        active 
-                          ? `${theme === 'dark' ? 'bg-[#1E293B] text-white font-bold' : 'bg-slate-100 text-slate-900 font-bold'}` 
-                          : `${textSec} hover:bg-slate-100 dark:hover:bg-[#1E293B]/40 bg-transparent cursor-pointer`
-                      }`}
-                      title={sidebarCollapsed ? item.label : ''}
-                    >
-                      <span className="text-sm mr-3 shrink-0" role="img" aria-label={item.label}>{item.emoji}</span>
-                      {!sidebarCollapsed && <span>{item.label}</span>}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-
-        {/* Promocional Widget inside Sidebar */}
-        {!sidebarCollapsed && (
-          <div className="p-3 mx-2 mb-3 bg-[#2563EB]/5 border border-[#2563EB]/10 rounded-xl space-y-2.5 text-left">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-10.96-1.57c-.12-.47-.13-.96-.02-1.43a1 1 0 01.35-.57L10.5 6.5a1 1 0 011.41 0l3.68 3.68a1 1 0 010 1.41l-2.73 2.78z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19 5l-4 4m2.5-2.5L13 11M4.5 19.5L9 15M15 9l1.5-1.5M9 15l-1.5 1.5" /></svg>
-            </div>
-            <div>
-              <p className={`text-[10px] font-bold ${textTitle} leading-snug mb-0`}>Escale seu negócio com o plano ideal para você!</p>
-            </div>
-            <button 
-              onClick={() => setCurrentTab('marketplace')} 
-              className="btn btn-xs w-full py-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[10px] font-bold rounded-lg border-0 cursor-pointer transition-colors"
-            >
-              Falar com especialista
-            </button>
-          </div>
-        )}
-
-        {/* Sidebar Collapse Toggle Button at the bottom */}
-        <div className={`p-3 border-t ${borderCol} flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
-          {!sidebarCollapsed && (
-            <span className="text-[9px] text-slate-400 font-mono">v4.0.0 Enterprise</span>
-          )}
-          <button 
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className={`p-1.5 rounded hover:bg-slate-100 dark:hover:bg-[#1E293B] ${textSec} border-0 bg-transparent cursor-pointer`}
-            title={sidebarCollapsed ? "Expandir Menu" : "Recolher Menu"}
-          >
-            <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${sidebarCollapsed ? '' : 'rotate-180'}`} />
-          </button>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* MAIN CONTENT AREA - Limitless content-wrapper */}
       <main className="content-wrapper flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-5 z-10 transition-colors duration-250">
         
         {/* HEADER / TOP NAVBAR */}
-        <header className={`navbar navbar-expand-md ${headerClass} px-4 py-3 flex items-center justify-between sticky top-0 z-40 transition-colors duration-250`}>
-          <div className="flex items-center space-x-3">
-            <button 
-              type="button"
-              onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden p-1 rounded hover:bg-light/10 text-slate-500 hover:text-slate-900 border-0 bg-transparent cursor-pointer"
-              title="Abrir Menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm">🏢</span>
-              <span className={`text-xs ${textSec} font-bold tracking-tight uppercase`}>DiskIngressos</span>
-            </div>
-            <span className="text-slate-300 dark:text-slate-700">/</span>
-            <span className={`text-xs font-semibold ${textTitle} capitalize`}>
-              {currentTab === 'appstore' ? 'Central de Aplicativos' : currentTab === 'marketplace' ? 'Planos e Upgrades' : currentTab === 'marketing' ? 'Marketing & Campanhas' : currentTab === 'contabilidade' ? 'Contabilidade Disk' : currentTab}
-            </span>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            {/* Spotlight Search Trigger (Cmd + K) */}
-            <button 
-              onClick={() => setSpotlightOpen(true)}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg border text-left text-xs ${
-                theme === 'dark' 
-                  ? 'bg-[#1E293B]/40 text-[#94A3B8] border-[#1F2937] hover:bg-[#1E293B]' 
-                  : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'
-              } w-60 justify-between cursor-pointer border-0`}
-            >
-              <div className="flex items-center space-x-2">
-                <Search className="w-3.5 h-3.5" />
-                <span>Pesquisar...</span>
-              </div>
-              <kbd className="text-[9px] font-mono bg-slate-200/50 dark:bg-[#111827] px-1.5 py-0.5 rounded text-slate-400">⌘K</kbd>
-            </button>
-
-            {/* Connection Status */}
-            <div className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-100 dark:bg-white/5 border border-slate-200/50 dark:border-white/5">
-              <span className={`w-1.5 h-1.5 rounded-full ${backendConnected ? 'bg-[#22C55E]' : 'bg-[#94A3B8]'}`}></span>
-              <span className="text-[9px] font-bold text-slate-400 font-mono">
-                {backendConnected ? 'API OK' : 'LOCAL'}
-              </span>
-            </div>
-            
-            {/* Theme switch button */}
-            <button 
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 rounded border transition-all ${
-                theme === 'dark' 
-                  ? 'text-[#94A3B8] hover:text-white bg-[#1E293B]/40 border-[#1F2937] hover:bg-[#1E293B]' 
-                  : 'text-slate-500 hover:text-slate-900 bg-slate-100 border-slate-200 hover:bg-slate-200'
-              } border-0 cursor-pointer`}
-              title={theme === 'dark' ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}
-            >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-            </button>
-
-            <button className={`p-2 ${textSec} hover:text-slate-900 dark:hover:text-white ${theme === 'dark' ? 'bg-[#1E293B]/40 border-[#1F2937]' : 'bg-slate-100 border-slate-200'} rounded border relative transition-all border-0 cursor-pointer`}>
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#3B82F6] rounded-full"></span>
-              <Bell className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </header>
+        <Header />
 
         {/* CONTENT AREA - Limitless content block */}
         <div className="content p-4 max-w-7xl w-full mx-auto space-y-4">
             
-          {/* ================= 1. DASHBOARD VIEW ================= */}
-          {currentTab === 'dashboard' && (
-            <div className="space-y-6 animate-fadeIn">
-              
-              {/* Dashboard Modern Header */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4 border-[#E2E8F0] dark:border-[#1F2937]">
-                <div>
-                  <h2 className={`text-xl font-bold ${textTitle} tracking-tight mb-0`}>Visão Geral do Ecossistema</h2>
-                  <p className={`text-xs ${textSec} mb-0`}>Métricas consolidadas de vendas, acessos e auditoria inteligente em tempo real.</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border ${borderCol} text-xs font-semibold ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'}`}>
-                    <Calendar className={`w-3.5 h-3.5 ${textSec}`} />
-                    <span>Período: Últimos 30 dias</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hero Dashboard Block */}
-              <div className={`card ${cardClass} p-5 relative overflow-hidden bg-white dark:bg-[#111827] border-0 shadow-sm`}>
-                <div className="relative z-10">
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${textSec} block mb-1`}>Receita do Mês</span>
-                  <div className="flex items-baseline space-x-3">
-                    <span className={`text-4xl md:text-5xl font-black ${textTitle} tracking-tighter`}>R$ 2.450.000</span>
-                    <span className="text-xs font-bold text-[#10B981] bg-[#10B981]/10 px-2.5 py-0.5 rounded-full font-mono flex items-center shrink-0">
-                      ▲ 14%
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-2 mb-0">Volume de negócios consolidado gerado através dos canais online e físicos nas últimas semanas.</p>
-                </div>
-                <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#2563EB]/5 to-transparent pointer-events-none"></div>
-              </div>
-
-              {/* 4 KPIs DHDS */}
-              <div className="row g-3">
-                {[
-                  { title: '🎫 Eventos', value: `${events.length} Projetos`, desc: 'Ativos no ecossistema', trend: '▲ 4 hoje' },
-                  { title: '👥 Clientes', value: '12.450', desc: 'Segmentados no CRM', trend: '+840 total' },
-                  { title: '📊 Fluxo de Caixa', value: `R$ ${financialStats.saldo.toLocaleString('pt-BR')}`, desc: 'Saldo pronto para repasse', trend: 'Líquido' },
-                  { title: '✅ Check-ins', value: `${financialStats.presente} / ${financialStats.esperado}`, desc: 'Acessos validados na portaria', trend: '93.8% Presença' }
-                ].map((kpi, idx) => (
-                  <div key={idx} className="col-lg-3 col-sm-6">
-                    <div className={`card ${cardClass} p-4 hover:shadow-md transition-all duration-200 border-0 shadow-sm`}>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider`}>{kpi.title}</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">{kpi.trend}</span>
-                      </div>
-                      <div className="mt-3">
-                        <span className={`text-2xl font-black ${textTitle}`}>{kpi.value}</span>
-                        <p className="text-[10px] text-slate-400 mt-1 mb-0">{kpi.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Gráfico Principal */}
-              <div className={`card ${cardClass} p-4 border-0 shadow-sm`}>
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h3 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-0`}>Gráfico Principal de Fluxo Financeiro</h3>
-                    <p className={`text-[10px] ${textSec} mb-0`}>Evolução diária de depósitos, vendas e repasses de produtores.</p>
-                  </div>
-                  <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-400">
-                    <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] mr-1"></span>Vendas</span>
-                    <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-[#10B981] mr-1"></span>Saídas/Repasses</span>
-                  </div>
-                </div>
-
-                <div className="relative w-full h-[220px] mt-2">
-                  <svg className="w-full h-full" viewBox="0 0 500 150" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="blue-grad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#2563EB" stopOpacity="0.15"/>
-                        <stop offset="100%" stopColor="#2563EB" stopOpacity="0"/>
-                      </linearGradient>
-                      <linearGradient id="green-grad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.1"/>
-                        <stop offset="100%" stopColor="#10B981" stopOpacity="0"/>
-                      </linearGradient>
-                    </defs>
-                    <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1"/>
-                    <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1"/>
-                    <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1"/>
-                    
-                    {/* Area path */}
-                    <path d="M 0 150 Q 50 110, 100 80 T 200 95 T 300 45 T 400 30 L 500 50 L 500 150 L 0 150 Z" fill="url(#blue-grad)"/>
-                    <path d="M 0 150 Q 50 130, 100 110 T 200 120 T 300 90 T 400 70 L 500 80 L 500 150 L 0 150 Z" fill="url(#green-grad)"/>
-                    
-                    {/* Line path */}
-                    <path d="M 0 150 Q 50 110, 100 80 T 200 95 T 300 45 T 400 30 L 500 50" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round"/>
-                    <path d="M 0 150 Q 50 130, 100 110 T 200 120 T 300 90 T 400 70 L 500 80" fill="none" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3,3"/>
-                  </svg>
-                </div>
-                <div className={`flex justify-between text-[9px] ${textSec} mt-2 font-mono font-bold px-1`}>
-                  <span>01 JUL</span><span>05 JUL</span><span>10 JUL</span><span>15 JUL</span><span>20 JUL</span><span>25 JUL</span><span>30 JUL</span>
-                </div>
-              </div>
-
-              {/* Agenda & Alertas Grid */}
-              <div className="row g-3">
-                
-                {/* Agenda Column */}
-                <div className="col-lg-6">
-                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between border-0 shadow-sm`}>
-                    <div>
-                      <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-4`}>📅 Agenda do Mês</h4>
-                      <div className="space-y-4">
-                        {events.slice(0, 3).map(ev => (
-                          <div key={ev.id} className="flex items-center justify-between text-xs pb-3 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#1E293B] flex items-center justify-center font-bold text-[#2563EB] shrink-0 font-mono text-[10px] flex-col">
-                                <span className="text-[8px] uppercase">{ev.date.split('/')[1] || 'DEZ'}</span>
-                                <span className="text-xs">{ev.date.split('/')[0] || '17'}</span>
-                              </div>
-                              <div className="overflow-hidden">
-                                <span className={`font-semibold ${textTitle} block truncate`}>{ev.name}</span>
-                                <span className={`text-[10px] ${textSec} block`}>{ev.venue} — {ev.city}</span>
-                              </div>
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full shrink-0 uppercase tracking-wider">{ev.category}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Alertas Column */}
-                <div className="col-lg-6">
-                  <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between border-0 shadow-sm`}>
-                    <div>
-                      <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-4`}>⚠️ Alertas de Operação</h4>
-                      <div className="space-y-3">
-                        {contabilAuditorias.slice(0, 2).map(aud => (
-                          <div key={aud.id} className="p-3 rounded-xl border border-[#E2E8F0] dark:border-[#1F2937] bg-slate-50 dark:bg-white/2 flex items-start space-x-2 text-xs">
-                            <span className="text-sm shrink-0">{aud.type === 'Sucesso' ? '✅' : '⚠️'}</span>
-                            <div>
-                              <p className={`text-[11px] font-semibold ${textTitle} mb-0.5 leading-normal`}>{aud.msg}</p>
-                              <span className="text-[9px] text-slate-400 block font-mono">{aud.date}</span>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="p-3 rounded-xl border border-[#E2E8F0] dark:border-[#1F2937] bg-slate-50 dark:bg-white/2 flex items-start space-x-2 text-xs">
-                          <span className="text-sm shrink-0">🤖</span>
-                          <div>
-                            <p className={`text-[11px] font-semibold ${textTitle} mb-0.5 leading-normal`}>Disk AI Copilot: Configurado pico de conciliação bancária automática com sucesso.</p>
-                            <span className="text-[9px] text-slate-400 block font-mono">Hoje, 11:32</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Últimos Eventos - Premium Luxury Table */}
-              <div className={`card ${cardClass} p-4 border-0 shadow-sm`}>
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-0`}>🎫 Últimos Eventos Cadastrados</h4>
-                    <p className={`text-[10px] ${textSec} mb-0`}>Lista de projetos em lançamento ou comercialização ativa.</p>
-                  </div>
-                </div>
-                <div className="table-responsive">
-                  <table className="table table-hover text-xs mb-0 align-middle">
-                    <thead>
-                      <tr className="border-b border-slate-100 dark:border-white/5 text-[9px] uppercase tracking-wider text-slate-400 font-bold bg-slate-50 dark:bg-white/2">
-                        <th className="p-3 border-0">Evento</th>
-                        <th className="p-3 border-0">Cidade</th>
-                        <th className="p-3 border-0 text-center">Status</th>
-                        <th className="p-3 border-0 text-right">Faturamento</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {events.slice(0, 3).map(ev => {
-                        const totalSold = issuedTickets.filter(t => t.eventId === ev.id && t.status === 'Pago').length;
-                        const revenue = totalSold * 150;
-                        return (
-                          <tr key={ev.id} className="border-b border-slate-100 dark:border-[#1F2937] hover:bg-slate-50/50 dark:hover:bg-[#1E293B]/20">
-                            <td className="p-3 border-0">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#3B82F6] flex items-center justify-center text-white text-xs font-bold font-mono">
-                                  {ev.name[0]}
-                                </div>
-                                <div>
-                                  <span className={`font-semibold ${textTitle} block`}>{ev.name}</span>
-                                  <span className="text-[10px] text-slate-400 block">{ev.category}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-3 border-0 font-medium text-slate-600 dark:text-slate-400">{ev.city}</td>
-                            <td className="p-3 border-0 text-center">
-                              <span className={`badge text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                                ev.status === 'Ativo' ? 'bg-[#22C55E]/15 text-[#22C55E]' : 'bg-[#F59E0B]/15 text-[#F59E0B]'
-                              }`}>
-                                {ev.status}
-                              </span>
-                            </td>
-                            <td className="p-3 border-0 text-right font-bold text-slate-800 dark:text-white font-mono">R$ {revenue.toLocaleString('pt-BR')}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
-          )}
+          {currentTab === 'dashboard' && <Dashboard />}
 
           {/* ================= 2. GESTÃO FINANCEIRA (ERP) VIEW ================= */}
           {currentTab === 'financeiro' && (
@@ -4961,6 +3920,8 @@ export default function App() {
             );
           })()}
 
+
+
           {/* ================= 4B. GESTÃO DE EVENTOS VIEW (FASE 4) ================= */}
           {currentTab === 'eventos' && (() => {
             const handleEventsSubTabChange = (tabId) => {
@@ -6896,14 +5857,6 @@ export default function App() {
               triggerToast("Configuração MaaS", `Módulo ${modId} alterado manualmente.`);
             };
 
-            const [selectedAiEvent, setSelectedAiEvent] = useState('ev-1');
-            const [aiOutputs, setAiOutputs] = useState({
-              bestTime: "Terça-feira às 19:30",
-              salesForecast: "O Lote Pista VIP deve se esgotar nas próximas 36 horas. Recomendado adiantar abertura de Lote 2.",
-              smartPrice: "R$ 165,00 (Preço ótimo estimado com base na taxa de cliques de 14.5%)",
-              occupancy: "94% de ocupação estimada (Margem de erro +-3%)",
-              sentiment: { pos: 88, neu: 9, neg: 3 }
-            });
 
             const handleSimulateAi = () => {
               setAiOutputs({
@@ -6953,21 +5906,23 @@ export default function App() {
                     <p className={`text-xs ${textSec} mb-0 italic`}>"Venda mais ingressos com inteligência, automação e marketing integrado."</p>
                   </div>
                   
-                  <div className={`flex flex-wrap ${theme === 'dark' ? 'bg-[#111827]' : 'bg-white'} border ${borderCol} p-1 rounded space-x-1 text-xs`}>
+                  <div className={`flex flex-wrap ${theme === 'dark' ? 'bg-[#111827]' : 'bg-slate-50'} border ${borderCol} p-1 rounded-lg space-x-1 text-xs`}>
                     {[
-                      { id: 'licensing', label: 'Planos & Módulos MaaS' },
                       { id: 'dashboard', label: 'Dashboard Performance' },
                       { id: 'campanhas', label: 'Central Campanhas' },
                       { id: 'ia_engine', label: 'Inteligência IA' },
                       { id: 'influencers', label: 'Influenciadores' },
                       { id: 'fidelidade', label: 'Fidelidade' },
-                      { id: 'analytics360', label: 'Analytics 360 & BI' }
+                      { id: 'analytics360', label: 'Analytics 360 & BI' },
+                      { id: 'licensing', label: 'Planos & Módulos MaaS' }
                     ].map(tab => (
                       <button 
                         key={tab.id}
                         onClick={() => setMarketingSubTab(tab.id)}
-                        className={`px-2.5 py-1.5 rounded font-semibold transition-all border-0 ${
-                          marketingSubTab === tab.id ? `${theme === 'dark' ? 'bg-[#1E293B]' : 'bg-slate-200'} ${textTitle}` : `${textSec} bg-transparent cursor-pointer`
+                        className={`px-3 py-1.5 rounded-md font-bold transition-all border-0 cursor-pointer ${
+                          marketingSubTab === tab.id 
+                            ? 'bg-[#F97316] text-white shadow-sm' 
+                            : `${textSec} bg-transparent hover:text-slate-900 dark:hover:text-white`
                         }`}
                       >
                         {tab.label}
@@ -7087,90 +6042,229 @@ export default function App() {
                   if (checkLock) return checkLock;
 
                   return (
-                    <div className="space-y-4 animate-fadeIn">
-                      <div className="row g-3">
+                    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-200">
+                      
+                      {/* Top KPI Cards with Sparklines */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         {[
-                          { title: 'Visualizações Site/App', value: '458.200', change: '+14.5%', text: 'Módulo 1 - Divulgação Básica' },
-                          { title: 'Cliques no Link Inteligente', value: '74.310', change: '+9.2%', text: 'Módulo 1 - Conversão de cliques' },
-                          { title: 'Vendas via Campanhas', value: '4.890', change: '+22.1%', text: 'Módulo 20 - Conversão de ingressos' },
-                          { title: 'Taxa de Conversão Média', value: '6.58%', change: '+1.4%', text: 'Conversão Geral' }
-                        ].map((kpi, idx) => (
-                          <div key={idx} className="col-lg-3 col-sm-6">
-                            <div className={`card ${cardClass} p-3.5 flex flex-col justify-between`}>
-                              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSec}`}>{kpi.title}</span>
-                              <div className="my-2 flex items-baseline justify-between">
-                                <span className={`text-2xl font-black ${textTitle}`}>{kpi.value}</span>
-                                <span className="text-[#22C55E] text-xs font-bold">{kpi.change}</span>
-                              </div>
-                              <span className="text-[9px] text-slate-400 font-mono">{kpi.text}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="row g-3">
-                        {[
-                          { title: 'CAC (Custo de Aquisição)', value: 'R$ 8,40', change: '-12%', desc: 'Custo de mídia por ingresso' },
-                          { title: 'LTV (Lifetime Value)', value: 'R$ 412,00', change: '+18%', desc: 'Valor gasto por produtor' },
-                          { title: 'Ticket Médio MaaS', value: 'R$ 184,00', change: '+5%', desc: 'Gasto médio por comprador' },
-                          { title: 'ROI de Campanhas MaaS', value: '480%', change: '+45%', desc: 'Retorno de investimento' }
+                          { title: 'Cliques no Link Único', value: '74.310', change: '+9.2%', trend: [20, 35, 25, 45, 30, 55, 45], color: '#3B82F6', icon: Users, desc: 'Cliques acumulados em redes sociais' },
+                          { title: 'Taxa de Conversão', value: '6.58%', change: '+1.4%', trend: [30, 25, 40, 35, 50, 45, 60], color: '#10B981', icon: Percent, desc: 'Visita ➔ Ingresso Pago' },
+                          { title: 'Ingressos via Campanhas', value: '4.890', change: '+22.1%', trend: [10, 20, 15, 30, 25, 40, 35], color: '#8B5CF6', icon: ShoppingBag, desc: 'Vendas rastreadas por UTMs' },
+                          { title: 'ROI Médio MaaS', value: '480%', change: '+45%', trend: [25, 35, 30, 50, 45, 65, 55], color: '#F59E0B', icon: TrendingUp, desc: 'Retorno sobre investimento' }
                         ].map((kpi, idx) => {
-                          const hasModule = marketingModulesStatus[21];
+                          const IconComponent = kpi.icon;
                           return (
-                            <div key={idx} className="col-lg-3 col-sm-6">
-                              <div className={`card ${cardClass} p-3.5 flex flex-col justify-between ${!hasModule ? 'opacity-40' : ''}`}>
-                                <div className="flex justify-between items-center mb-1">
-                                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSec}`}>{kpi.title}</span>
-                                  {!hasModule && <span className="text-[#F59E0B] text-[8px] font-bold">Mód. 21 Req.</span>}
+                            <div key={idx} className={`card ${cardClass} p-4 relative overflow-hidden transition-all duration-300 hover:shadow-md border border-slate-200 dark:border-white/5`}>
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="space-y-1">
+                                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{kpi.title}</span>
+                                  <span className={`text-2xl font-black ${textTitle} block`}>{kpi.value}</span>
                                 </div>
-                                {hasModule ? (
-                                  <>
-                                    <div className="my-2 flex items-baseline justify-between">
-                                      <span className={`text-xl font-bold ${textTitle}`}>{kpi.value}</span>
-                                      <span className="text-[#22C55E] text-xs font-bold">{kpi.change}</span>
-                                    </div>
-                                    <span className="text-[9px] text-slate-400">{kpi.desc}</span>
-                                  </>
-                                ) : (
-                                  <div className="py-4 text-center text-slate-500 text-[10px] font-mono">// Módulo Analytics 360 Inativo</div>
-                                )}
+                                <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-400" style={{ color: kpi.color }}>
+                                  <IconComponent className="w-4 h-4" />
+                                </div>
+                              </div>
+
+                              {/* Custom Sparkline Chart */}
+                              <div className="h-10 w-full mt-2">
+                                <svg viewBox="0 0 100 30" className="w-full h-full overflow-visible">
+                                  <path
+                                    d={`M ${kpi.trend.map((val, i) => `${(i * 100) / (kpi.trend.length - 1)} ${30 - val / 2.5}`).join(' L ')}`}
+                                    fill="none"
+                                    stroke={kpi.color}
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </div>
+
+                              <div className="mt-2.5 flex items-center justify-between text-[10px]">
+                                <span className="text-emerald-500 font-bold">{kpi.change}</span>
+                                <span className="text-slate-400 truncate max-w-[120px]">{kpi.desc}</span>
                               </div>
                             </div>
                           );
                         })}
                       </div>
 
-                      <div className={`card ${cardClass} p-4`}>
-                        <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-3`}>Monitoramento Geral de Campanhas Ativas</h4>
-                        <div className="table-responsive">
-                          <table className="table text-xs mb-0">
-                            <thead>
-                              <tr className={`border-bottom ${borderCol} text-slate-400 font-semibold text-[9.5px] uppercase text-left`}>
-                                <th className="pb-2 border-0">Campanha</th>
-                                <th className="pb-2 border-0">Canal</th>
-                                <th className="pb-2 border-0 text-center">Disparos</th>
-                                <th className="pb-2 border-0 text-center">Taxa de Abertura</th>
-                                <th className="pb-2 border-0 text-center">Cliques</th>
-                                <th className="pb-2 border-0 text-right">Vendas Geradas</th>
-                                <th className="pb-2 border-0 text-right">Receita Total</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {campaigns.map(c => (
-                                <tr key={c.id} className={`border-bottom ${borderCol}/40 hover:bg-light/5`}>
-                                  <td className={`py-3 border-0 font-bold ${textTitle}`}>{c.name}</td>
-                                  <td className="py-3 border-0"><span className="badge bg-slate-100 dark:bg-white/5 text-slate-400 font-mono text-[9px] px-2 py-1 rounded">{c.channel}</span></td>
-                                  <td className="py-3 border-0 text-center font-mono">{c.sent.toLocaleString()}</td>
-                                  <td className="py-3 border-0 text-center text-[#22C55E] font-bold font-mono">{c.openRate}%</td>
-                                  <td className="py-3 border-0 text-center font-mono">{(c.sent * (c.clickRate/100)).toFixed(0)} ({c.clickRate}%)</td>
-                                  <td className="py-3 border-0 text-right font-bold font-mono text-[#3B82F6]">{c.conversions}</td>
-                                  <td className="py-3 border-0 text-right font-black font-mono text-[#22C55E]">R$ {c.revenue.toLocaleString()}</td>
-                                </tr>
+                      {/* Main Charts & Funnel Row */}
+                      <div className="row g-4">
+                        {/* Interactive Area Chart */}
+                        <div className="col-lg-8">
+                          <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex justify-between items-center">
+                              <div>
+                                <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-1`}>Conversão e Faturamento das Campanhas (7 dias)</h4>
+                                <p className={`text-xs ${textSec} mb-0`}>Histórico semanal de vendas rastreadas e volume de tráfego.</p>
+                              </div>
+                              <span className="badge bg-[#F97316]/10 text-[#F97316] border border-[#F97316]/20 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full">Atualizado em Tempo Real</span>
+                            </div>
+
+                            {/* SVG Area Chart */}
+                            <div className="w-full flex-1 flex flex-col justify-end">
+                              <svg viewBox="0 0 500 150" className="w-full h-44 overflow-visible">
+                                <defs>
+                                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.25" />
+                                    <stop offset="100%" stopColor="#F97316" stopOpacity="0" />
+                                  </linearGradient>
+                                </defs>
+                                {/* Grid lines */}
+                                <line x1="0" y1="20" x2="500" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+                                <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+                                <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+                                <line x1="0" y1="140" x2="500" y2="140" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+                                
+                                {/* Area */}
+                                <path d="M 0 120 Q 80 50 150 90 T 300 30 T 450 60 L 500 50 L 500 150 L 0 150 Z" fill="url(#areaGrad)" />
+                                {/* Line */}
+                                <path d="M 0 120 Q 80 50 150 90 T 300 30 T 450 60 L 500 50" fill="none" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round" />
+                                
+                                {/* Points & Tooltips */}
+                                <g className="cursor-pointer group">
+                                  <circle cx="150" cy="90" r="4.5" fill="#F97316" stroke="#fff" strokeWidth="1.5" />
+                                  <text x="150" y="75" textAnchor="middle" className="text-[9px] font-mono fill-[#F97316] font-bold opacity-0 group-hover:opacity-100 transition-opacity">R$ 48K</text>
+                                </g>
+                                <g className="cursor-pointer group">
+                                  <circle cx="300" cy="30" r="4.5" fill="#F97316" stroke="#fff" strokeWidth="1.5" />
+                                  <text x="300" y="15" textAnchor="middle" className="text-[9px] font-mono fill-[#F97316] font-bold opacity-0 group-hover:opacity-100 transition-opacity">R$ 115K</text>
+                                </g>
+                                <g className="cursor-pointer group">
+                                  <circle cx="450" cy="60" r="4.5" fill="#F97316" stroke="#fff" strokeWidth="1.5" />
+                                  <text x="450" y="45" textAnchor="middle" className="text-[9px] font-mono fill-[#F97316] font-bold opacity-0 group-hover:opacity-100 transition-opacity">R$ 82K</text>
+                                </g>
+                              </svg>
+
+                              {/* X Axis Labels */}
+                              <div className="flex justify-between items-center text-[9px] text-slate-400 font-mono mt-3 px-2">
+                                <span>Segunda</span>
+                                <span>Terça</span>
+                                <span>Quarta</span>
+                                <span>Quinta</span>
+                                <span>Sexta</span>
+                                <span>Sábado</span>
+                                <span>Domingo</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Conversion Funnel */}
+                        <div className="col-lg-4">
+                          <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-1`}>Funil de Vendas de Marketing</h4>
+                              <p className={`text-xs ${textSec} mb-0`}>Taxa de conversão por etapa da campanha.</p>
+                            </div>
+
+                            <div className="space-y-3.5 flex-1 flex flex-col justify-center">
+                              {[
+                                { stage: 'Visualizações (Site/App)', count: '458.200', pct: '100%', bg: 'bg-slate-400 dark:bg-slate-500' },
+                                { stage: 'Cliques no Link', count: '74.310', pct: '16.2%', bg: 'bg-blue-500' },
+                                { stage: 'Checkout Iniciado', count: '18.420', pct: '4.0%', bg: 'bg-indigo-500' },
+                                { stage: 'Ingressos Pagos', count: '4.890', pct: '1.06%', bg: 'bg-[#F97316]' }
+                              ].map((f, fIdx) => (
+                                <div key={fIdx} className="space-y-1">
+                                  <div className="flex justify-between text-[10px] font-bold">
+                                    <span className={textTitle}>{f.stage}</span>
+                                    <span className="font-mono text-slate-400">{f.count} ({f.pct})</span>
+                                  </div>
+                                  <div className="progress rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800" style={{ height: '8px' }}>
+                                    <div className={`progress-bar ${f.bg} h-full rounded-lg`} style={{ width: f.pct }}></div>
+                                  </div>
+                                </div>
                               ))}
-                            </tbody>
-                          </table>
+                            </div>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Bottom row: Campaign list & AI Suggestions */}
+                      <div className="row g-4">
+                        {/* Table List of Campaigns */}
+                        <div className="col-lg-8">
+                          <div className={`card ${cardClass} p-4`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex justify-between items-center">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-0`}>Monitoramento Geral de Campanhas Ativas</h4>
+                              <span className="text-[10px] text-slate-400 font-mono">Status em Tempo Real</span>
+                            </div>
+
+                            <div className="table-responsive">
+                              <table className="table text-xs mb-0 align-middle">
+                                <thead>
+                                  <tr className={`border-bottom ${borderCol} text-slate-400 font-semibold text-[9.5px] uppercase`}>
+                                    <th className="pb-2 border-0">Campanha</th>
+                                    <th className="pb-2 border-0">Canal</th>
+                                    <th className="pb-2 border-0 text-center">Disparos</th>
+                                    <th className="pb-2 border-0 text-center">Abertura</th>
+                                    <th className="pb-2 border-0 text-center">Cliques</th>
+                                    <th className="pb-2 border-0 text-right">Vendas</th>
+                                    <th className="pb-2 border-0 text-right">Faturamento</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {campaigns.slice(0, 5).map(c => (
+                                    <tr key={c.id} className={`border-bottom ${borderCol}/40 hover:bg-slate-50/10`}>
+                                      <td className="py-2.5 border-0">
+                                        <span className={`font-bold ${textTitle} block`}>{c.name}</span>
+                                        <span className="text-[9px] text-slate-400 block">{c.audience || 'Público Geral'}</span>
+                                      </td>
+                                      <td className="py-2.5 border-0">
+                                        <span className="badge bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-350 font-mono text-[9px] px-2.5 py-0.5 rounded-full">
+                                          {c.channel}
+                                        </span>
+                                      </td>
+                                      <td className="py-2.5 border-0 text-center font-mono text-slate-500">{c.sent.toLocaleString()}</td>
+                                      <td className="py-2.5 border-0 text-center text-[#22C55E] font-bold font-mono">{c.openRate}%</td>
+                                      <td className="py-2.5 border-0 text-center font-mono text-slate-500">
+                                        {((c.sent * c.clickRate) / 100).toFixed(0)} ({c.clickRate}%)
+                                      </td>
+                                      <td className="py-2.5 border-0 text-right font-semibold text-blue-500">{c.conversions}</td>
+                                      <td className="py-2.5 border-0 text-right font-black text-[#22C55E]">R$ {c.revenue.toLocaleString()}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* AI Recommendations & Actions */}
+                        <div className="col-lg-4">
+                          <div className={`card ${cardClass} p-4 space-y-4`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-1 flex items-center space-x-1.5`}>
+                                <Sparkles className="w-4 h-4 text-amber-500" />
+                                <span>IA Copilot Recomendações</span>
+                              </h4>
+                              <p className={`text-xs ${textSec} mb-0`}>Insights preditivos baseados nas vendas locais de Curitiba.</p>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 space-y-1">
+                                <span className="text-[10px] font-bold text-amber-500 uppercase block">Gatilho de Escassez Lote 2</span>
+                                <p className="text-[10.5px] leading-relaxed text-slate-600 dark:text-slate-300 mb-0">
+                                  O Lote Pista VIP do **Festival de Inverno Curitiba** atingiu 92% da capacidade limite. Agende um disparo de "Últimos Ingressos" via WhatsApp para o público semelhante.
+                                </p>
+                              </div>
+
+                              <div className="p-3 rounded-lg border border-blue-500/20 bg-blue-500/5 space-y-1">
+                                <span className="text-[10px] font-bold text-blue-500 uppercase block">Otimização de CPC (Meta Ads)</span>
+                                <p className="text-[10.5px] leading-relaxed text-slate-600 dark:text-slate-300 mb-0">
+                                  O custo por clique nos stories do **Metal Fest 2026** caiu 15%. É recomendado mover R$ 2.000 do orçamento de remarketing geral para esta campanha de atração.
+                                </p>
+                              </div>
+                            </div>
+
+                            <button onClick={() => setMarketingSubTab('campanhas')} className="btn btn-primary w-full py-2.5 bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold rounded-lg border-0 cursor-pointer transition-all flex items-center justify-center space-x-1.5 shadow-md shadow-[#F97316]/20">
+                              <Megaphone className="w-3.5 h-3.5" />
+                              <span>Configurar Nova Ação de Vendas</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   );
                 })()}
@@ -7179,142 +6273,451 @@ export default function App() {
                   const checkLock = renderModuleLock([5, 20], "Central de Campanhas");
                   if (checkLock) return checkLock;
 
+                  const playbookCategories = [
+                    {
+                      title: '🎯 1. Pré-Venda & Escassez',
+                      desc: 'Desperte desejo e exclusividade logo no lançamento do show.',
+                      color: '#F97316',
+                      accent: 'bg-[#F97316]',
+                      strategies: [
+                        {
+                          name: 'Listas VIP no WhatsApp',
+                          desc: 'Acesso antecipado com desconto exclusivo nos grupos de maior engajamento.',
+                          channel: 'WhatsApp',
+                          templateName: 'Lista VIP WhatsApp - Pré-Venda Artista'
+                        },
+                        {
+                          name: 'Ingressos Early Bird (Lote Cego)',
+                          desc: 'Primeiro lote promocional de curtíssima duração para criar senso de imediatismo.',
+                          channel: 'E-mail',
+                          templateName: 'Lote Early Bird - Lançamento Exclusivo'
+                        }
+                      ]
+                    },
+                    {
+                      title: '📈 2. Tráfego Pago & Ads',
+                      desc: 'Alavanque alcance e atinja quem realmente busca seu artista.',
+                      color: '#3B82F6',
+                      accent: 'bg-blue-500',
+                      strategies: [
+                        {
+                          name: 'Meta Ads (Instagram Reels)',
+                          desc: 'Criativos em vídeo e stories segmentados por gênero e região.',
+                          channel: 'Instagram Ads',
+                          templateName: 'Meta Ads - Divulgação Instagram Reels'
+                        },
+                        {
+                          name: 'Google Ads (Fundo de Funil)',
+                          desc: 'Capture buscas ativas por "ingresso" e nome do show no buscador.',
+                          channel: 'Google Ads',
+                          templateName: 'Google Search Ads - Fundo de Funil'
+                        },
+                        {
+                          name: 'Remarketing de Checkout',
+                          desc: 'Re-impacte clientes que iniciaram compra mas abandonaram o carrinho.',
+                          channel: 'Google Ads',
+                          templateName: 'Remarketing Dinâmico - Abandono de Checkout'
+                        }
+                      ]
+                    },
+                    {
+                      title: '📣 3. Influência & Parcerias',
+                      desc: 'Utilize a autoridade de embaixadores locais para vender.',
+                      color: '#8B5CF6',
+                      accent: 'bg-purple-500',
+                      strategies: [
+                        {
+                          name: 'Embaixadores (Cupom VIP)',
+                          desc: 'Parcerias com influenciadores do gênero oferecendo códigos comissionados.',
+                          channel: 'Instagram Ads',
+                          templateName: 'Campanha Embaixadores - Cupom Afiliado'
+                        },
+                        {
+                          name: 'Collabs de Co-Autoria',
+                          desc: 'Posts divididos entre o perfil oficial do show, marcas e artistas.',
+                          channel: 'Instagram Ads',
+                          templateName: 'Collab Instagram - Post Duplo Artista'
+                        }
+                      ]
+                    },
+                    {
+                      title: '🎬 4. Engajamento & Conteúdo',
+                      desc: 'Comunique a experiência e os bastidores do evento.',
+                      color: '#10B981',
+                      accent: 'bg-emerald-500',
+                      strategies: [
+                        {
+                          name: 'Reels / TikTok Trends',
+                          desc: 'Bastidores da montagem do palco, convites em vídeo e desafios de setlist.',
+                          channel: 'Instagram Ads',
+                          templateName: 'Trends Reels/TikTok - Bastidores do Show'
+                        },
+                        {
+                          name: 'Lives de Aquecimento',
+                          desc: 'Lives rápidas de 15 minutos com os músicos dias antes de abrir vendas.',
+                          channel: 'WhatsApp',
+                          templateName: 'Disparo Live - Aquecimento ao Vivo'
+                        },
+                        {
+                          name: 'Sorteios VIP (Meet & Greet)',
+                          desc: 'Sorteio de camarim virtual para aumentar compartilhamentos e menções.',
+                          channel: 'E-mail',
+                          templateName: 'Sorteio Promocional - Meet & Greet VIP'
+                        }
+                      ]
+                    },
+                    {
+                      title: '📧 5. Funis Automatizados',
+                      desc: 'E-mail e mensagens diretas automáticas para conversão instantânea.',
+                      color: '#EC4899',
+                      accent: 'bg-pink-500',
+                      strategies: [
+                        {
+                          name: 'Reativação de Compradores',
+                          desc: 'Oferta especial de lote secreto enviada para quem comprou shows passados.',
+                          channel: 'E-mail',
+                          templateName: 'Reativação Base - Desconto Clientes Antigos'
+                        },
+                        {
+                          name: 'Carrinho Abandonado (SMS/WA)',
+                          desc: 'Mensagem automatizada lembrando que os ingressos expiram em 2 horas.',
+                          channel: 'SMS',
+                          templateName: 'Carrinho Abandonado - Lembrete Final de Lote'
+                        }
+                      ]
+                    }
+                  ];
+
+                  const loadStrategy = (strat) => {
+                    const nameInput = document.getElementById('camp-form-name');
+                    const channelSelect = document.getElementById('camp-form-channel');
+                    if (nameInput) nameInput.value = strat.templateName;
+                    if (channelSelect) channelSelect.value = strat.channel;
+                    triggerToast("Estratégia Selecionada", `Modelo "${strat.name}" carregado. Dispare abaixo.`);
+                    nameInput.focus();
+                  };
+
                   return (
-                    <div className="row g-3 animate-fadeIn">
-                      <div className="col-lg-4">
-                        <div className={`card ${cardClass} p-4 space-y-4`}>
-                          <div>
-                            <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-1`}>Criador de Campanhas Exclusivas</h4>
-                            <p className={`text-[10px] ${textSec} mb-0`}>Crie ações de incentivo comercial integradas à bilheteria em minutos.</p>
+                    <div className="space-y-6 animate-fadeIn text-slate-800 dark:text-slate-200">
+                      
+                      {/* Dashboard Metrics Header */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className={`card ${cardClass} p-4 relative overflow-hidden transition-all duration-300 hover:shadow-md border-b-4 border-b-[#F97316]`}>
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1.5">
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Faturamento</span>
+                              <span className={`text-2xl font-black ${textTitle} block`}>R$ 599.700,00</span>
+                            </div>
+                            <div className="p-2.5 rounded-lg bg-[#F97316]/10 text-[#F97316]">
+                              <TrendingUp className="w-5 h-5" />
+                            </div>
                           </div>
+                          <div className="mt-3 flex items-center space-x-1">
+                            <span className="text-[10px] text-emerald-500 font-bold">▲ +18.4%</span>
+                            <span className="text-[10px] text-slate-400">em relação ao mês anterior</span>
+                          </div>
+                        </div>
 
-                          <form onSubmit={(e) => {
-                            e.preventDefault();
-                            const data = new FormData(e.target);
-                            const actionType = data.get('type');
-                            const target = data.get('targetEvent');
-                            const name = data.get('name');
-
-                            const newCampObj = {
-                              id: `camp-${Date.now()}`,
-                              name: name || `Campanha ${actionType} - ${target}`,
-                              channel: data.get('channel'),
-                              sent: Math.floor(Math.random()*10000) + 1500,
-                              openRate: (Math.random()*40 + 60).toFixed(1),
-                              clickRate: (Math.random()*10 + 10).toFixed(1),
-                              conversions: Math.floor(Math.random()*300) + 50,
-                              revenue: Math.floor(Math.random()*45000) + 5000,
-                              status: 'Concluída',
-                              date: new Date().toLocaleDateString()
-                            };
-
-                            setCampaigns(prev => [newCampObj, ...prev]);
-                            triggerToast("Campanha MaaS", `Campanha "${newCampObj.name}" disparada com sucesso!`);
-                            e.target.reset();
-                          }} className="space-y-3 text-xs">
-                            <div>
-                              <label className={`text-[9px] font-bold ${textSec} uppercase block mb-1`}>Ação de Marketing</label>
-                              <select name="type" className={`form-control form-select ${inputClass} text-xs p-2.5 rounded w-full`}>
-                                <option value="Cupom">Cupom de Desconto</option>
-                                <option value="Compre e Ganhe">Compre e Ganhe</option>
-                                <option value="Cashback">Cashback Especial</option>
-                                <option value="Ingresso Solidário">Ingresso Solidário</option>
-                                <option value="Lote Relâmpago">Lote Relâmpago</option>
-                                <option value="Combo Família">Combo Família / Casal</option>
-                                <option value="Black Friday">Black Friday / Flash Sale</option>
-                                <option value="Indique e Ganhe">Indique e Ganhe</option>
-                              </select>
+                        <div className={`card ${cardClass} p-4 relative overflow-hidden transition-all duration-300 hover:shadow-md border-b-4 border-b-slate-200 dark:border-b-white/10`}>
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1.5">
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Conversão Ingressos</span>
+                              <span className={`text-2xl font-black ${textTitle} block`}>4.960 un</span>
                             </div>
-
-                            <div>
-                              <label className={`text-[9px] font-bold ${textSec} uppercase block mb-1`}>Nome do Lote / Identificação</label>
-                              <input type="text" name="name" placeholder="Ex: Black Friday Pista VIP" className={`form-control ${inputClass} text-xs p-2.5 rounded w-full`} required />
+                            <div className="p-2.5 rounded-lg bg-slate-500/10 text-slate-500">
+                              <Users className="w-5 h-5" />
                             </div>
+                          </div>
+                          <div className="mt-3 flex items-center space-x-1">
+                            <span className="text-[10px] text-emerald-500 font-bold">12.8%</span>
+                            <span className="text-[10px] text-slate-400">taxa média de conversão</span>
+                          </div>
+                        </div>
 
-                            <div>
-                              <label className={`text-[9px] font-bold ${textSec} uppercase block mb-1`}>Canal de Envio (Módulo 5/10)</label>
-                              <select name="channel" className={`form-control form-select ${inputClass} text-xs p-2.5 rounded w-full`}>
-                                <option value="WhatsApp">Disparo WhatsApp API</option>
-                                <option value="E-mail">E-mail Marketing Integrado</option>
-                                <option value="SMS">SMS Direto de Lembrete</option>
-                                <option value="Push">Push Notification App</option>
-                              </select>
+                        <div className={`card ${cardClass} p-4 relative overflow-hidden transition-all duration-300 hover:shadow-md border-b-4 border-b-emerald-500`}>
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1.5">
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Retorno (ROI)</span>
+                              <span className={`text-2xl font-black ${textTitle} block`}>435% ROI</span>
                             </div>
-
-                            <div>
-                              <label className={`text-[9px] font-bold ${textSec} uppercase block mb-1`}>Evento Alvo</label>
-                              <select name="targetEvent" className={`form-control form-select ${inputClass} text-xs p-2.5 rounded w-full`}>
-                                {events.map(ev => (
-                                  <option key={ev.id} value={ev.name}>{ev.name}</option>
-                                ))}
-                              </select>
+                            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+                              <Percent className="w-5 h-5" />
                             </div>
+                          </div>
+                          <div className="mt-3 flex items-center space-x-1">
+                            <span className="text-[10px] text-emerald-500 font-bold">Excelente</span>
+                            <span className="text-[10px] text-slate-400">retorno sobre ad spend</span>
+                          </div>
+                        </div>
 
-                            <button type="submit" className="btn btn-primary w-full py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold rounded border-0 cursor-pointer">
-                              Disparar Campanha de Venda
-                            </button>
-                          </form>
+                        <div className={`card ${cardClass} p-4 relative overflow-hidden transition-all duration-300 hover:shadow-md border-b-4 border-b-slate-200 dark:border-b-white/10`}>
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1.5">
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Alcance Estimado</span>
+                              <span className={`text-2xl font-black ${textTitle} block`}>198K</span>
+                            </div>
+                            <div className="p-2.5 rounded-lg bg-slate-500/10 text-slate-500">
+                              <Send className="w-5 h-5" />
+                            </div>
+                          </div>
+                          <div className="mt-3 flex items-center space-x-1">
+                            <span className="text-[10px] text-slate-400">WhatsApp, E-mail e SMS ativos</span>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="col-lg-8 space-y-3">
-                        <div className={`card ${cardClass} p-4`}>
-                          <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-3`}>Campanhas Disparadas</h4>
-                          <div className="table-responsive">
-                            <table className="table text-xs mb-0">
-                              <thead>
-                                <tr className={`border-bottom ${borderCol} text-slate-400 font-semibold text-[9.5px] uppercase`}>
-                                  <th className="pb-2 border-0">Campanha</th>
-                                  <th className="pb-2 border-0">Canal</th>
-                                  <th className="pb-2 border-0 text-center">Status</th>
-                                  <th className="pb-2 border-0 text-center">Data</th>
-                                  <th className="pb-2 border-0 text-right">Vendas</th>
-                                  <th className="pb-2 border-0 text-right">Faturamento</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {campaigns.map(c => (
-                                  <tr key={c.id} className={`border-bottom ${borderCol}/40`}>
-                                    <td className={`py-3 border-0 font-bold ${textTitle}`}>{c.name}</td>
-                                    <td className="py-3 border-0"><span className="badge bg-slate-100 dark:bg-white/5 text-slate-400 font-mono text-[9px] px-2 py-1 rounded">{c.channel}</span></td>
-                                    <td className="py-3 border-0 text-center">
-                                      <span className={`badge ${c.status === 'Concluída' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#F59E0B]/10 text-[#F59E0B]'} text-[8.5px] font-bold px-2 py-0.5 rounded-full`}>
-                                        {c.status}
-                                      </span>
-                                    </td>
-                                    <td className="py-3 border-0 text-center text-slate-400">{c.date}</td>
-                                    <td className="py-3 border-0 text-right font-bold">{c.conversions}</td>
-                                    <td className="py-3 border-0 text-right font-black text-[#22C55E]">R$ {c.revenue.toLocaleString()}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                      {/* Main Workspace Row */}
+                      <div className="row g-4">
+                        {/* Playbook - Guia Estratégico */}
+                        <div className="col-lg-8">
+                          <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex justify-between items-center">
+                              <div>
+                                <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-1 flex items-center space-x-2`}>
+                                  <Sparkles className="w-4 h-4 text-blue-500" />
+                                  <span>Roteiro de Esgotamento de Bilheteria</span>
+                                </h4>
+                                <p className={`text-xs ${textSec} mb-0`}>Siga a jornada recomendada de marketing para atingir sold out rapidamente.</p>
+                              </div>
+                              <span className="badge bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/20 font-bold text-[9px] px-2.5 py-1 rounded-full">Visual Playbook Active</span>
+                            </div>
+
+                            <div className="space-y-6">
+                              {playbookCategories.map((cat, idx) => (
+                                <div key={idx} className="relative pl-9 border-l-2 border-slate-200 dark:border-white/5 pb-6 last:pb-0">
+                                  {/* Timeline Dot Step Indicator */}
+                                  <div 
+                                    className="absolute left-0 top-0 -translate-x-[17px] w-8 h-8 rounded-full border-2 text-white flex items-center justify-center font-bold text-xs shadow-sm"
+                                    style={{ 
+                                      backgroundColor: '#F97316', 
+                                      borderColor: theme === 'dark' ? '#090A0F' : '#ffffff' 
+                                    }}
+                                  >
+                                    {idx + 1}
+                                  </div>
+                                  
+                                  {/* Step details */}
+                                  <div className="space-y-3">
+                                    <div className="pl-1">
+                                      <h5 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-0.5`}>
+                                        {cat.title}
+                                      </h5>
+                                      <p className="text-[10.5px] text-slate-700 dark:text-slate-300 mb-0 font-semibold">
+                                        {cat.desc}
+                                      </p>
+                                    </div>
+                                    
+                                    {/* Strategy Cards Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                      {cat.strategies.map((strat, sIdx) => (
+                                        <div 
+                                          key={sIdx} 
+                                          className="p-3.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-3"
+                                          style={{ backgroundColor: theme === 'dark' ? '#131520' : '#ffffff' }}
+                                        >
+                                          <div>
+                                            <div className="flex justify-between items-start mb-1.5 gap-2">
+                                              <span className={`text-[11px] font-black ${textTitle} leading-snug`}>
+                                                {strat.name}
+                                              </span>
+                                              <span className="badge bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 font-mono text-[8.5px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                                                {strat.channel}
+                                              </span>
+                                            </div>
+                                            <p className="text-[10.5px] text-slate-800 dark:text-slate-200 leading-relaxed mb-0 font-medium">
+                                              {strat.desc}
+                                            </p>
+                                          </div>
+                                          
+                                          <button
+                                            type="button"
+                                            onClick={() => loadStrategy(strat)}
+                                            className="btn btn-xs py-1.5 px-3 bg-[#F97316] text-white hover:bg-[#EA580C] rounded-lg border-0 text-[9.5px] font-black cursor-pointer transition-all flex items-center space-x-1.5 shadow-sm shadow-[#F97316]/20 self-start"
+                                          >
+                                            <Send className="w-3 h-3" />
+                                            <span>Usar Modelo</span>
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
 
-                        <div className={`card ${cardClass} p-4`}>
-                          <div className="flex justify-between items-center mb-3">
-                            <h4 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-0`}>Cupons Promocionais Gerados</h4>
-                            <button onClick={()=>setShowAddCouponModal(true)} className="btn btn-outline-primary btn-xs border-[#3B82F6] text-[#3B82F6] px-2.5 py-1 text-[9px] rounded font-bold bg-transparent cursor-pointer">
-                              Novo Cupom
-                            </button>
-                          </div>
-                          <div className="row g-2">
-                            {coupons.map(cp => (
-                              <div key={cp.id} className="col-md-4">
-                                <div className={`p-3 rounded border ${borderCol} flex justify-between items-center bg-slate-50 dark:bg-white/2`}>
-                                  <div>
-                                    <span className={`font-mono font-bold text-xs ${textTitle} block`}>{cp.code}</span>
-                                    <span className="text-[9.5px] text-slate-400 block">{cp.event}</span>
-                                    <span className="text-[9.5px] text-slate-400 block">{cp.usages} utilizações</span>
-                                  </div>
-                                  <span className="text-xs font-black text-[#22C55E]">{cp.discount}% OFF</span>
+                        {/* Criador de Campanhas */}
+                        <div className="col-lg-4">
+                          <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between bg-gradient-to-b from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-900/50`}>
+                            <div className="border-b border-slate-150 dark:border-white/5 pb-3 mb-4">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-1 flex items-center space-x-1.5`}>
+                                <Megaphone className="w-4 h-4 text-blue-500" />
+                                <span>Criador de Campanhas</span>
+                              </h4>
+                              <p className={`text-xs ${textSec} mb-0`}>Revise o modelo selecionado e efetue o disparo de vendas.</p>
+                            </div>
+
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              const data = new FormData(e.target);
+                              const name = data.get('name') || 'Nova Campanha';
+                              const channel = data.get('channel') || 'WhatsApp';
+                              
+                              const newCamp = {
+                                id: `camp-${Date.now()}`,
+                                name,
+                                channel,
+                                sent: Math.floor(Math.random()*15000) + 2000,
+                                openRate: (Math.random()*30 + 70).toFixed(1),
+                                clickRate: (Math.random()*12 + 8).toFixed(1),
+                                conversions: Math.floor(Math.random()*400) + 60,
+                                revenue: Math.floor(Math.random()*60000) + 8000,
+                                status: 'Ativa',
+                                date: new Date().toLocaleDateString(),
+                                roi: Math.floor(Math.random()*300) + 200,
+                                audience: 'Público Alvo Selecionado'
+                              };
+
+                              setCampaigns(prev => [newCamp, ...prev]);
+                              triggerToast("Campanha Iniciada", `Campanha "${name}" foi disparada pelo canal ${channel}.`);
+                              e.target.reset();
+                            }} className="space-y-4 text-xs flex-1 flex flex-col justify-between">
+                              <div className="space-y-3.5">
+                                <div>
+                                  <label className={`text-[10px] font-bold ${textSec} uppercase block mb-1`}>Nome da Ação</label>
+                                  <input id="camp-form-name" type="text" name="name" placeholder="Ex: Black Friday Pista VIP" className={`form-control ${inputClass} text-xs p-3 rounded-lg w-full bg-transparent`} required />
+                                </div>
+
+                                <div>
+                                  <label className={`text-[10px] font-bold ${textSec} uppercase block mb-1`}>Canal de Comunicação</label>
+                                  <select id="camp-form-channel" name="channel" className={`form-control form-select ${inputClass} text-xs p-3 rounded-lg w-full bg-transparent`}>
+                                    <option value="WhatsApp">WhatsApp API</option>
+                                    <option value="E-mail">E-mail Marketing</option>
+                                    <option value="SMS">SMS Direto</option>
+                                    <option value="Instagram Ads">Instagram Ads</option>
+                                    <option value="Google Ads">Google Ads</option>
+                                  </select>
+                                </div>
+
+                                <div>
+                                  <label className={`text-[10px] font-bold ${textSec} uppercase block mb-1`}>Show Associado</label>
+                                  <select name="targetEvent" className={`form-control form-select ${inputClass} text-xs p-3 rounded-lg w-full bg-transparent`}>
+                                    {events.map(ev => (
+                                      <option key={ev.id} value={ev.name}>{ev.name}</option>
+                                    ))}
+                                  </select>
                                 </div>
                               </div>
-                            ))}
+
+                              <button type="submit" className="btn btn-primary w-full py-3 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-lg border-0 cursor-pointer transition-all shadow-md shadow-blue-500/10 mt-4 flex items-center justify-center space-x-1.5">
+                                <Send className="w-3.5 h-3.5" />
+                                <span>Iniciar Disparos em Lote</span>
+                              </button>
+                            </form>
                           </div>
                         </div>
                       </div>
+
+                      {/* History & Active Coupons Rows */}
+                      <div className="row g-4">
+                        {/* Listagem de campanhas */}
+                        <div className="col-lg-8">
+                          <div className={`card ${cardClass} p-4`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex justify-between items-center">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-0`}>Histórico e Status das Campanhas ({campaigns.length})</h4>
+                              <span className="text-[10px] text-slate-400 font-mono">Real-time stats</span>
+                            </div>
+                            <div className="table-responsive">
+                              <table className="table text-xs mb-0 align-middle">
+                                <thead>
+                                  <tr className={`border-bottom ${borderCol} text-slate-400 font-semibold text-[9.5px] uppercase`}>
+                                    <th className="pb-2 border-0">Campanha</th>
+                                    <th className="pb-2 border-0">Canal</th>
+                                    <th className="pb-2 border-0 text-center">Desempenho</th>
+                                    <th className="pb-2 border-0 text-center">Status</th>
+                                    <th className="pb-2 border-0 text-center">ROI</th>
+                                    <th className="pb-2 border-0 text-right">Vendas</th>
+                                    <th className="pb-2 border-0 text-right">Faturamento</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {campaigns.map(c => (
+                                    <tr key={c.id} className={`border-bottom ${borderCol}/40 hover:bg-slate-50/10`}>
+                                      <td className="py-3 border-0">
+                                        <span className={`font-bold ${textTitle} block`}>{c.name}</span>
+                                        <span className="text-[9px] text-slate-400 block">{c.audience || 'Público Geral'}</span>
+                                      </td>
+                                      <td className="py-3 border-0">
+                                        <span className="badge bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-350 font-mono text-[9.5px] px-2.5 py-1 rounded-full">
+                                          {c.channel}
+                                        </span>
+                                      </td>
+                                      <td className="py-3 border-0 text-center text-slate-400">
+                                        <span className={`font-bold ${textTitle}`}>{c.openRate}%</span>
+                                        <span className="block text-[8px] text-slate-400">clique: {c.clickRate}%</span>
+                                      </td>
+                                      <td className="py-3 border-0 text-center">
+                                        <span className={`badge ${c.status === 'Concluída' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#3B82F6]/10 text-[#3B82F6]'} text-[9px] font-bold px-2.5 py-1 rounded-full`}>
+                                          {c.status}
+                                        </span>
+                                      </td>
+                                      <td className="py-3 border-0 text-center">
+                                        <span className="text-[#22C55E] font-mono font-black">{c.roi || '—'}%</span>
+                                      </td>
+                                      <td className="py-3 border-0 text-right font-semibold">{c.conversions}</td>
+                                      <td className="py-3 border-0 text-right font-black text-[#22C55E]">R$ {c.revenue.toLocaleString()}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Cupons Promocionais */}
+                        <div className="col-lg-4">
+                          <div className={`card ${cardClass} p-4`}>
+                            <div className="border-b border-slate-100 dark:border-white/5 pb-3 mb-4 flex justify-between items-center">
+                              <h4 className={`text-sm font-black ${textTitle} uppercase tracking-wider mb-0`}>Cupons Promocionais</h4>
+                              <button onClick={() => setShowAddCouponModal(true)} className="btn btn-primary btn-xs bg-blue-500 hover:bg-blue-600 border-0 px-3 py-1.5 text-[9.5px] rounded-lg font-bold cursor-pointer flex items-center space-x-1">
+                                <Plus className="w-2.5 h-2.5" />
+                                <span>Criar Cupom</span>
+                              </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 gap-3">
+                              {coupons.map(cp => (
+                                <div key={cp.id} className="relative rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 p-3.5 overflow-hidden flex justify-between items-center transition-all duration-300 hover:shadow-md">
+                                  {/* Ticket Visual Cutouts */}
+                                  <div className="absolute top-1/2 left-0 w-3 h-3 bg-[#F4F6F9] dark:bg-[#0F172A] rounded-full border-r border-slate-200 dark:border-white/5 -translate-y-1/2 -translate-x-1.5"></div>
+                                  <div className="absolute top-1/2 right-0 w-3 h-3 bg-[#F4F6F9] dark:bg-[#0F172A] rounded-full border-l border-slate-200 dark:border-white/5 -translate-y-1/2 translate-x-1.5"></div>
+                                  
+                                  <div className="pl-2.5 space-y-1">
+                                    <span className="font-mono font-black text-[13.5px] text-blue-500 block leading-none">{cp.code}</span>
+                                    <span className="text-[10px] text-slate-400 block truncate max-w-[150px] leading-snug">{cp.event}</span>
+                                    <span className="text-[9px] text-slate-500 block font-mono">{cp.usages} usos registrados</span>
+                                  </div>
+                                  
+                                  <div className="text-right pr-2.5 space-y-1">
+                                    <span className="text-[13px] font-black text-emerald-500 block leading-none">{cp.discount}% OFF</span>
+                                    <button 
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(cp.code);
+                                        triggerToast("Copiado!", `Cupom "${cp.code}" copiado.`);
+                                      }}
+                                      className="btn btn-xs py-1 px-2.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded border-0 cursor-pointer text-[8px] font-bold transition-all"
+                                    >
+                                      Copiar
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   );
                 })()}
@@ -7395,7 +6798,7 @@ export default function App() {
                                     <span className="text-2xl font-black text-[#22C55E]">{aiOutputs.sentiment.pos}%</span>
                                     <div>
                                       <span className={`text-xs font-bold ${textTitle} block`}>Sentimento Positivo</span>
-                                      <span className="text-[10px] text-slate-400">Interações e menções favoráveis</span>
+                                    <span className="text-[10px] text-slate-400">Interações e menções favoráveis</span>
                                     </div>
                                   </div>
                                 </div>
@@ -7425,6 +6828,11 @@ export default function App() {
                   if (checkLock) return checkLock;
 
                   const handleHireInfluencer = (infId) => {
+                    if (backendConnected) {
+                      fetch(`http://localhost:3001/api/marketing/influencers/${infId}/hire`, {
+                        method: 'POST'
+                      }).catch(err => console.error('Error hiring influencer on API:', err));
+                    }
                     setInfluencers(prev => prev.map(inf => {
                       if (inf.id === infId) {
                         const newHired = !inf.hired;
@@ -7569,7 +6977,19 @@ export default function App() {
                               />
                             </div>
 
-                            <button className="btn btn-primary w-full py-2 bg-[#22C55E] hover:bg-[#16a34a] text-white text-xs font-bold rounded border-0 cursor-pointer">
+                            <button 
+                              onClick={() => {
+                                if (backendConnected) {
+                                  fetch('http://localhost:3001/api/marketing/loyalty', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(loyaltyRules)
+                                  }).catch(err => console.error('Error saving loyalty rules on API:', err));
+                                }
+                                triggerToast("Configurações Salvas", "Regras de fidelidade atualizadas no banco.");
+                              }}
+                              className="btn btn-primary w-full py-2 bg-[#22C55E] hover:bg-[#16a34a] text-white text-xs font-bold rounded border-0 cursor-pointer"
+                            >
                               Salvar Configurações
                             </button>
                           </div>
@@ -7604,10 +7024,19 @@ export default function App() {
                                     <td className="py-3 border-0 text-center">
                                       <button 
                                         onClick={() => {
-                                          setLoyaltyRules(prev => ({
-                                            ...prev,
-                                            missions: prev.missions.map(mi => mi.id === m.id ? { ...mi, status: mi.status === 'Ativa' ? 'Inativa' : 'Ativa' } : mi)
-                                          }));
+                                          const updatedMissions = loyaltyRules.missions.map(mi => mi.id === m.id ? { ...mi, status: mi.status === 'Ativa' ? 'Inativa' : 'Ativa' } : mi);
+                                          const updatedRules = {
+                                            ...loyaltyRules,
+                                            missions: updatedMissions
+                                          };
+                                          setLoyaltyRules(updatedRules);
+                                          if (backendConnected) {
+                                            fetch('http://localhost:3001/api/marketing/loyalty', {
+                                              method: 'POST',
+                                              headers: { 'Content-Type': 'application/json' },
+                                              body: JSON.stringify(updatedRules)
+                                            }).catch(err => console.error('Error toggling mission status on API:', err));
+                                          }
                                           triggerToast("Missão Gamificada", "Status da missão alterado.");
                                         }}
                                         className="btn btn-outline-primary btn-xs border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white bg-transparent px-2 py-0.5 rounded text-[9px] cursor-pointer"
@@ -9317,5 +8746,15 @@ export default function App() {
       </div>
 
     </div>
+    )}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <DiskHubProvider>
+      <AppContent />
+    </DiskHubProvider>
   );
 }
