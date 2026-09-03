@@ -1,166 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDiskHub } from '../context/DiskHubContext';
+import { subscriptionService } from '../services/subscriptionService';
+import { apps } from '../config/apps';
 import { 
   X, 
   Search, 
-  LayoutDashboard, 
-  ShoppingCart, 
   Users, 
-  Wallet, 
+  Boxes, 
+  WalletCards, 
   Megaphone, 
   Headphones, 
-  Calendar, 
-  Receipt, 
-  FileText, 
-  Brain, 
-  Zap, 
-  Blocks, 
-  Settings,
-  ArrowRight
+  BarChart3, 
+  Calculator, 
+  Workflow, 
+  BrainCircuit, 
+  Plug,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  CreditCard,
+  Layers
 } from 'lucide-react';
 
-export default function AppLauncher() {
-  const {
-    appsOpen,
-    setAppsOpen,
-    navigateTo
-  } = useDiskHub();
+const iconMap = {
+  Users,
+  Boxes,
+  WalletCards,
+  Megaphone,
+  Headphones,
+  BarChart3,
+  Calculator,
+  Workflow,
+  BrainCircuit,
+  Plug
+};
 
+export default function AppLauncher() {
+  const { appsOpen, setAppsOpen, navigateTo } = useDiskHub();
   const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all' | 'active' | 'available' | 'upgrade'
+  const [subscription, setSubscription] = useState(() => subscriptionService.getSubscription());
   const modalRef = useRef(null);
 
-  const apps = [
-    {
-      id: 'dashboard',
-      name: 'Dashboard',
-      icon: LayoutDashboard,
-      route: '/dashboard',
-      description: 'Visão geral e central de operações',
-      status: 'active',
-      testId: 'app-dashboard',
-      color: 'bg-emerald-500/10 text-emerald-500'
-    },
-    {
-      id: 'sales',
-      name: 'Vendas',
-      icon: ShoppingCart,
-      route: '/vendas',
-      description: 'Pipeline, propostas e gestão comercial',
-      status: 'active',
-      testId: 'app-sales',
-      color: 'bg-orange-500/10 text-[#F97316]'
-    },
-    {
-      id: 'crm',
-      name: 'CRM',
-      icon: Users,
-      route: '/crm',
-      description: 'Clientes, leads e relacionamento 360º',
-      status: 'active',
-      testId: 'app-crm',
-      color: 'bg-blue-500/10 text-blue-500'
-    },
-    {
-      id: 'finance',
-      name: 'Financeiro',
-      icon: Wallet,
-      route: '/financeiro',
-      description: 'Fluxo de caixa, conciliação e DRE',
-      status: 'active',
-      testId: 'app-finance',
-      color: 'bg-emerald-500/10 text-emerald-600'
-    },
-    {
-      id: 'marketing',
-      name: 'Marketing',
-      icon: Megaphone,
-      route: '/marketing',
-      description: 'Campanhas, automações e pixels',
-      status: 'active',
-      testId: 'app-marketing',
-      color: 'bg-purple-500/10 text-purple-500'
-    },
-    {
-      id: 'support',
-      name: 'SAC',
-      icon: Headphones,
-      route: '/sac',
-      description: 'Atendimento, tickets e suporte ao cliente',
-      status: 'active',
-      testId: 'app-sac',
-      color: 'bg-amber-500/10 text-amber-500'
-    },
-    {
-      id: 'events',
-      name: 'Eventos',
-      icon: Calendar,
-      route: '/eventos',
-      description: 'Gestão de eventos, lotes e portaria',
-      status: 'active',
-      testId: 'app-events',
-      color: 'bg-rose-500/10 text-rose-500'
-    },
-    {
-      id: 'accounting',
-      name: 'Contabilidade',
-      icon: Receipt,
-      route: '/contabilidade',
-      description: 'Emissão de NF-e, balancetes e fiscal',
-      status: 'active',
-      testId: 'app-accounting',
-      color: 'bg-teal-500/10 text-teal-500'
-    },
-    {
-      id: 'reports',
-      name: 'Relatórios',
-      icon: FileText,
-      route: '/relatorios',
-      description: 'Exportações e relatórios consolidados',
-      status: 'beta',
-      testId: 'app-reports',
-      color: 'bg-indigo-500/10 text-indigo-500'
-    },
-    {
-      id: 'bi',
-      name: 'BI & Analytics',
-      icon: Brain,
-      route: '/bi',
-      description: 'Disk AI e inteligência preditiva',
-      status: 'beta',
-      testId: 'app-bi',
-      color: 'bg-cyan-500/10 text-cyan-500'
-    },
-    {
-      id: 'automation',
-      name: 'Automação',
-      icon: Zap,
-      route: '/automacao',
-      description: 'Workflows comerciais e triggers automáticos',
-      status: 'coming-soon',
-      testId: 'app-automation',
-      color: 'bg-yellow-500/10 text-yellow-600'
-    },
-    {
-      id: 'integrations',
-      name: 'Integrações',
-      icon: Blocks,
-      route: '/integracoes',
-      description: 'Gateways, APIs e Webhooks',
-      status: 'active',
-      testId: 'app-integrations',
-      color: 'bg-violet-500/10 text-violet-500'
-    },
-    {
-      id: 'settings',
-      name: 'Configurações',
-      icon: Settings,
-      route: '/configuracoes',
-      description: 'Preferências do sistema e permissões',
-      status: 'active',
-      testId: 'app-settings',
-      color: 'bg-slate-500/10 text-slate-500'
-    }
-  ];
+  useEffect(() => {
+    const unsub = subscriptionService.subscribe((sub) => {
+      setSubscription(sub);
+    });
+    return unsub;
+  }, []);
 
   // Close on Escape key
   useEffect(() => {
@@ -173,46 +60,153 @@ export default function AppLauncher() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [appsOpen, setAppsOpen]);
 
+  // Lock body scroll while open
+  useEffect(() => {
+    if (appsOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [appsOpen]);
+
   if (!appsOpen) return null;
 
-  const filteredApps = apps.filter(app =>
-    app.name.toLowerCase().includes(search.toLowerCase()) ||
-    app.description.toLowerCase().includes(search.toLowerCase())
-  );
+  // Compute status per app
+  const appsWithStatus = apps.map(app => {
+    const status = subscriptionService.getAppStatus(app.id);
+    return {
+      ...app,
+      status
+    };
+  });
 
-  const openApp = (app) => {
+  // Filter apps
+  const filteredApps = appsWithStatus.filter(app => {
+    const term = search.toLowerCase();
+    const matchSearch = app.name.toLowerCase().includes(term) ||
+                        app.description.toLowerCase().includes(term) ||
+                        app.category.toLowerCase().includes(term);
+
+    if (!matchSearch) return false;
+
+    if (activeFilter === 'active') return app.status === 'active';
+    if (activeFilter === 'available') return app.status === 'available';
+    if (activeFilter === 'upgrade') return app.status === 'upgrade';
+    return true;
+  });
+
+  const myApps = filteredApps.filter(a => a.status === 'active' || a.status === 'trial' || a.status === 'implementing');
+  const marketplaceApps = filteredApps.filter(a => a.status === 'available' || a.status === 'upgrade' || a.status === 'coming-soon');
+
+  const handleAppAction = (app) => {
     setAppsOpen(false);
-    navigateTo(app.route);
+    if (app.status === 'active') {
+      navigateTo(app.route);
+    } else if (app.status === 'available') {
+      navigateTo(app.productRoute);
+    } else if (app.status === 'upgrade') {
+      navigateTo(`/planos?produto=${app.id}&upgrade=true`);
+    } else if (app.status === 'trial') {
+      navigateTo(`/produtos/${app.id}`);
+    }
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'active':
-        return (
-          <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            Ativo
+  const renderCard = (app) => {
+    const IconComponent = iconMap[app.icon] || Layers;
+
+    return (
+      <div
+        key={app.id}
+        data-testid={app.testId}
+        className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/70 dark:bg-[#1E293B]/40 hover:bg-white dark:hover:bg-[#1E293B] hover:border-[#F97316] hover:shadow-lg transition-all flex flex-col justify-between group text-left relative"
+      >
+        <div>
+          <div className="flex items-center justify-between mb-2.5">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs transition-transform group-hover:scale-105 ${
+              app.status === 'active' 
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                : 'bg-orange-500/10 text-[#F97316]'
+            }`}>
+              <IconComponent className="w-5 h-5" />
+            </div>
+
+            {/* Status Badge */}
+            {app.status === 'active' && (
+              <span data-testid={`${app.testId}-status`} className="text-[9.5px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                Ativo
+              </span>
+            )}
+            {app.status === 'available' && (
+              <span data-testid={`${app.testId}-status`} className="text-[9.5px] font-black px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                Disponível
+              </span>
+            )}
+            {app.status === 'upgrade' && (
+              <span data-testid={`${app.testId}-status`} className="text-[9.5px] font-black px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-500/20 text-[#F97316] uppercase tracking-wider">
+                {app.plan === 'expert' ? 'Expert' : 'Advanced'}
+              </span>
+            )}
+            {app.status === 'implementing' && (
+              <span data-testid={`${app.testId}-status`} className="text-[9.5px] font-black px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                Em implantação
+              </span>
+            )}
+          </div>
+
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+            {app.category}
           </span>
-        );
-      case 'beta':
-        return (
-          <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-            Beta
-          </span>
-        );
-      case 'coming-soon':
-        return (
-          <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-            Em breve
-          </span>
-        );
-      default:
-        return null;
-    }
+          <h3 className="text-sm font-black text-slate-900 dark:text-white mb-1 group-hover:text-[#F97316] transition-colors">
+            {app.name}
+          </h3>
+          <p className="text-[11px] text-slate-400 leading-snug line-clamp-2 mb-0">
+            {app.description}
+          </p>
+        </div>
+
+        <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-white/5 flex items-center justify-between">
+          {app.status === 'active' ? (
+            <button
+              type="button"
+              onClick={() => handleAppAction(app)}
+              className="w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold border-0 cursor-pointer shadow-xs flex items-center justify-center space-x-1.5 transition-all"
+            >
+              <span>Abrir Módulo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : app.status === 'upgrade' ? (
+            <button
+              type="button"
+              onClick={() => handleAppAction(app)}
+              className="w-full py-1.5 px-3 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold border-0 cursor-pointer shadow-xs flex items-center justify-center space-x-1.5 transition-all"
+            >
+              <span>Ver Upgrade</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleAppAction(app)}
+              className="w-full py-1.5 px-3 rounded-lg bg-slate-200 dark:bg-white/10 hover:bg-[#F97316] hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold border-0 cursor-pointer transition-all flex items-center justify-center space-x-1.5"
+            >
+              <span>Conhecer</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div 
       className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Central de Aplicativos DiskHub Business Cloud"
       onClick={(e) => {
         if (e.target === e.currentTarget) setAppsOpen(false);
       }}
@@ -220,20 +214,25 @@ export default function AppLauncher() {
       <div 
         ref={modalRef}
         data-testid="app-launcher"
-        className={`w-full max-w-4xl max-h-[90vh] flex flex-col bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] rounded-3xl shadow-2xl overflow-hidden animate-scaleUp font-sans`}
+        className="w-full max-w-5xl max-h-[88vh] flex flex-col bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] rounded-3xl shadow-2xl overflow-hidden animate-scaleUp font-sans"
       >
         {/* Top Header */}
         <div className="p-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-2xl bg-orange-500/10 text-[#F97316] flex items-center justify-center shadow-xs">
-              <Blocks className="w-5 h-5" />
+              <Boxes className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight mb-0.5">
-                Central de Aplicativos DiskHub
-              </h2>
+              <div className="flex items-center space-x-2">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight mb-0">
+                  DiskHub Business Cloud
+                </h2>
+                <span data-testid="current-plan" className="text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-500/20 text-[#F97316]">
+                  Plano {subscription.plan.toUpperCase()}
+                </span>
+              </div>
               <p className="text-xs text-slate-400 mb-0">
-                Selecione um módulo para navegar instantaneamente
+                Seu hub empresarial de soluções e módulos digitais para produtores
               </p>
             </div>
           </div>
@@ -248,57 +247,105 @@ export default function AppLauncher() {
           </button>
         </div>
 
-        {/* Search Input Bar */}
-        <div className="px-5 pt-4 pb-2">
-          <div className="relative">
+        {/* Search & Filter Bar */}
+        <div className="px-5 pt-4 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5">
+          <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input 
               type="text"
-              placeholder="Buscar aplicativo..."
+              data-testid="app-search"
+              placeholder="Buscar aplicativo por nome, recurso ou categoria..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-100 dark:bg-[#1E293B] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#F97316]"
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-100 dark:bg-[#1E293B] border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#F97316]"
             />
+          </div>
+
+          <div className="flex items-center space-x-1.5 text-xs overflow-x-auto">
+            <button
+              type="button"
+              data-testid="app-filter-all"
+              onClick={() => setActiveFilter('all')}
+              className={`px-3 py-1.5 rounded-xl font-bold border-0 cursor-pointer transition-all ${
+                activeFilter === 'all'
+                  ? 'bg-[#F97316] text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              type="button"
+              data-testid="app-filter-active"
+              onClick={() => setActiveFilter('active')}
+              className={`px-3 py-1.5 rounded-xl font-bold border-0 cursor-pointer transition-all ${
+                activeFilter === 'active'
+                  ? 'bg-[#F97316] text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Meus Apps ({myApps.length})
+            </button>
+            <button
+              type="button"
+              data-testid="app-filter-available"
+              onClick={() => setActiveFilter('available')}
+              className={`px-3 py-1.5 rounded-xl font-bold border-0 cursor-pointer transition-all ${
+                activeFilter === 'available'
+                  ? 'bg-[#F97316] text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Disponíveis
+            </button>
+            <button
+              type="button"
+              data-testid="app-filter-upgrade"
+              onClick={() => setActiveFilter('upgrade')}
+              className={`px-3 py-1.5 rounded-xl font-bold border-0 cursor-pointer transition-all ${
+                activeFilter === 'upgrade'
+                  ? 'bg-[#F97316] text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Upgrade
+            </button>
           </div>
         </div>
 
-        {/* Responsive Apps Grid */}
-        <div className="p-5 overflow-y-auto max-h-[calc(90vh-180px)]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
-            {filteredApps.map(app => {
-              const Icon = app.icon;
-              return (
-                <div
-                  key={app.id}
-                  data-testid={app.testId}
-                  onClick={() => openApp(app)}
-                  className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/70 dark:bg-[#1E293B]/40 hover:bg-white dark:hover:bg-[#1E293B] hover:border-[#F97316] hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group text-left"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`w-11 h-11 rounded-2xl ${app.color} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      {getStatusBadge(app.status)}
-                    </div>
+        {/* Content Scroll Area */}
+        <div className="p-5 overflow-y-auto max-h-[calc(88vh-200px)] space-y-6">
+          
+          {/* SECTION 1: MEUS APPS */}
+          {(activeFilter === 'all' || activeFilter === 'active') && myApps.length > 0 && (
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-0">
+                  Meus Aplicativos Liberados
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {myApps.map(renderCard)}
+              </div>
+            </div>
+          )}
 
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white mb-1 group-hover:text-[#F97316] transition-colors">
-                      {app.name}
-                    </h3>
-                    <p className="text-[11px] text-slate-400 leading-snug line-clamp-2 mb-0">
-                      {app.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-white/5 flex items-center justify-between text-[10.5px] font-bold text-slate-400 group-hover:text-[#F97316] transition-colors">
-                    <span>Acessar</span>
-                    <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* SECTION 2: EXPANDA SUA OPERAÇÃO (MARKETPLACE) */}
+          {(activeFilter === 'all' || activeFilter === 'available' || activeFilter === 'upgrade') && marketplaceApps.length > 0 && (
+            <div>
+              <div className="flex items-center space-x-2 mb-3">
+                <Sparkles className="w-4 h-4 text-[#F97316]" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-0">
+                  Expanda sua Operação (Marketplace)
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {marketplaceApps.map(renderCard)}
+              </div>
+            </div>
+          )}
 
           {filteredApps.length === 0 && (
             <div className="py-12 text-center text-slate-400">
@@ -306,13 +353,41 @@ export default function AppLauncher() {
               <p className="text-xs font-semibold">Nenhum aplicativo encontrado para "{search}".</p>
             </div>
           )}
+
         </div>
 
-        {/* Bottom Footer Info */}
-        <div className="px-5 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111827] flex flex-wrap items-center justify-between text-[11px] text-slate-400">
-          <span>Pressione <strong>ESC</strong> ou clique fora para fechar</span>
-          <span className="font-semibold text-slate-600 dark:text-slate-300">DiskHub Launchpad • 13 módulos</span>
+        {/* Bottom Banner: Planos & Assinatura */}
+        <div className="px-5 py-3.5 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#111827] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-300">
+            <Sparkles className="w-4 h-4 text-[#F97316]" />
+            <span>Quer liberar mais ferramentas? Conheça os planos <strong>DiskHub Business Cloud</strong>.</span>
+          </div>
+
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setAppsOpen(false);
+                navigateTo('/planos');
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white font-bold text-xs border-0 cursor-pointer shadow-xs transition-all"
+            >
+              Comparar Planos
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAppsOpen(false);
+                navigateTo('/assinatura');
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200 font-bold text-xs border-0 cursor-pointer transition-all flex items-center space-x-1"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              <span>Minha Assinatura</span>
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   );

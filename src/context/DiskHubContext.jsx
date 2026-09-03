@@ -45,7 +45,11 @@ export function DiskHubProvider({ children }) {
     if (!path) return 'dashboard';
     const clean = path.replace(/^\/+|\/+$/g, '').toLowerCase().split('?')[0].split('#')[0];
     if (!clean || clean === 'dashboard') return 'dashboard';
-    if (clean === 'vendas' || clean === 'sales' || clean === 'pdv') return 'vendas';
+    if (clean.startsWith('produtos')) return 'produtos';
+    if (clean.startsWith('contratacao')) return 'contratacao';
+    if (clean === 'planos') return 'planos';
+    if (clean === 'assinatura') return 'assinatura';
+    if (clean === 'vendas' || clean === 'sales' || clean === 'pdv' || clean === 'erp') return 'vendas';
     if (clean === 'financeiro' || clean === 'finance') return 'financeiro';
     if (clean === 'marketing' || clean === 'mkt') return 'marketing';
     if (clean === 'crm') return 'crm';
@@ -53,11 +57,10 @@ export function DiskHubProvider({ children }) {
     if (clean === 'eventos' || clean === 'events') return 'eventos';
     if (clean === 'contabilidade' || clean === 'fiscal') return 'contabilidade';
     if (clean === 'relatorios' || clean === 'reports') return 'relatorios';
-    if (clean === 'bi' || clean === 'ai' || clean === 'analytics') return 'ai';
+    if (clean === 'bi' || clean === 'ai' || clean === 'analytics' || clean === 'ia') return 'ai';
     if (clean === 'automacao' || clean === 'automation') return 'automacao';
     if (clean === 'integracoes' || clean === 'appstore') return 'appstore';
     if (clean === 'configuracoes' || clean === 'roadmap') return 'roadmap';
-    if (clean === 'planos' || clean === 'marketplace') return 'marketplace';
     if (clean === 'logistica' || clean === 'ingressos') return 'logistica';
     if (clean === 'bar' || clean === 'estoque') return 'bar';
     if (clean === 'patrimonio') return 'patrimonio';

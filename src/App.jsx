@@ -14,6 +14,7 @@ import AiChatDrawer from './components/AiChatDrawer';
 import SpotlightSearch from './components/SpotlightSearch';
 import QuickActionModals from './components/QuickActionModals';
 import AppLauncher from './components/AppLauncher';
+import AppAccessGuard from './components/AppAccessGuard';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -31,7 +32,10 @@ import BarInventoryPage from './pages/BarInventoryPage';
 import PatrimonyPage from './pages/PatrimonyPage';
 import AiAnalyticsPage from './pages/AiAnalyticsPage';
 import AppStorePage from './pages/AppStorePage';
-import PlansPage from './pages/PlansPage';
+import PlansPage from './pages/plans/PlansPage';
+import ProductDetails from './pages/products/ProductDetails';
+import CheckoutPage from './pages/checkout/CheckoutPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import RoadmapPage from './pages/RoadmapPage';
 
 export function AppContent() {
@@ -73,34 +77,66 @@ export function AppContent() {
         {/* CONTENT AREA */}
         <div className="content p-4 max-w-7xl w-full mx-auto space-y-4">
           {currentTab === 'dashboard' && <Dashboard />}
-          {(currentTab === 'vendas' || currentTab === 'pdv') && <SalesPage />}
-          {currentTab === 'financeiro' && <FinancePage />}
-          {currentTab === 'contabilidade' && <AccountingPage />}
-          {currentTab === 'crm' && <CrmPage />}
+          {currentTab === 'produtos' && <ProductDetails />}
+          {currentTab === 'planos' && <PlansPage />}
+          {currentTab === 'contratacao' && <CheckoutPage />}
+          {currentTab === 'assinatura' && <SubscriptionPage />}
+          
+          {(currentTab === 'vendas' || currentTab === 'pdv') && (
+            <AppAccessGuard appId="erp">
+              <SalesPage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'financeiro' && (
+            <AppAccessGuard appId="finance">
+              <FinancePage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'crm' && (
+            <AppAccessGuard appId="crm">
+              <CrmPage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'marketing' && (
+            <AppAccessGuard appId="marketing">
+              <MarketingPage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'sac' && (
+            <AppAccessGuard appId="support">
+              <SacPage />
+            </AppAccessGuard>
+          )}
+          {(currentTab === 'ai' || currentTab === 'bi') && (
+            <AppAccessGuard appId="analytics">
+              <AiAnalyticsPage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'contabilidade' && (
+            <AppAccessGuard appId="accounting">
+              <AccountingPage />
+            </AppAccessGuard>
+          )}
+          {currentTab === 'automacao' && (
+            <AppAccessGuard appId="automation">
+              <PreparationPage moduleName="Automação Comercial" />
+            </AppAccessGuard>
+          )}
+          
           {currentTab === 'eventos' && <EventsPage />}
-          {currentTab === 'marketing' && <MarketingPage />}
-          {currentTab === 'sac' && <SacPage />}
           {currentTab === 'logistica' && <LogisticsPage />}
           {(currentTab === 'bar' || currentTab === 'estoque') && <BarInventoryPage />}
           {currentTab === 'patrimonio' && <PatrimonyPage />}
-          {(currentTab === 'ai' || currentTab === 'bi') && <AiAnalyticsPage />}
           {(currentTab === 'appstore' || currentTab === 'integracoes') && <AppStorePage />}
-          {(currentTab === 'marketplace' || currentTab === 'planos') && (
-            <PlansPage 
-              plan={plan}
-              setPlan={setPlan}
-              theme={theme}
-              triggerToast={triggerToast}
-            />
-          )}
           {(currentTab === 'roadmap' || currentTab === 'configuracoes') && <RoadmapPage />}
-          {currentTab === 'automacao' && <PreparationPage moduleName="Automação Comercial" />}
           {currentTab === 'relatorios' && <PreparationPage moduleName="Relatórios Consolidados" />}
+          
           {![
-            'dashboard', 'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
+            'dashboard', 'produtos', 'planos', 'contratacao', 'assinatura',
+            'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
             'eventos', 'marketing', 'sac', 'logistica', 'bar', 'estoque',
             'patrimonio', 'ai', 'bi', 'appstore', 'integracoes', 'marketplace',
-            'planos', 'roadmap', 'configuracoes', 'automacao', 'relatorios'
+            'roadmap', 'configuracoes', 'automacao', 'relatorios'
           ].includes(currentTab) && <PreparationPage moduleName="Módulo" />}
         </div>
 
