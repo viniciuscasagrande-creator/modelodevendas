@@ -48,7 +48,7 @@ export function DiskHubProvider({ children }) {
     if (clean.startsWith('produtos')) return 'produtos';
     if (clean.startsWith('contratacao')) return 'contratacao';
     if (clean === 'planos') return 'planos';
-    if (clean === 'assinatura') return 'assinatura';
+    if (clean.startsWith('assinatura')) return 'assinatura';
     if (clean === 'vendas' || clean === 'sales' || clean === 'pdv' || clean === 'erp') return 'vendas';
     if (clean === 'financeiro' || clean === 'finance') return 'financeiro';
     if (clean === 'marketing' || clean === 'mkt') return 'marketing';
