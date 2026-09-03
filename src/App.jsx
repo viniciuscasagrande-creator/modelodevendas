@@ -12,6 +12,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import AiChatDrawer from './components/AiChatDrawer';
 import SpotlightSearch from './components/SpotlightSearch';
+import QuickActionModals from './components/QuickActionModals';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -111,6 +112,9 @@ export function AppContent() {
 
       {/* SPOTLIGHT SEARCH OVERLAY */}
       <SpotlightSearch />
+
+      {/* QUICK ACTIONS MODALS (NOVA VENDA, NOVO EVENTO, ETC.) */}
+      <QuickActionModals />
 
       {/* FLOATING SIMULATOR CONTROL BAR (DEVELOPER TOOLBAR) */}
       <div className="fixed bottom-16 md:bottom-4 left-1/2 -translate-x-1/2 z-40 bg-white/90 dark:bg-[#111827]/90 backdrop-blur border border-slate-200 dark:border-[#1F2937] px-3.5 py-2 rounded-2xl md:rounded-full shadow-xl flex items-center justify-center gap-2 flex-wrap max-w-[95%] text-[10.5px]">

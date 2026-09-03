@@ -28,6 +28,7 @@ import {
   MoreVertical,
   Ticket
 } from 'lucide-react';
+import EventDashboardPage from './EventDashboardPage';
 
 export default function EventsPage() {
   const {
@@ -55,6 +56,8 @@ export default function EventsPage() {
     setEventWizardStep,
     wizardInputs,
     setWizardInputs,
+    selectedEventForDetail,
+    setSelectedEventForDetail,
     triggerToast,
     theme,
     cardClass,
@@ -105,6 +108,10 @@ export default function EventsPage() {
     setNewPdv({ name: '', manager: '', type: 'Local', balance: '', status: 'Aberto' });
     triggerToast("Sucesso", "Novo ponto de venda física (PDV) ativo.");
   };
+
+  if (selectedEventForDetail) {
+    return <EventDashboardPage onBack={() => setSelectedEventForDetail(null)} />;
+  }
 
   return (
     <>

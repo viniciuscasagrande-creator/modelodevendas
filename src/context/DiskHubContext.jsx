@@ -340,6 +340,23 @@ export function DiskHubProvider({ children }) {
     boleto: { name: 'Boleto Bancário', rate: 0.0, fixed: 2.50 }
   };
 
+  // Context Cascade: Diskingressos -> Produtor -> Evento -> Sessão
+  const [selectedCompany, setSelectedCompany] = useState('Diskingressos');
+  const [selectedProducer, setSelectedProducer] = useState('Produtor Exemplo');
+  const [selectedEventContext, setSelectedEventContext] = useState('Rock Festival 2025');
+  const [selectedSessionContext, setSelectedSessionContext] = useState('05 Set • 18:00');
+
+  // Quick Action Modals
+  const [showQuickSaleModal, setShowQuickSaleModal] = useState(false);
+  const [showQuickEventModal, setShowQuickEventModal] = useState(false);
+  const [showQuickClientModal, setShowQuickClientModal] = useState(false);
+  const [showQuickCourtesyModal, setShowQuickCourtesyModal] = useState(false);
+  const [showQuickCancelModal, setShowQuickCancelModal] = useState(false);
+
+  // Event Detail Dashboard State
+  const [selectedEventForDetail, setSelectedEventForDetail] = useState(null);
+  const [eventDetailTab, setEventDetailTab] = useState('visao-geral');
+
   // REST API connection state
   const [backendConnected, setBackendConnected] = useState(false);
 
@@ -734,6 +751,17 @@ export function DiskHubProvider({ children }) {
       handleTriggerCampaign,
       handleCreateCampaign,
       handleCreateCoupon,
+      selectedCompany, setSelectedCompany,
+      selectedProducer, setSelectedProducer,
+      selectedEventContext, setSelectedEventContext,
+      selectedSessionContext, setSelectedSessionContext,
+      showQuickSaleModal, setShowQuickSaleModal,
+      showQuickEventModal, setShowQuickEventModal,
+      showQuickClientModal, setShowQuickClientModal,
+      showQuickCourtesyModal, setShowQuickCourtesyModal,
+      showQuickCancelModal, setShowQuickCancelModal,
+      selectedEventForDetail, setSelectedEventForDetail,
+      eventDetailTab, setEventDetailTab,
       bgMain, sidebarClass, cardClass, bgCard, cardHeaderClass, inputClass, headerClass, borderCol, textTitle, textSec, textBody, bgInput, selectThemeText
     }}>
       {children}
