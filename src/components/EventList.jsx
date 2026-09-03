@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDiskHub } from '../context/DiskHubContext';
-import { MapPin, Calendar, Users } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
 
 export default function EventList() {
   const { events, cardClass, textTitle, textSec, setCurrentTab } = useDiskHub();

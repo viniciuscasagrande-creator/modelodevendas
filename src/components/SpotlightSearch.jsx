@@ -11,7 +11,6 @@ export default function SpotlightSearch() {
     setSpotlightQuery,
     setCurrentTab,
     triggerToast,
-    theme,
     textTitle,
     events,
     setTheme,

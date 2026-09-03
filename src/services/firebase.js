@@ -20,7 +20,7 @@ try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
-} catch (_e) {
+} catch {
   console.log("Firebase not configured yet. Running in local simulated mode.");
 }
 

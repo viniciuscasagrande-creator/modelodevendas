@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDiskHub } from '../context/DiskHubContext';
-import { Terminal } from 'lucide-react';
 
 export default function PatrimonyPage() {
   const {
@@ -9,7 +8,6 @@ export default function PatrimonyPage() {
     borderCol,
     textTitle,
     textSec,
-    theme,
     triggerToast
   } = useDiskHub();
 

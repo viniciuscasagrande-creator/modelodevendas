@@ -2,7 +2,7 @@ import React from 'react';
 import { useDiskHub } from '../context/DiskHubContext';
 
 export default function KPICard({ title, value, icon: Icon, trend, trendColor = 'text-[#10B981]', trendBg = 'bg-[#10B981]/10', borderLeftColor }) {
-  const { cardClass, textTitle, textSec } = useDiskHub();
+  const { cardClass, textTitle } = useDiskHub();
 
   return (
     <div 

@@ -11,7 +11,6 @@ import {
 export default function Header() {
   const {
     currentTab,
-    setCurrentTab,
     currentUser,
     setCurrentUser,
     theme,

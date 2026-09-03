@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDiskHub } from '../context/DiskHubContext';
-import { Landmark, ArrowUpRight } from 'lucide-react';
+import { Landmark } from 'lucide-react';
 
 export default function FinanceCard() {
   const { accounts, cardClass, textTitle, textSec } = useDiskHub();

@@ -124,7 +124,7 @@ export default function MarketingPage() {
               triggerToast("Inteligência Artificial", "Previsões de mercado e recomendação de IA recalculadas.");
             };
 
-            const renderModuleLock = (moduleIds, title) => {
+            const renderModuleLock = (moduleIds, _title) => {
               const active = moduleIds.every(id => marketingModulesStatus[id]);
               if (!active) {
                 return (

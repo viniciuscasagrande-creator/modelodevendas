@@ -3,7 +3,7 @@ import { useDiskHub } from '../context/DiskHubContext';
 import { Clock } from 'lucide-react';
 
 export default function Calendar() {
-  const { appointments, cardClass, textTitle, textSec, setCurrentTab, setCrmSubTab } = useDiskHub();
+  const { appointments, cardClass, textTitle, setCurrentTab, setCrmSubTab } = useDiskHub();
 
   const handleGoToAgenda = () => {
     setCurrentTab('contabilidade');

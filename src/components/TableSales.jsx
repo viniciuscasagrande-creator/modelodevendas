@@ -3,7 +3,7 @@ import { useDiskHub } from '../context/DiskHubContext';
 import { Send } from 'lucide-react';
 
 export default function TableSales() {
-  const { campaigns, handleTriggerCampaign, cardClass, textTitle, textSec, borderCol } = useDiskHub();
+  const { campaigns, handleTriggerCampaign, cardClass, textTitle, borderCol } = useDiskHub();
 
   return (
     <div className={`card ${cardClass} p-4`}>

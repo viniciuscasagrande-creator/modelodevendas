@@ -3,7 +3,7 @@ import { useDiskHub } from '../context/DiskHubContext';
 import { Clock } from 'lucide-react';
 
 export default function Activities() {
-  const { eventLogs, cardClass, textTitle, textSec } = useDiskHub();
+  const { eventLogs, cardClass, textTitle } = useDiskHub();
 
   return (
     <div className={`card ${cardClass} p-4 h-100 flex flex-col justify-between`}>

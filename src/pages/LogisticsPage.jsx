@@ -7,8 +7,7 @@ export default function LogisticsPage() {
     cardClass,
     borderCol,
     textTitle,
-    textSec,
-    theme
+    textSec
   } = useDiskHub();
 
   return (

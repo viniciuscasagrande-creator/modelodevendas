@@ -33,7 +33,7 @@ export default function AiChatDrawer() {
     if (messagesEndRef?.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chatMessages, isTyping]);
+  }, [chatMessages, isTyping, messagesEndRef]);
 
   const handleEmitNFe = (invoiceId) => {
     setInvoices(prev => prev.map(inv => {

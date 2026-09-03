@@ -1,5 +1,4 @@
 import React from 'react';
-import { Calendar, ShoppingBag, CreditCard, Users, Mail, ShieldCheck, BarChart3, Layers, Brain } from 'lucide-react';
 import { Card } from '../ui/Card';
 
 export default function PricingComparison({ cardClass, textTitle }) {

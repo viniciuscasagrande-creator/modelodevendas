@@ -4,16 +4,10 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function AiAnalyticsPage() {
   const {
-    events,
-    selectedAiEvent,
-    setSelectedAiEvent,
-    aiOutputs,
     cardClass,
     borderCol,
     textTitle,
     textSec,
-    bgInput,
-    inputClass,
     theme
   } = useDiskHub();
 
