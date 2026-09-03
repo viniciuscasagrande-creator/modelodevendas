@@ -40,7 +40,60 @@ export const usersDatabase = [
 export function DiskHubProvider({ children }) {
   // Navigation & General configuration
   const [currentUser, setCurrentUser] = useState(usersDatabase[0]);
-  const [currentTab, setCurrentTab] = useState('dashboard');
+  
+  const getTabFromPath = (path) => {
+    if (!path) return 'dashboard';
+    const clean = path.replace(/^\/+|\/+$/g, '').toLowerCase().split('?')[0].split('#')[0];
+    if (!clean || clean === 'dashboard') return 'dashboard';
+    if (clean === 'vendas' || clean === 'sales' || clean === 'pdv') return 'vendas';
+    if (clean === 'financeiro' || clean === 'finance') return 'financeiro';
+    if (clean === 'marketing' || clean === 'mkt') return 'marketing';
+    if (clean === 'crm') return 'crm';
+    if (clean === 'sac' || clean === 'suporte') return 'sac';
+    if (clean === 'eventos' || clean === 'events') return 'eventos';
+    if (clean === 'contabilidade' || clean === 'fiscal') return 'contabilidade';
+    if (clean === 'relatorios' || clean === 'reports') return 'relatorios';
+    if (clean === 'bi' || clean === 'ai' || clean === 'analytics') return 'ai';
+    if (clean === 'automacao' || clean === 'automation') return 'automacao';
+    if (clean === 'integracoes' || clean === 'appstore') return 'appstore';
+    if (clean === 'configuracoes' || clean === 'roadmap') return 'roadmap';
+    if (clean === 'planos' || clean === 'marketplace') return 'marketplace';
+    if (clean === 'logistica' || clean === 'ingressos') return 'logistica';
+    if (clean === 'bar' || clean === 'estoque') return 'bar';
+    if (clean === 'patrimonio') return 'patrimonio';
+    return clean;
+  };
+
+  const [currentTab, setCurrentTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return getTabFromPath(window.location.pathname);
+    }
+    return 'dashboard';
+  });
+
+  const [appsOpen, setAppsOpen] = useState(false);
+
+  const navigateTo = (route) => {
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname !== route) {
+        window.history.pushState({}, '', route);
+      }
+      const tab = getTabFromPath(route);
+      setCurrentTab(tab);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handlePopState = () => {
+        const tab = getTabFromPath(window.location.pathname);
+        setCurrentTab(tab);
+      };
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }
+  }, []);
+
   const [financeSubTab, setFinanceSubTab] = useState('dashboard');
   const [accountingSubTab, setAccountingSubTab] = useState('dashboard');
   const [marketingSubTab, setMarketingSubTab] = useState('dashboard');
@@ -762,6 +815,8 @@ export function DiskHubProvider({ children }) {
       showQuickCancelModal, setShowQuickCancelModal,
       selectedEventForDetail, setSelectedEventForDetail,
       eventDetailTab, setEventDetailTab,
+      appsOpen, setAppsOpen,
+      navigateTo,
       bgMain, sidebarClass, cardClass, bgCard, cardHeaderClass, inputClass, headerClass, borderCol, textTitle, textSec, textBody, bgInput, selectThemeText
     }}>
       {children}

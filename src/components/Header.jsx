@@ -10,7 +10,8 @@ import {
   Building, 
   Users, 
   Calendar, 
-  ChevronDown 
+  ChevronDown,
+  LayoutGrid
 } from 'lucide-react';
 
 export default function Header() {
@@ -24,6 +25,7 @@ export default function Header() {
     selectedCompany,
     selectedProducer,
     selectedEventContext,
+    setAppsOpen,
     triggerToast,
     headerClass,
     textTitle
@@ -91,6 +93,17 @@ export default function Header() {
           <kbd className="text-[9px] font-mono bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded text-slate-400 shadow-2xs">
             ⌘K
           </kbd>
+        </button>
+
+        {/* Central Apps Launcher Button (Fase 27.1) */}
+        <button
+          type="button"
+          data-testid="app-launcher-button"
+          onClick={() => setAppsOpen(true)}
+          className="p-2 rounded-lg text-slate-400 hover:text-[#F97316] hover:bg-orange-50 dark:hover:bg-orange-500/10 bg-slate-100 dark:bg-[#1E293B]/60 border border-slate-200 dark:border-white/5 cursor-pointer transition-all flex items-center justify-center"
+          title="Menu Central de Apps"
+        >
+          <LayoutGrid className="w-4 h-4" />
         </button>
 
         {/* Theme Switcher */}

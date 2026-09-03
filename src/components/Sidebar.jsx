@@ -18,13 +18,13 @@ import {
   Sliders,
   ShieldCheck,
   Blocks,
-  Compass
+  Compass,
+  Headphones
 } from 'lucide-react';
 
 export default function Sidebar() {
   const {
     currentTab,
-    setCurrentTab,
     sidebarCollapsed,
     setSidebarCollapsed,
     mobileSidebarOpen,
@@ -32,11 +32,32 @@ export default function Sidebar() {
     invoices,
     events,
     leads,
-    installedApps
+    installedApps,
+    navigateTo
   } = useDiskHub();
 
   const selectTab = (tabName) => {
-    setCurrentTab(tabName);
+    const routeMap = {
+      dashboard: '/dashboard',
+      vendas: '/vendas',
+      pdv: '/vendas',
+      financeiro: '/financeiro',
+      crm: '/crm',
+      marketing: '/marketing',
+      sac: '/sac',
+      eventos: '/eventos',
+      contabilidade: '/contabilidade',
+      relatorios: '/relatorios',
+      ai: '/bi',
+      automacao: '/automacao',
+      appstore: '/integracoes',
+      roadmap: '/configuracoes',
+      marketplace: '/planos',
+      logistica: '/logistica',
+      bar: '/estoque',
+      patrimonio: '/patrimonio'
+    };
+    navigateTo(routeMap[tabName] || `/${tabName}`);
     setMobileSidebarOpen(false);
   };
 
@@ -50,7 +71,7 @@ export default function Sidebar() {
     {
       title: 'OPERAÇÃO',
       items: [
-        { id: 'pdv', label: 'Vendas', icon: Compass, badge: 'Online', condition: installedApps.pdv === true },
+        { id: 'vendas', label: 'Vendas', icon: Compass, badge: 'Online', condition: installedApps.pdv === true },
         { id: 'eventos', label: 'Eventos', icon: Calendar, badge: events.filter(e => e.status === 'Ativo').length, condition: installedApps.eventos === true },
         { id: 'pdv', label: 'PDVs', icon: ShoppingBag, condition: installedApps.pdv === true },
         { id: 'logistica', label: 'Ingressos', icon: Ticket, condition: installedApps.logistica === true }
@@ -59,7 +80,8 @@ export default function Sidebar() {
     {
       title: 'CLIENTES',
       items: [
-        { id: 'crm', label: 'CRM', icon: Users, badge: leads.filter(l => l.stage !== 'won').length, condition: installedApps.crm === true }
+        { id: 'crm', label: 'CRM', icon: Users, badge: leads.filter(l => l.stage !== 'won').length, condition: installedApps.crm === true },
+        { id: 'sac', label: 'SAC 360º', icon: Headphones }
       ]
     },
     {
@@ -132,7 +154,7 @@ export default function Sidebar() {
                 <ul className="list-none p-0 m-0 space-y-1">
                   {sec.items.map(item => {
                     if (item.condition === false) return null;
-                    const active = currentTab === item.id;
+                    const active = currentTab === item.id || (item.id === 'vendas' && currentTab === 'pdv');
                     const Icon = item.icon;
                     return (
                       <li key={`${sec.title}-${item.label}`}>

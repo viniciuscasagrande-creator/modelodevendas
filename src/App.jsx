@@ -13,6 +13,7 @@ import Header from './components/Header';
 import AiChatDrawer from './components/AiChatDrawer';
 import SpotlightSearch from './components/SpotlightSearch';
 import QuickActionModals from './components/QuickActionModals';
+import AppLauncher from './components/AppLauncher';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -22,7 +23,9 @@ import AccountingPage from './pages/AccountingPage';
 import CrmPage from './pages/CrmPage';
 import EventsPage from './pages/EventsPage';
 import MarketingPage from './pages/MarketingPage';
-import PdvPage from './pages/PdvPage';
+import SalesPage from './pages/SalesPage';
+import SacPage from './pages/SacPage';
+import PreparationPage from './pages/PreparationPage';
 import LogisticsPage from './pages/LogisticsPage';
 import BarInventoryPage from './pages/BarInventoryPage';
 import PatrimonyPage from './pages/PatrimonyPage';
@@ -41,7 +44,6 @@ export function AppContent() {
     theme,
     setTheme,
     setMobileSidebarOpen,
-    installedApps,
     toast,
     triggerToast,
     setFinancialStats,
@@ -71,18 +73,19 @@ export function AppContent() {
         {/* CONTENT AREA */}
         <div className="content p-4 max-w-7xl w-full mx-auto space-y-4">
           {currentTab === 'dashboard' && <Dashboard />}
+          {(currentTab === 'vendas' || currentTab === 'pdv') && <SalesPage />}
           {currentTab === 'financeiro' && <FinancePage />}
           {currentTab === 'contabilidade' && <AccountingPage />}
-          {currentTab === 'crm' && installedApps.crm === true && <CrmPage />}
-          {currentTab === 'eventos' && installedApps.eventos === true && <EventsPage />}
-          {currentTab === 'marketing' && installedApps.mkt === true && <MarketingPage />}
-          {currentTab === 'pdv' && installedApps.pdv === true && <PdvPage />}
-          {currentTab === 'logistica' && installedApps.logistica === true && <LogisticsPage />}
-          {currentTab === 'bar' && installedApps.bar === true && <BarInventoryPage />}
-          {currentTab === 'patrimonio' && installedApps.patrimonio === true && <PatrimonyPage />}
-          {currentTab === 'ai' && installedApps.ai === true && <AiAnalyticsPage />}
-          {currentTab === 'appstore' && <AppStorePage />}
-          {currentTab === 'marketplace' && (
+          {currentTab === 'crm' && <CrmPage />}
+          {currentTab === 'eventos' && <EventsPage />}
+          {currentTab === 'marketing' && <MarketingPage />}
+          {currentTab === 'sac' && <SacPage />}
+          {currentTab === 'logistica' && <LogisticsPage />}
+          {(currentTab === 'bar' || currentTab === 'estoque') && <BarInventoryPage />}
+          {currentTab === 'patrimonio' && <PatrimonyPage />}
+          {(currentTab === 'ai' || currentTab === 'bi') && <AiAnalyticsPage />}
+          {(currentTab === 'appstore' || currentTab === 'integracoes') && <AppStorePage />}
+          {(currentTab === 'marketplace' || currentTab === 'planos') && (
             <PlansPage 
               plan={plan}
               setPlan={setPlan}
@@ -90,7 +93,15 @@ export function AppContent() {
               triggerToast={triggerToast}
             />
           )}
-          {currentTab === 'roadmap' && <RoadmapPage />}
+          {(currentTab === 'roadmap' || currentTab === 'configuracoes') && <RoadmapPage />}
+          {currentTab === 'automacao' && <PreparationPage moduleName="Automação Comercial" />}
+          {currentTab === 'relatorios' && <PreparationPage moduleName="Relatórios Consolidados" />}
+          {![
+            'dashboard', 'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
+            'eventos', 'marketing', 'sac', 'logistica', 'bar', 'estoque',
+            'patrimonio', 'ai', 'bi', 'appstore', 'integracoes', 'marketplace',
+            'planos', 'roadmap', 'configuracoes', 'automacao', 'relatorios'
+          ].includes(currentTab) && <PreparationPage moduleName="Módulo" />}
         </div>
 
         {/* NOTIFICATION TOAST */}
@@ -112,6 +123,9 @@ export function AppContent() {
 
       {/* SPOTLIGHT SEARCH OVERLAY */}
       <SpotlightSearch />
+
+      {/* CENTRAL APPS LAUNCHPAD OVERLAY (FASE 27.1) */}
+      <AppLauncher />
 
       {/* QUICK ACTIONS MODALS (NOVA VENDA, NOVO EVENTO, ETC.) */}
       <QuickActionModals />
