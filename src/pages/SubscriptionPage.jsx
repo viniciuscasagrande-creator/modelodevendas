@@ -4,13 +4,8 @@ import { subscriptionService } from '../services/subscriptionService';
 import { plans } from '../config/plans';
 import { 
   CreditCard, 
-  ShieldCheck, 
   Sparkles, 
   CheckCircle2, 
-  Users, 
-  Building2, 
-  Calendar, 
-  ArrowRight, 
   RotateCcw,
   Boxes
 } from 'lucide-react';

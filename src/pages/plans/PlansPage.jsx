@@ -10,11 +10,9 @@ import {
   Minus, 
   ArrowRight, 
   ShieldCheck, 
-  HelpCircle, 
   Plus, 
   X, 
   Send,
-  Zap,
   Star
 } from 'lucide-react';
 

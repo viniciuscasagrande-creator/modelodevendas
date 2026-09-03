@@ -7,7 +7,6 @@ import {
   Sparkles, 
   CheckCircle2, 
   ArrowRight, 
-  ShieldCheck, 
   Layers, 
   HelpCircle, 
   X, 

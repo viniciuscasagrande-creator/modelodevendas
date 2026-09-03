@@ -9,14 +9,9 @@ import {
   ArrowLeft, 
   ShieldCheck, 
   CreditCard, 
-  Building2, 
-  Users, 
-  Sparkles, 
   Lock, 
   QrCode, 
-  Barcode, 
-  AlertCircle,
-  FileText
+  Barcode
 } from 'lucide-react';
 
 const STORAGE_KEY = 'diskhub_checkout';
