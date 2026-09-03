@@ -14,7 +14,9 @@ import AiChatDrawer from './components/AiChatDrawer';
 import SpotlightSearch from './components/SpotlightSearch';
 import QuickActionModals from './components/QuickActionModals';
 import AppLauncher from './components/AppLauncher';
-import AppAccessGuard from './components/AppAccessGuard';
+import AppBootstrap from './components/common/AppBootstrap';
+import ModuleShell from './components/common/ModuleShell';
+import AppEntryGuard from './components/common/AppEntryGuard';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -79,45 +81,84 @@ export function AppContent() {
           {currentTab === 'contratacao' && <CheckoutPage />}
           {currentTab === 'assinatura' && <SubscriptionPage />}
           
-          {(currentTab === 'vendas' || currentTab === 'pdv') && (
-            <AppAccessGuard appId="erp">
-              <SalesPage />
-            </AppAccessGuard>
-          )}
-          {currentTab === 'financeiro' && (
-            <AppAccessGuard appId="finance">
-              <FinancePage />
-            </AppAccessGuard>
-          )}
           {currentTab === 'crm' && (
-            <AppAccessGuard appId="crm">
-              <CrmPage />
-            </AppAccessGuard>
+            <AppEntryGuard appId="crm">
+              <ModuleShell appId="crm" title="CRM & Vendas" subtitle="Clientes e Leads">
+                <CrmPage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
+
+          {(currentTab === 'vendas' || currentTab === 'pdv') && (
+            <AppEntryGuard appId="erp">
+              <ModuleShell appId="erp" title="ERP Empresarial" subtitle="Vendas & PDVs">
+                <SalesPage />
+              </ModuleShell>
+            </AppEntryGuard>
+          )}
+
+          {currentTab === 'financeiro' && (
+            <AppEntryGuard appId="finance">
+              <ModuleShell appId="finance" title="Financeiro" subtitle="Fluxo de Caixa & Contas">
+                <FinancePage />
+              </ModuleShell>
+            </AppEntryGuard>
+          )}
+
           {currentTab === 'marketing' && (
-            <AppAccessGuard appId="marketing">
-              <MarketingPage />
-            </AppAccessGuard>
+            <AppEntryGuard appId="marketing">
+              <ModuleShell appId="marketing" title="Marketing Digital" subtitle="Campanhas & Disparos">
+                <MarketingPage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
+
           {currentTab === 'sac' && (
-            <AppAccessGuard appId="support">
-              <SacPage />
-            </AppAccessGuard>
+            <AppEntryGuard appId="support">
+              <ModuleShell appId="support" title="SAC 360º" subtitle="Atendimento & Chamados">
+                <SacPage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
+
           {(currentTab === 'ai' || currentTab === 'bi') && (
-            <AppAccessGuard appId="analytics">
-              <AiAnalyticsPage />
-            </AppAccessGuard>
+            <AppEntryGuard appId="analytics">
+              <ModuleShell appId="analytics" title="BI & Analytics" subtitle="Inteligência Analítica">
+                <AiAnalyticsPage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
+
           {currentTab === 'contabilidade' && (
-            <AppAccessGuard appId="accounting">
-              <AccountingPage />
-            </AppAccessGuard>
+            <AppEntryGuard appId="accounting">
+              <ModuleShell appId="accounting" title="Contabilidade" subtitle="Fiscal & NF-e">
+                <AccountingPage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
+
           {currentTab === 'automacao' && (
-            <AppAccessGuard appId="automation">
-              <PreparationPage moduleName="Automação Comercial" />
-            </AppAccessGuard>
+            <AppEntryGuard appId="automation">
+              <ModuleShell appId="automation" title="Automação" subtitle="Workflows & Triggers">
+                <PreparationPage moduleName="Automação Comercial" />
+              </ModuleShell>
+            </AppEntryGuard>
+          )}
+
+          {currentTab === 'ia' && (
+            <AppEntryGuard appId="ai">
+              <ModuleShell appId="ai" title="Disk AI" subtitle="Copilot Operacional">
+                <PreparationPage moduleName="Disk AI (Copilot)" />
+              </ModuleShell>
+            </AppEntryGuard>
+          )}
+
+          {(currentTab === 'appstore' || currentTab === 'integracoes') && (
+            <AppEntryGuard appId="integrations">
+              <ModuleShell appId="integrations" title="Integrações" subtitle="Hub de APIs">
+                <AppStorePage />
+              </ModuleShell>
+            </AppEntryGuard>
           )}
           
           {currentTab === 'eventos' && <EventsPage />}
@@ -290,7 +331,9 @@ export function AppContent() {
 export default function App() {
   return (
     <DiskHubProvider>
-      <AppContent />
+      <AppBootstrap>
+        <AppContent />
+      </AppBootstrap>
     </DiskHubProvider>
   );
 }
