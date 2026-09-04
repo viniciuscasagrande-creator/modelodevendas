@@ -21,7 +21,12 @@ import {
   Compass,
   Headphones,
   Bell,
-  Sparkles
+  Sparkles,
+  LayoutGrid,
+  Crown,
+  ArrowRight,
+  HelpCircle,
+  Cpu
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -35,13 +40,15 @@ export default function Sidebar() {
     events,
     leads,
     installedApps,
-    navigateTo
+    navigateTo,
+    triggerToast
   } = useDiskHub();
 
   const selectTab = (tabName) => {
     const routeMap = {
       dashboard: '/dashboard',
       vendas: '/vendas',
+      erp: '/vendas',
       pdv: '/vendas',
       financeiro: '/financeiro',
       crm: '/crm',
@@ -51,13 +58,17 @@ export default function Sidebar() {
       contabilidade: '/contabilidade',
       relatorios: '/relatorios',
       ai: '/bi',
+      bi: '/bi',
       automacao: '/automacao',
+      ia: '/ia',
       appstore: '/appstore',
       integracoes: '/integracoes',
       usuarios: '/usuarios',
       roadmap: '/configuracoes',
+      configuracoes: '/configuracoes',
       marketplace: '/planos',
       planos: '/planos',
+      assinatura: '/assinatura',
       notificacoes: '/notificacoes',
       logistica: '/logistica',
       bar: '/estoque',
@@ -72,49 +83,31 @@ export default function Sidebar() {
       title: 'VISÃO GERAL',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: Home },
-        { id: 'planos', label: 'Planos & Soluções', icon: Sparkles }
+        { id: 'appstore', label: 'Central de Apps', icon: LayoutGrid },
+        { id: 'planos', label: 'Planos & Soluções', icon: CreditCard }
       ]
     },
     {
-      title: 'OPERAÇÃO',
+      title: 'MÓDULOS & SOLUÇÕES',
       items: [
-        { id: 'vendas', label: 'Vendas', icon: Compass, badge: 'Online', condition: installedApps.pdv === true },
-        { id: 'eventos', label: 'Eventos', icon: Calendar, badge: events.filter(e => e.status === 'Ativo').length, condition: installedApps.eventos === true },
-        { id: 'pdv', label: 'PDVs', icon: ShoppingBag, condition: installedApps.pdv === true },
-        { id: 'logistica', label: 'Ingressos', icon: Ticket, condition: installedApps.logistica === true }
-      ]
-    },
-    {
-      title: 'CLIENTES',
-      items: [
-        { id: 'crm', label: 'CRM', icon: Users, badge: leads.filter(l => l.stage !== 'won').length, condition: installedApps.crm === true },
-        { id: 'sac', label: 'SAC 360º', icon: Headphones }
-      ]
-    },
-    {
-      title: 'GESTÃO',
-      items: [
+        { id: 'crm', label: 'CRM', icon: Users, badge: leads.filter(l => l.stage !== 'won').length },
+        { id: 'vendas', label: 'ERP', icon: ShoppingBag },
         { id: 'financeiro', label: 'Financeiro', icon: CreditCard },
+        { id: 'marketing', label: 'Marketing', icon: Megaphone },
+        { id: 'sac', label: 'SAC', icon: Headphones },
+        { id: 'ai', label: 'BI & Analytics', icon: Brain },
         { id: 'contabilidade', label: 'Contabilidade', icon: Receipt, badge: invoices.filter(inv => inv.status === 'Pendente').length },
-        { id: 'bar', label: 'Estoque', icon: Database, condition: installedApps.bar === true },
-        { id: 'patrimonio', label: 'Patrimônio', icon: Landmark, condition: installedApps.patrimonio === true }
-      ]
-    },
-    {
-      title: 'CRESCIMENTO',
-      items: [
-        { id: 'marketing', label: 'Marketing', icon: Megaphone, condition: installedApps.mkt === true },
-        { id: 'ai', label: 'Analytics', icon: Brain, condition: installedApps.ai === true }
+        { id: 'automacao', label: 'Automação', icon: Blocks },
+        { id: 'ia', label: 'Inteligência Artificial', icon: Sparkles },
+        { id: 'integracoes', label: 'Integrações', icon: Cpu }
       ]
     },
     {
       title: 'SISTEMA',
       items: [
-        { id: 'appstore', label: 'Central de Apps', icon: ShoppingBag },
-        { id: 'notificacoes', label: 'Notificações', icon: Bell },
-        { id: 'integracoes', label: 'Integrações', icon: Blocks },
-        { id: 'usuarios', label: 'Usuários e Permissões', icon: ShieldCheck },
-        { id: 'roadmap', label: 'Configurações', icon: Sliders }
+        { id: 'assinatura', label: 'Minha Assinatura', icon: ShieldCheck },
+        { id: 'roadmap', label: 'Configurações', icon: Sliders },
+        { id: 'ajuda', label: 'Ajuda', icon: HelpCircle }
       ]
     }
   ];
@@ -122,20 +115,34 @@ export default function Sidebar() {
   return (
     <aside className={`aside-sidebar flex flex-col justify-between shrink-0 z-30 transition-all duration-300 ${
       sidebarCollapsed ? 'w-[72px]' : 'w-60'
-    } bg-[#0B0D17] border-r border-white/5 ${
+    } bg-[#0D111D] border-r border-white/[0.06] ${
       mobileSidebarOpen ? 'sidebar-mobile-expanded' : ''
     }`}>
-      <div className="flex flex-col h-full justify-between">
-        <div>
+      <div className="flex flex-col h-full justify-between overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Brand Logo */}
-          <div className="p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
             <div className="flex items-center space-x-2.5 overflow-hidden">
-              <h1 className="text-xl font-black tracking-tight text-white flex items-center mb-0">
-                Disk<span className="text-[#F97316] font-extrabold ml-0.5">Hub</span>
-              </h1>
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+              {!sidebarCollapsed && (
+                <div>
+                  <h1 className="text-sm font-black tracking-tight text-white flex items-center mb-0">
+                    DiskHub
+                  </h1>
+                  <span className="text-[10px] text-slate-400 font-semibold tracking-wider block -mt-0.5">
+                    Business Cloud
+                  </span>
+                </div>
+              )}
             </div>
             <button 
-              type="button"
+              type="button" 
               onClick={() => setMobileSidebarOpen(false)}
               className="md:hidden p-1 rounded hover:bg-white/10 text-white/65 border-0 bg-transparent cursor-pointer"
             >
@@ -143,16 +150,8 @@ export default function Sidebar() {
             </button>
           </div>
 
-          <div className="px-4 pt-1 pb-3">
-            {!sidebarCollapsed && (
-              <p className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider mb-0">
-                Business Cloud ERP & CRM
-              </p>
-            )}
-          </div>
-
-          {/* Navigation Items Organized by 6 Sections */}
-          <div className="py-1 px-2.5 overflow-y-auto max-h-[calc(100vh-140px)] space-y-4">
+          {/* Navigation Items */}
+          <div className="py-2 px-2.5 overflow-y-auto flex-1 space-y-4">
             {navSections.map((sec, secIdx) => (
               <div key={secIdx} className="space-y-1">
                 {!sidebarCollapsed && (
@@ -162,16 +161,21 @@ export default function Sidebar() {
                 )}
                 <ul className="list-none p-0 m-0 space-y-1">
                   {sec.items.map(item => {
-                    if (item.condition === false) return null;
-                    const active = currentTab === item.id || (item.id === 'vendas' && currentTab === 'pdv');
+                    const active = currentTab === item.id || (item.id === 'vendas' && currentTab === 'pdv') || (item.id === 'ai' && currentTab === 'bi');
                     const Icon = item.icon;
                     return (
-                      <li key={`${sec.title}-${item.label}`}>
+                      <li key={`${sec.title}-${item.id}`}>
                         <button 
-                          onClick={() => selectTab(item.id)} 
+                          onClick={() => {
+                            if (item.id === 'ajuda') {
+                              triggerToast("Central de Ajuda", "Documentação do sistema DiskHub v2.8.1 aberta.");
+                            } else {
+                              selectTab(item.id);
+                            }
+                          }} 
                           className={`w-full text-left flex items-center justify-between px-3 py-2 text-xs transition-all rounded-xl border-0 cursor-pointer ${
                             active 
-                              ? 'bg-[#F97316] text-white font-bold shadow-md shadow-[#F97316]/25'
+                              ? 'bg-[#2563EB] text-white font-bold shadow-md shadow-blue-600/30'
                               : 'text-slate-400 hover:bg-white/5 hover:text-white bg-transparent'
                           }`}
                           title={sidebarCollapsed ? item.label : ''}
@@ -203,12 +207,31 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Bottom Menu Collapser Button */}
-        <div className="p-3 border-t border-white/5">
+        {/* Bottom Area: Promo Card + Collapser Button */}
+        <div className="p-2 border-t border-white/[0.06] bg-[#0D111D] space-y-2">
+          {!sidebarCollapsed && (
+            <div className="p-3 rounded-2xl bg-gradient-to-b from-[#1E293B]/70 to-[#0F172A] border border-white/[0.08] text-left">
+              <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2">
+                <Crown className="w-4 h-4 text-blue-400" />
+              </div>
+              <p className="text-[11px] font-bold text-white mb-2 leading-tight">
+                Evolua sua operação com o DiskHub.
+              </p>
+              <button
+                type="button"
+                onClick={() => selectTab('planos')}
+                className="w-full py-1.5 px-3 rounded-xl bg-[#2563EB] hover:bg-blue-600 text-white text-[11px] font-bold border-0 cursor-pointer shadow-sm flex items-center justify-center space-x-1 transition-all"
+              >
+                <span>Ver planos</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
           <button 
             type="button" 
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-full py-2 px-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs font-semibold flex items-center justify-center space-x-2 border-0 bg-transparent cursor-pointer transition-colors"
+            className="w-full py-1.5 px-3 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs font-semibold flex items-center justify-center space-x-2 border-0 bg-transparent cursor-pointer transition-colors"
           >
             {sidebarCollapsed ? (
               <ChevronRight className="w-4 h-4" />

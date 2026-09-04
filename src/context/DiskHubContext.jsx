@@ -711,18 +711,18 @@ export function DiskHubProvider({ children }) {
   };
 
   // Theme Design System Style Classes mapping
-  const bgMain = theme === 'dark' ? 'bg-[#090A0F] text-[#FFFFFF]' : 'bg-[#F1F5F9] text-[#334155]';
-  const sidebarClass = theme === 'dark' ? 'bg-[#0B0D17] border-r border-white/5' : 'bg-white border-r border-[#D1D5DB]';
-  const cardClass = theme === 'dark' ? 'bg-[#131520] border border-white/5 shadow-sm rounded-[18px]' : 'bg-white border border-[#E5E7EB] shadow-md rounded-[18px]';
-  const bgCard = theme === 'dark' ? 'bg-[#131520]' : 'bg-white';
-  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/5 bg-[#131520]/40 px-4 py-3' : 'border-b border-[#E5E7EB] bg-slate-50/50 px-4 py-3';
-  const inputClass = theme === 'dark' ? 'bg-[#090A0F] border-white/5 text-white focus:ring-2 focus:ring-[#F97316]/40' : 'bg-white border-[#D1D5DB] text-[#0F172A] focus:ring-2 focus:ring-[#F97316]/40';
-  const headerClass = theme === 'dark' ? 'bg-[#131520] border-b border-white/5' : 'bg-white border-b border-[#D1D5DB]';
-  const borderCol = theme === 'dark' ? 'border-white/5' : 'border-[#E5E7EB]';
+  const bgMain = theme === 'dark' ? 'bg-[#0B0E17] text-[#FFFFFF]' : 'bg-[#F1F5F9] text-[#334155]';
+  const sidebarClass = theme === 'dark' ? 'bg-[#0D111D] border-r border-white/[0.06]' : 'bg-white border-r border-[#D1D5DB]';
+  const cardClass = theme === 'dark' ? 'bg-[#111625] border border-white/[0.06] shadow-sm rounded-2xl' : 'bg-white border border-[#E5E7EB] shadow-md rounded-2xl';
+  const bgCard = theme === 'dark' ? 'bg-[#111625]' : 'bg-white';
+  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/[0.06] bg-[#111625]/60 px-4 py-3' : 'border-b border-[#E5E7EB] bg-slate-50/50 px-4 py-3';
+  const inputClass = theme === 'dark' ? 'bg-[#111625] border-white/10 text-white focus:ring-2 focus:ring-blue-500/40' : 'bg-white border-[#D1D5DB] text-[#0F172A] focus:ring-2 focus:ring-blue-500/40';
+  const headerClass = theme === 'dark' ? 'bg-[#0D111D] border-b border-white/[0.06]' : 'bg-white border-b border-[#D1D5DB]';
+  const borderCol = theme === 'dark' ? 'border-white/[0.06]' : 'border-[#E5E7EB]';
   const textTitle = theme === 'dark' ? 'text-white font-bold' : 'text-[#0F172A] font-bold';
   const textSec = theme === 'dark' ? 'text-slate-400' : 'text-slate-600';
-  const textBody = theme === 'dark' ? 'text-slate-350' : 'text-slate-700';
-  const bgInput = theme === 'dark' ? 'bg-[#090A0F]' : 'bg-white';
+  const textBody = theme === 'dark' ? 'text-slate-300' : 'text-slate-700';
+  const bgInput = theme === 'dark' ? 'bg-[#111625]' : 'bg-white';
   const selectThemeText = theme === 'dark' ? 'text-[#F8FAFC] font-medium' : 'text-[#111827] font-semibold';
 
   return (
