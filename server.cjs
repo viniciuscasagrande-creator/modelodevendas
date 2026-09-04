@@ -276,6 +276,152 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
+// GET /api/me/context - Fase 28.1 Frontend Context
+app.get('/api/me/context', (req, res) => {
+  const db = readDb();
+  const user = db.users[0] || {
+    id: 'usr-1',
+    name: 'Vinicius Casagrande',
+    email: 'vinicius@diskhub.com.br',
+    role: 'CEO & Fundador'
+  };
+
+  res.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatarColor: '#2563EB'
+    },
+    tenant: {
+      id: 'tenant-diskhub-01',
+      name: 'Diskingressos & Produtores Associados',
+      document: '12.345.678/0001-90',
+      activeProducer: 'Produtor Exemplo',
+      activeCompany: 'Diskingressos',
+      plan: 'advanced'
+    },
+    subscription: {
+      id: 'sub-adv-2026',
+      plan: 'advanced',
+      planName: 'Advanced',
+      status: 'active',
+      monthlyPrice: 890,
+      billingCycle: 'monthly',
+      renewsAt: '2026-10-01',
+      usersCount: 12,
+      maxUsers: 25,
+      activeAppsCount: 6
+    },
+    apps: [
+      { id: 'crm', name: 'CRM Comercial', status: 'active', tier: 'standard' },
+      { id: 'erp', name: 'ERP Operacional', status: 'active', tier: 'standard' },
+      { id: 'financeiro', name: 'Financeiro & Conciliação', status: 'active', tier: 'standard' },
+      { id: 'marketing', name: 'Marketing & Audiência', status: 'active', tier: 'advanced' },
+      { id: 'sac', name: 'SAC & Atendimento', status: 'active', tier: 'advanced' },
+      { id: 'bi', name: 'BI & Analytics', status: 'active', tier: 'advanced' },
+      { id: 'contabilidade', name: 'Contabilidade', status: 'upgrade_required', tier: 'expert' },
+      { id: 'automacao', name: 'Automações Avançadas', status: 'upgrade_required', tier: 'expert' },
+      { id: 'ia', name: 'Inteligência Artificial', status: 'upgrade_required', tier: 'expert' },
+      { id: 'integracoes', name: 'Webhooks & APIs', status: 'upgrade_required', tier: 'expert' }
+    ],
+    permissions: [
+      'view_dashboard',
+      'manage_sales',
+      'view_financial_reports',
+      'manage_marketing_campaigns',
+      'manage_support_tickets',
+      'export_data'
+    ],
+    features: [
+      'advanced_analytics',
+      'multi_producer_context',
+      'realtime_alerts',
+      'custom_export'
+    ]
+  });
+});
+
+// GET /api/dashboard/summary - Fase 28.1 Executive Dashboard
+app.get('/api/dashboard/summary', (req, res) => {
+  res.json({
+    kpis: {
+      revenue: 184320,
+      revenueGrowth: 12.4,
+      orders: 2184,
+      ordersGrowth: 8.1,
+      conversion: 3.8,
+      conversionGrowth: 0.6,
+      ticketAverage: 84.39,
+      ticketAverageGrowth: 3.2
+    },
+    series: [
+      { date: '01/09', receita: 4200, pedidos: 52 },
+      { date: '02/09', receita: 5800, pedidos: 68 },
+      { date: '03/09', receita: 6100, pedidos: 74 },
+      { date: '04/09', receita: 7900, pedidos: 96 }
+    ],
+    alerts: [
+      { id: 'alt-1', title: 'Lote 1 Festival de Verão', message: '92% vendido. Virada automática programada.', type: 'warning', time: '10 min atrás' },
+      { id: 'alt-2', title: 'Meta Mensal de Vendas', message: '84% atingida no dia 04.', type: 'info', time: '1h atrás' }
+    ],
+    recentActivity: [
+      { id: 'act-1', event: 'Venda de 4 ingressos VIP', user: 'Sandra Costa (PDV)', time: '5 min atrás' },
+      { id: 'act-2', event: 'Exportação do relatório financeiro D+2', user: 'Roberto Carlos', time: '22 min atrás' },
+      { id: 'act-3', event: 'Campanha de WhatsApp disparada', user: 'Mariana Costa', time: '1h atrás' }
+    ],
+    subscription: {
+      plan: 'advanced',
+      planName: 'Advanced',
+      status: 'active',
+      users: 12,
+      activeApps: 6
+    }
+  });
+});
+
+// GET /api/subscription/current
+app.get('/api/subscription/current', (req, res) => {
+  res.json({
+    plan: 'advanced',
+    planName: 'Advanced',
+    status: 'active',
+    monthlyPrice: 890,
+    renewsAt: '2026-10-01',
+    users: 12,
+    activeApps: 6
+  });
+});
+
+// GET /api/plans
+app.get('/api/plans', (req, res) => {
+  res.json([
+    {
+      id: 'standard',
+      name: 'Standard',
+      tagline: 'Organize sua operação.',
+      price: 'Sob Consulta',
+      features: ['CRM Essencial', 'ERP Operacional', 'Financeiro & Conciliação', 'Até 5 usuários']
+    },
+    {
+      id: 'advanced',
+      name: 'Advanced',
+      tagline: 'Venda mais e tenha mais controle.',
+      price: 'R$ 890/mês',
+      popular: true,
+      features: ['Tudo do Standard', 'Marketing & Audiência', 'SAC & Atendimento', 'BI & Analytics', 'Até 15 usuários']
+    },
+    {
+      id: 'expert',
+      name: 'Expert',
+      tagline: 'Automatize e escale sua operação.',
+      price: 'R$ 1.890/mês',
+      features: ['Tudo do Advanced', 'Contabilidade Integrada', 'Automações Avançadas', 'Inteligência Artificial', 'Webhooks & APIs', 'Usuários ilimitados']
+    }
+  ]);
+});
+
 // ================= FASE 2: FINANCEIRO ENDPOINTS =================
 app.get('/api/financeiro/dashboard', (req, res) => {
   const db = readDb();

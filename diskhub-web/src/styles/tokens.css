@@ -1,0 +1,36 @@
+:root {
+  /* Dark Navy Backgrounds */
+  --dh-bg: #0b0e13;
+  --dh-sidebar: #0d1118;
+  --dh-surface: #111721;
+  --dh-surface-hover: #161d29;
+  --dh-surface-active: #1c2433;
+
+  /* Borders */
+  --dh-border: rgba(255, 255, 255, 0.08);
+  --dh-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Typography */
+  --dh-text: #f8fafc;
+  --dh-text-muted: #94a3b8;
+  --dh-text-dim: #64748b;
+
+  /* Accent & Brands */
+  --dh-primary: #3b82f6;
+  --dh-primary-hover: #2563eb;
+  --dh-primary-strong: #1d4ed8;
+  --dh-indigo: #6366f1;
+  --dh-purple: #8b5cf6;
+
+  /* Semantic Feedback */
+  --dh-success: #22c55e;
+  --dh-warning: #f59e0b;
+  --dh-danger: #ef4444;
+  --dh-info: #0ea5e9;
+
+  /* Geometry & Radii */
+  --dh-radius-sm: 8px;
+  --dh-radius-md: 12px;
+  --dh-radius-lg: 16px;
+  --dh-radius-xl: 20px;
+}
