@@ -158,6 +158,35 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* External Deployments Bar (Vercel Production) */}
+      <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-900/20 via-[#111625] to-purple-900/20 border border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center space-x-2.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span className="font-bold text-white">Frontends Publicados na Vercel:</span>
+          <span className="text-slate-400 hidden sm:inline">Acesse as aplicações e templates hospedados em produção:</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <a
+            href="https://diskhub-web.vercel.app/app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-sm no-underline"
+          >
+            <span>DiskHub Web (App)</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+          <a
+            href="https://diskhub-premium-frontend.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 font-bold transition-all no-underline"
+          >
+            <span>Template Premium (5175)</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+      </div>
+
       {/* 1. TOP GREETING & FILTERS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
         <div>

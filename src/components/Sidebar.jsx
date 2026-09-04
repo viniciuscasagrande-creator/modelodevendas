@@ -26,7 +26,9 @@ import {
   Crown,
   ArrowRight,
   HelpCircle,
-  Cpu
+  Cpu,
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -103,6 +105,13 @@ export default function Sidebar() {
       ]
     },
     {
+      title: 'FRONTENDS VERCEL',
+      items: [
+        { id: 'ext-web', label: 'DiskHub Web (App)', icon: Globe, externalUrl: 'https://diskhub-web.vercel.app/app' },
+        { id: 'ext-premium', label: 'Template Premium', icon: ExternalLink, externalUrl: 'https://diskhub-premium-frontend.vercel.app' }
+      ]
+    },
+    {
       title: 'SISTEMA',
       items: [
         { id: 'assinatura', label: 'Minha Assinatura', icon: ShieldCheck },
@@ -167,7 +176,10 @@ export default function Sidebar() {
                       <li key={`${sec.title}-${item.id}`}>
                         <button 
                           onClick={() => {
-                            if (item.id === 'ajuda') {
+                            if (item.externalUrl) {
+                              window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+                              triggerToast("Frontend Externo 🌐", `Abrindo ${item.label} na Vercel...`);
+                            } else if (item.id === 'ajuda') {
                               triggerToast("Central de Ajuda", "Documentação do sistema DiskHub v2.8.1 aberta.");
                             } else {
                               selectTab(item.id);
@@ -188,6 +200,9 @@ export default function Sidebar() {
                               </span>
                             )}
                           </div>
+                          {!sidebarCollapsed && item.externalUrl && (
+                            <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-white shrink-0" />
+                          )}
                           {!sidebarCollapsed && item.badge && (
                             <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${
                               active 
