@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDiskHub } from '../../context/DiskHubContext';
 import { subscriptionService } from '../../services/subscriptionService';
 import { commercialPlans, planGoals, commercialBenefits, comparisonCategories, commercialFaqs } from '../../config/commercialPlans';
-import { products } from '../../config/products';
+import { products, productList } from '../../config/products';
 import { addons } from '../../config/addons';
 import { 
   Sparkles, 
@@ -750,7 +750,7 @@ export default function PlansPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.values(products).map((prod) => (
+          {productList.map((prod) => (
             <div
               key={prod.id}
               className="p-5 rounded-2xl bg-white dark:bg-[#11151d] border border-slate-200 dark:border-white/5 flex flex-col justify-between hover:border-[#F97316]/40 transition-all group"

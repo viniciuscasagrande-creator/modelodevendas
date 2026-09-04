@@ -13,7 +13,7 @@ test.describe('Fase 27.2.1 / 27.2.2.1 — Integração Comercial no Dashboard e 
     await expect(planCard).toContainText(/usuário/i);
 
     // Clica no link para Minha Assinatura
-    await planCard.getByRole('button', { name: /gerenciar assinatura/i }).click();
+    await planCard.getByRole('button', { name: /ver minha assinatura/i }).click();
     await expect(page).toHaveURL(/assinatura/);
   });
 

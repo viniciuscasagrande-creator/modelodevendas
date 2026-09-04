@@ -313,3 +313,17 @@ products.automation = products.automacao;
 products.ai = products.ia;
 products.integrations = products.integracoes;
 
+export const productList = [
+  products.crm,
+  products.erp,
+  products.financeiro,
+  products.marketing,
+  products.sac,
+  products.bi,
+  products.contabilidade,
+  products.automacao,
+  products.ia,
+  products.integracoes
+];
+
+
