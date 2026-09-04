@@ -20,7 +20,8 @@ import {
   Blocks,
   Compass,
   Headphones,
-  Bell
+  Bell,
+  Sparkles
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -70,7 +71,8 @@ export default function Sidebar() {
     {
       title: 'VISÃO GERAL',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: Home }
+        { id: 'dashboard', label: 'Dashboard', icon: Home },
+        { id: 'planos', label: 'Planos & Soluções', icon: Sparkles }
       ]
     },
     {

@@ -37,7 +37,7 @@ test.describe('Fase 27.1.3 — Planos Standard, Advanced e Expert', () => {
     await expect(page.getByTestId('plan-comparison')).toBeVisible();
     await expect(page.getByText('CRM & Vendas')).toBeVisible();
     await expect(page.getByText('Marketing Digital')).toBeVisible();
-    await expect(page.getByText('Contabilidade & NF-e')).toBeVisible();
+    await expect(page.getByText('Contabilidade & NF-e').first()).toBeVisible();
   });
 
 });

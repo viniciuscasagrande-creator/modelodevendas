@@ -1,0 +1,62 @@
+/**
+ * DISKHUB BUSINESS CLOUD — PREMIUM SAAS DESIGN SYSTEM TOKENS
+ * Fase 27.2.2.1
+ */
+
+:root {
+  --dh-bg-app: #0b0e13;
+  --dh-surface: #11151d;
+  --dh-surface-elevated: #151a24;
+  --dh-surface-hover: #1a202c;
+  --dh-border-subtle: rgba(255, 255, 255, 0.08);
+  --dh-border-highlight: rgba(249, 115, 22, 0.4);
+  --dh-text-primary: #f7f8fa;
+  --dh-text-secondary: #98a2b3;
+  --dh-text-muted: #64748b;
+  --dh-accent-orange: #F97316;
+  --dh-accent-orange-hover: #EA580C;
+  --dh-accent-indigo: #6366F1;
+  --dh-accent-blue: #3B82F6;
+  --dh-accent-emerald: #10B981;
+  --dh-radius-card: 16px;
+  --dh-radius-button: 12px;
+  --dh-radius-input: 12px;
+}
+
+/* Base Utility Classes for Premium UI */
+.dh-premium-surface {
+  background-color: var(--dh-surface);
+  border: 1px solid var(--dh-border-subtle);
+  border-radius: var(--dh-radius-card);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dh-premium-surface:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dh-premium-card-elevated {
+  background-color: var(--dh-surface-elevated);
+  border: 1px solid var(--dh-border-subtle);
+  border-radius: var(--dh-radius-card);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.dh-plan-featured-ring {
+  box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.3), 0 0 0 2px rgba(249, 115, 22, 0.5);
+}
+
+.dh-btn-primary {
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: var(--dh-radius-button);
+  box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.35);
+  transition: all 0.2s ease;
+}
+
+.dh-btn-primary:hover {
+  background: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(249, 115, 22, 0.45);
+}

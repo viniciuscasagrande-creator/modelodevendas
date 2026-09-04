@@ -5,6 +5,8 @@ import { metricsService } from '../services/metricsService';
 import TrendIndicator from '../components/dashboard/TrendIndicator';
 import DashboardFilters from '../components/dashboard/DashboardFilters';
 import WidgetErrorState from '../components/dashboard/WidgetErrorState';
+import { subscriptionService } from '../services/subscriptionService';
+import { commercialPlans } from '../config/commercialPlans';
 import { 
   DollarSign, 
   Ticket, 
@@ -26,7 +28,10 @@ import {
   ArrowRight,
   Sparkles,
   RefreshCw,
-  Lock
+  Lock,
+  Zap,
+  Crown,
+  Check
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -44,8 +49,21 @@ export default function Dashboard() {
     setSelectedEventForDetail,
     triggerToast,
     textTitle,
-    textSec
+    textSec,
+    navigateTo
   } = useDiskHub();
+
+  const [subscription, setSubscription] = useState(() => subscriptionService.getSubscription());
+
+  useEffect(() => {
+    return subscriptionService.subscribe((sub) => {
+      setSubscription({ ...sub });
+    });
+  }, []);
+
+  const currentPlanConfig = commercialPlans[subscription?.plan] || commercialPlans.standard;
+  const activeAppsCount = subscriptionService.getEntitlements()?.length || 3;
+  const usersCount = subscription?.users || 1;
 
   const [period, setPeriod] = useState('30d');
   const [eventId, setEventId] = useState('all');
@@ -409,6 +427,119 @@ export default function Dashboard() {
 
         </div>
       )}
+
+      {/* SEÇÃO COMERCIAL: PLANO ATUAL & EXPANSÃO MODULAR */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* CURRENT PLAN CARD (1/3) */}
+        <div 
+          data-testid="current-plan-card"
+          className="bg-white dark:bg-[#11151D] border border-slate-200 dark:border-white/10 p-5 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Plano Contratado
+                  </span>
+                  <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    {subscription?.status === 'active' ? 'Ativo' : subscription?.status || 'Ativo'}
+                  </span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1 mb-0 flex items-center gap-2">
+                  <span>Plano {currentPlanConfig?.name || 'Standard'}</span>
+                  {subscription?.plan === 'advanced' && (
+                    <span className="text-[10px] font-extrabold bg-[#F97316]/10 text-[#F97316] border border-[#F97316]/30 px-2 py-0.5 rounded-full">
+                      Recomendado
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 mb-0">
+                  {currentPlanConfig?.tagline || 'Organize sua operação'}
+                </p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-[#F97316]/10 text-[#F97316] flex items-center justify-center shrink-0">
+                <Crown className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 py-3 border-y border-slate-100 dark:border-white/5 my-2 text-xs">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400 font-semibold">Módulos Ativos</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white">
+                  {activeAppsCount} módulos
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-slate-400 font-semibold">Usuários & Acessos</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white">
+                  {usersCount} {usersCount === 1 ? 'usuário' : 'usuários'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-[11px] text-slate-400">
+              Renovação mensal
+            </span>
+            <button
+              type="button"
+              onClick={() => navigateTo('/assinatura')}
+              className="text-xs font-bold text-[#F97316] hover:text-[#EA580C] hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+            >
+              <span>Gerenciar assinatura</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* GROWTH BANNER (2/3) */}
+        <div 
+          data-testid="growth-banner"
+          className="lg:col-span-2 bg-gradient-to-br from-[#11151D] via-[#151A24] to-[#1E293B] border border-[#F97316]/30 p-5 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden text-white"
+        >
+          <div className="relative z-10 flex flex-col justify-between h-full space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <span className="text-xs font-black uppercase tracking-wider text-[#F97316]">
+                  Expanda sua operação
+                </span>
+              </div>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 font-semibold">
+                DiskHub Cloud
+              </span>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-black text-white tracking-tight mb-1">
+                Evolua seu negócio com ferramentas modulares
+              </h3>
+              <p className="text-xs text-slate-300 max-w-xl leading-relaxed mb-0">
+                Desbloqueie WhatsApp Marketing ativo, CRM com funil avançado, atendimento SAC integrado e relatórios preditivos para acelerar suas vendas.
+              </p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between gap-3 flex-wrap border-t border-white/5">
+              <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Pacotes Standard, Advanced e Expert disponíveis</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigateTo('/planos')}
+                className="px-4 py-2 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold shadow-lg shadow-[#F97316]/20 flex items-center gap-1.5 cursor-pointer border-0 transition-all hover:scale-[1.02] active:scale-95"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Conhecer soluções</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* 5. BLOCO 2: PERFORMANCE (2/3) + FUNIL DE VENDAS (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
@@ -943,6 +1074,155 @@ export default function Dashboard() {
           )}
         </div>
 
+      </div>
+
+      {/* SEÇÃO DE PLANOS COMERCIAIS DISKHUB */}
+      <div 
+        data-testid="commercial-plans-preview"
+        className="bg-white dark:bg-[#11151D] border border-slate-200 dark:border-white/10 p-5 rounded-2xl shadow-sm"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-white/5 mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Crown className="w-4 h-4 text-[#F97316]" />
+              <h3 className="text-base font-black text-slate-900 dark:text-white mb-0">
+                Soluções Comerciais DiskHub
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-0 mt-0.5">
+              Evolua sua operação de acordo com o crescimento do seu negócio
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigateTo('/planos')}
+            className="text-xs font-bold text-[#F97316] hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-0 self-start sm:self-auto"
+          >
+            <span>Ver matriz comparativa completa</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {/* STANDARD */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm font-black text-slate-900 dark:text-white">Standard</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                  Organize
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3">
+                Centralize clientes, ERP e controle financeiro básico em um só lugar.
+              </p>
+              <div className="space-y-1.5 mb-4 text-[11px] text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>CRM & Vendas Essencial</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>ERP Empresarial & Contratos</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Gestão Financeira & DRE</span>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigateTo('/planos')}
+              className="w-full py-2 rounded-lg bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-900 dark:text-white text-xs font-bold border-0 cursor-pointer transition-colors"
+            >
+              {subscription?.plan === 'standard' ? 'Seu Plano Atual' : 'Conhecer Standard'}
+            </button>
+          </div>
+
+          {/* ADVANCED */}
+          <div className="p-4 rounded-xl border-2 border-[#F97316] bg-orange-50/20 dark:bg-[#F97316]/5 shadow-sm flex flex-col justify-between relative">
+            <div className="absolute -top-2.5 right-4 bg-[#F97316] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow">
+              Mais Recomendado
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm font-black text-slate-900 dark:text-white">Advanced</span>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#F97316]/20 text-[#F97316]">
+                  Cresça
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3">
+                Venda mais com campanhas ativas, SAC multicanal e BI de performance.
+              </p>
+              <div className="space-y-1.5 mb-4 text-[11px] text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
+                  <span className="font-semibold">Tudo do Standard</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
+                  <span>Marketing (WhatsApp & E-mail)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
+                  <span>SAC 360º & Suporte Unificado</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-[#F97316] shrink-0" />
+                  <span>Analytics & BI Executivo</span>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigateTo('/planos')}
+              className="w-full py-2 rounded-lg bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold border-0 cursor-pointer transition-colors shadow-md shadow-[#F97316]/20"
+            >
+              {subscription?.plan === 'advanced' ? 'Seu Plano Atual' : 'Conhecer Advanced'}
+            </button>
+          </div>
+
+          {/* EXPERT */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm font-black text-slate-900 dark:text-white">Expert</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  Escale
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3">
+                Automação com IA, multieventos em grande escala e consultoria dedicada.
+              </p>
+              <div className="space-y-1.5 mb-4 text-[11px] text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                  <span className="font-semibold">Tudo do Advanced</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                  <span>Automação Total de Processos</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                  <span>IA Generativa para Vendas</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                  <span>SLA Dedicado e Onboarding VIP</span>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigateTo('/planos')}
+              className="w-full py-2 rounded-lg bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-900 dark:text-white text-xs font-bold border-0 cursor-pointer transition-colors"
+            >
+              {subscription?.plan === 'expert' ? 'Seu Plano Atual' : 'Conhecer Expert'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 8. BLOCO 5: INSIGHTS EXECUTIVOS (LARGURA TOTAL) */}
