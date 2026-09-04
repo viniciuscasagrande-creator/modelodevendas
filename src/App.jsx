@@ -69,12 +69,12 @@ export function AppContent() {
       <Sidebar />
 
       {/* MAIN CONTENT AREA */}
-      <main className="content-wrapper flex-1 flex flex-col min-w-0 overflow-y-auto relative pb-16 md:pb-5 z-10 transition-colors duration-250">
+      <main className="content-wrapper main-content flex-1 flex flex-col min-w-0 overflow-y-auto overflow-x-hidden relative pb-28 md:pb-24 z-10 transition-colors duration-250">
         {/* HEADER / TOP NAVBAR */}
         <Header />
 
         {/* CONTENT AREA */}
-        <div className="content p-4 max-w-7xl w-full mx-auto space-y-4">
+        <div className="content dashboard-content p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-5">
           {currentTab === 'dashboard' && <Dashboard />}
           {currentTab === 'produtos' && <ProductDetails />}
           {currentTab === 'planos' && <PlansPage />}
