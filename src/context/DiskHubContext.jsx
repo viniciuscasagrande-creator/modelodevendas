@@ -158,7 +158,7 @@ export function DiskHubProvider({ children }) {
   ]);
 
   const [plan, setPlan] = useState('omnichannel');
-  const [theme, setTheme] = useState('light'); // 'dark' or 'light'
+  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
@@ -711,19 +711,19 @@ export function DiskHubProvider({ children }) {
   };
 
   // Theme Design System Style Classes mapping
-  const bgMain = theme === 'dark' ? 'bg-[#0B0E17] text-[#FFFFFF]' : 'bg-[#F1F5F9] text-[#334155]';
-  const sidebarClass = theme === 'dark' ? 'bg-[#0D111D] border-r border-white/[0.06]' : 'bg-white border-r border-[#D1D5DB]';
-  const cardClass = theme === 'dark' ? 'bg-[#111625] border border-white/[0.06] shadow-sm rounded-2xl' : 'bg-white border border-[#E5E7EB] shadow-md rounded-2xl';
-  const bgCard = theme === 'dark' ? 'bg-[#111625]' : 'bg-white';
-  const cardHeaderClass = theme === 'dark' ? 'border-b border-white/[0.06] bg-[#111625]/60 px-4 py-3' : 'border-b border-[#E5E7EB] bg-slate-50/50 px-4 py-3';
-  const inputClass = theme === 'dark' ? 'bg-[#111625] border-white/10 text-white focus:ring-2 focus:ring-blue-500/40' : 'bg-white border-[#D1D5DB] text-[#0F172A] focus:ring-2 focus:ring-blue-500/40';
-  const headerClass = theme === 'dark' ? 'bg-[#0D111D] border-b border-white/[0.06]' : 'bg-white border-b border-[#D1D5DB]';
-  const borderCol = theme === 'dark' ? 'border-white/[0.06]' : 'border-[#E5E7EB]';
-  const textTitle = theme === 'dark' ? 'text-white font-bold' : 'text-[#0F172A] font-bold';
-  const textSec = theme === 'dark' ? 'text-slate-400' : 'text-slate-600';
-  const textBody = theme === 'dark' ? 'text-slate-300' : 'text-slate-700';
-  const bgInput = theme === 'dark' ? 'bg-[#111625]' : 'bg-white';
-  const selectThemeText = theme === 'dark' ? 'text-[#F8FAFC] font-medium' : 'text-[#111827] font-semibold';
+  const bgMain = theme === 'light' ? 'bg-[#0B0E17] text-[#FFFFFF]' : 'bg-[#0B0E17] text-[#FFFFFF]';
+  const sidebarClass = 'bg-[#0D111D] border-r border-white/[0.06]';
+  const cardClass = 'bg-[#111625] border border-white/[0.06] shadow-sm rounded-2xl';
+  const bgCard = 'bg-[#111625]';
+  const cardHeaderClass = 'border-b border-white/[0.06] bg-[#111625]/60 px-4 py-3';
+  const inputClass = 'bg-[#0D111D] border-white/10 text-white focus:ring-2 focus:ring-blue-500/40';
+  const headerClass = 'bg-[#0D111D] border-b border-white/[0.06]';
+  const borderCol = 'border-white/[0.06]';
+  const textTitle = 'text-white font-bold';
+  const textSec = 'text-slate-400';
+  const textBody = 'text-slate-300';
+  const bgInput = 'bg-[#0D111D]';
+  const selectThemeText = 'text-[#F8FAFC] font-medium';
 
   return (
     <DiskHubContext.Provider value={{

@@ -15,8 +15,8 @@ export default function PricingCard({
 
   return (
     <Card 
-      className={`card ${cardClass} p-4 h-100 flex flex-col justify-between border border-slate-200 dark:border-white/5 shadow-sm relative ${
-        isOmni ? 'bg-[#0B0D16] border-slate-800 text-white' : ''
+      className={`card ${cardClass || 'bg-[#111625]'} p-4 h-100 flex flex-col justify-between border border-white/[0.06] rounded-2xl shadow-sm relative ${
+        isOmni ? 'bg-[#161D33] border-purple-500/30 text-white' : ''
       } ${isActive ? `ring-2 ${planItem.ring}` : ''}`}
     >
       {planItem.id === 'profissional' && (

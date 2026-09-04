@@ -138,9 +138,9 @@ export default function PlansPage({
     }
   ];
 
-  const textTitle = theme === 'dark' ? 'text-white' : 'text-slate-900';
-  const textSec = theme === 'dark' ? 'text-slate-400' : 'text-slate-500';
-  const cardClass = theme === 'dark' ? 'bg-[#1E293B]/70 border-[#334155]' : 'bg-white border-slate-200';
+  const textTitle = 'text-white';
+  const textSec = 'text-slate-400';
+  const cardClass = 'bg-[#111625] border border-white/[0.06] rounded-2xl';
 
   return (
     <div className="space-y-6 animate-fadeIn text-left max-w-7xl mx-auto">

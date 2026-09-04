@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" class="light">
+<html lang="pt-BR" class="dark" data-color-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -7,6 +7,11 @@
     <title>DiskHub - Business Cloud ERP & CRM</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <!-- Limitless CSS Assets -->
     <link href="./limitless_assets/css/ltr/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="./limitless_assets/css/ltr/bootstrap_limitless.min.css" rel="stylesheet" type="text/css">
@@ -18,23 +23,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #f5f7fb;
-            --border-color: #e2e8f0;
-            --th-bg: #f5f7fb;
-            --text-sec: #64748b;
-            --row-striped: rgba(241, 245, 249, 0.4);
-            --row-hover: rgba(241, 245, 249, 0.8);
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.03), 0 2px 4px -2px rgb(0 0 0 / 0.03);
-            --card-hover-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-            --scrollbar-track: #f1f5f9;
-            --scrollbar-thumb: #cbd5e1;
-            --scrollbar-thumb-hover: #94a3b8;
+            --bg-main: #0B0E17;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --th-bg: #0D111D;
+            --text-sec: #94a3b8;
+            --row-striped: rgba(255, 255, 255, 0.01);
+            --row-hover: rgba(255, 255, 255, 0.02);
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+            --card-hover-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+            --scrollbar-track: #090d16;
+            --scrollbar-thumb: #1e293b;
+            --scrollbar-thumb-hover: #334155;
         }
 
         .dark {
-            --bg-main: #090d16;
+            --bg-main: #0B0E17;
             --border-color: rgba(255, 255, 255, 0.06);
-            --th-bg: #0d111d;
+            --th-bg: #0D111D;
             --text-sec: #94a3b8;
             --row-striped: rgba(255, 255, 255, 0.01);
             --row-hover: rgba(255, 255, 255, 0.02);
@@ -47,8 +52,13 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
+            background-color: var(--bg-main) !important;
+            color: #FFFFFF;
             transition: background-color 0.25s ease;
+        }
+
+        .content-wrapper, .page-content, .content, .dashboard-content {
+            background-color: #0B0E17 !important;
         }
 
         /* Custom scrollbar for webkit */

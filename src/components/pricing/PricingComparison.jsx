@@ -13,12 +13,12 @@ export default function PricingComparison({ cardClass, textTitle }) {
   ];
 
   return (
-    <Card className={`card ${cardClass} p-4 mt-4 border border-slate-200 dark:border-white/5 shadow-sm overflow-hidden`}>
-      <h3 className={`text-xs font-bold ${textTitle} uppercase tracking-wider mb-4`}>Tabela Comparativa (Padrão Stripe / Vercel)</h3>
+    <Card className={`card ${cardClass || 'bg-[#111625]'} p-4 mt-4 border border-white/[0.06] rounded-2xl shadow-sm overflow-hidden`}>
+      <h3 className={`text-xs font-bold text-white uppercase tracking-wider mb-4`}>Tabela Comparativa (Padrão Stripe / Vercel)</h3>
       <div className="table-responsive">
         <table className="table text-xs mb-0 align-middle">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-white/5 text-[9px] uppercase tracking-wider text-slate-400 font-bold bg-slate-50/50 dark:bg-white/2">
+            <tr className="border-b border-white/[0.06] text-[9px] uppercase tracking-wider text-slate-400 font-bold bg-[#161D33]">
               <th className="p-3 border-0">Recurso do Ecossistema</th>
               <th className="p-3 border-0 text-center text-[#10B981]">ESSENCIAL</th>
               <th className="p-3 border-0 text-center text-[#2563EB]">PROFISSIONAL</th>
