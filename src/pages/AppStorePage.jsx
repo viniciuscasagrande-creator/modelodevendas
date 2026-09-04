@@ -28,7 +28,7 @@ export default function AppStorePage() {
     installedApps,
     setInstalledApps,
     plan,
-    setCurrentTab,
+    navigateTo,
     triggerToast,
     theme,
     cardClass,
@@ -130,7 +130,7 @@ export default function AppStorePage() {
                       Mais de 40 módulos integrados para gerenciar bilheterias, vendas físicas de bar, logística de entregas e auditorias fiscais avançadas.
                     </p>
                     <button 
-                      onClick={() => selectTab('marketplace')}
+                      onClick={() => navigateTo('/planos')}
                       className="btn btn-primary bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold px-4 py-2 rounded-lg border-0 cursor-pointer shadow-sm transition-all"
                     >
                       Conhecer Planos & Upgrades
@@ -309,7 +309,7 @@ export default function AppStorePage() {
                               ) : (
                                 <button 
                                   onClick={() => {
-                                    setCurrentTab('marketplace');
+                                    navigateTo('/planos');
                                     triggerToast("Upgrade Necessário", `O plano atual não dá suporte ao módulo ${app.name}.`, "warning");
                                   }}
                                   className={`btn py-2 px-3 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white text-xs font-semibold rounded border-0 cursor-pointer`}
@@ -512,7 +512,7 @@ export default function AppStorePage() {
                           <button 
                             onClick={() => {
                               setSelectedApp(null);
-                              setCurrentTab('marketplace');
+                              navigateTo('/planos');
                               triggerToast("Upgrade de Plano", `Redirecionando para a pagina de Planos para adquirir ${selectedApp.name}.`);
                             }}
                             className="btn btn-primary bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#C2410C] text-white text-xs font-semibold rounded px-4 py-2 border-0 cursor-pointer"

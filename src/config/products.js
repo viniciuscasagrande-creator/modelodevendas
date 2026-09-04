@@ -303,3 +303,13 @@ export const products = {
     ]
   }
 };
+
+// Aliases to seamlessly support both English app IDs and Portuguese product slugs
+products.finance = products.financeiro;
+products.support = products.sac;
+products.analytics = products.bi;
+products.accounting = products.contabilidade;
+products.automation = products.automacao;
+products.ai = products.ia;
+products.integrations = products.integracoes;
+

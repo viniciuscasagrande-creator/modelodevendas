@@ -38,6 +38,7 @@ import PlansPage from './pages/plans/PlansPage';
 import ProductDetails from './pages/products/ProductDetails';
 import CheckoutPage from './pages/checkout/CheckoutPage';
 import SubscriptionPage from './pages/SubscriptionPage';
+import UsersManagementPage from './pages/subscription/UsersManagementPage';
 import RoadmapPage from './pages/RoadmapPage';
 
 export function AppContent() {
@@ -153,24 +154,27 @@ export function AppContent() {
             </AppEntryGuard>
           )}
 
-          {(currentTab === 'appstore' || currentTab === 'integracoes') && (
+          {currentTab === 'integracoes' && (
             <AppEntryGuard appId="integrations">
               <ModuleShell appId="integrations" title="Integrações" subtitle="Hub de APIs">
                 <AppStorePage />
               </ModuleShell>
             </AppEntryGuard>
           )}
+
+          {currentTab === 'appstore' && <AppStorePage />}
+          {currentTab === 'marketplace' && <PlansPage />}
+          {currentTab === 'usuarios' && <UsersManagementPage />}
           
           {currentTab === 'eventos' && <EventsPage />}
           {currentTab === 'logistica' && <LogisticsPage />}
           {(currentTab === 'bar' || currentTab === 'estoque') && <BarInventoryPage />}
           {currentTab === 'patrimonio' && <PatrimonyPage />}
-          {(currentTab === 'appstore' || currentTab === 'integracoes') && <AppStorePage />}
           {(currentTab === 'roadmap' || currentTab === 'configuracoes') && <RoadmapPage />}
           {currentTab === 'relatorios' && <PreparationPage moduleName="Relatórios Consolidados" />}
           
           {![
-            'dashboard', 'produtos', 'planos', 'contratacao', 'assinatura',
+            'dashboard', 'produtos', 'planos', 'contratacao', 'assinatura', 'usuarios',
             'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
             'eventos', 'marketing', 'sac', 'logistica', 'bar', 'estoque',
             'patrimonio', 'ai', 'bi', 'appstore', 'integracoes', 'marketplace',

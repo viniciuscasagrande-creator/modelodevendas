@@ -107,7 +107,8 @@ export default function ProductDetails({ productId }) {
   // Fallback if productId not provided directly
   let currentId = productId;
   if (!currentId && typeof window !== 'undefined') {
-    const parts = window.location.pathname.split('/');
+    const cleanPath = window.location.pathname.replace(/\/+$/, '').split('?')[0];
+    const parts = cleanPath.split('/');
     currentId = parts[parts.length - 1] || 'crm';
   }
 

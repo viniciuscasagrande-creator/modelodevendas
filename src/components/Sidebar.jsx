@@ -50,9 +50,12 @@ export default function Sidebar() {
       relatorios: '/relatorios',
       ai: '/bi',
       automacao: '/automacao',
-      appstore: '/integracoes',
+      appstore: '/appstore',
+      integracoes: '/integracoes',
+      usuarios: '/usuarios',
       roadmap: '/configuracoes',
       marketplace: '/planos',
+      planos: '/planos',
       logistica: '/logistica',
       bar: '/estoque',
       patrimonio: '/patrimonio'
@@ -103,8 +106,9 @@ export default function Sidebar() {
     {
       title: 'SISTEMA',
       items: [
-        { id: 'appstore', label: 'Integrações', icon: Blocks },
-        { id: 'marketplace', label: 'Usuários e Permissões', icon: ShieldCheck },
+        { id: 'appstore', label: 'Central de Apps', icon: ShoppingBag },
+        { id: 'integracoes', label: 'Integrações', icon: Blocks },
+        { id: 'usuarios', label: 'Usuários e Permissões', icon: ShieldCheck },
         { id: 'roadmap', label: 'Configurações', icon: Sliders }
       ]
     }
