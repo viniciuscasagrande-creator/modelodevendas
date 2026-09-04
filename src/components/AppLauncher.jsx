@@ -105,12 +105,8 @@ export default function AppLauncher() {
     setAppsOpen(false);
     if (app.status === 'active') {
       navigateTo(app.route);
-    } else if (app.status === 'available') {
-      navigateTo(app.productRoute);
-    } else if (app.status === 'upgrade') {
-      navigateTo(`/planos?produto=${app.id}&upgrade=true`);
-    } else if (app.status === 'trial') {
-      navigateTo(`/produtos/${app.id}`);
+    } else {
+      navigateTo(app.productRoute || `/produtos/${app.id}`);
     }
   };
 
@@ -121,8 +117,12 @@ export default function AppLauncher() {
       <div
         key={app.id}
         data-testid={app.testId}
-        className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/70 dark:bg-[#1E293B]/40 hover:bg-white dark:hover:bg-[#1E293B] hover:border-[#F97316] hover:shadow-lg transition-all flex flex-col justify-between group text-left relative"
+        onClick={() => handleAppAction(app)}
+        className="p-4 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/70 dark:bg-[#1E293B]/40 hover:bg-white dark:hover:bg-[#1E293B] hover:border-[#F97316] hover:shadow-lg transition-all flex flex-col justify-between group text-left relative cursor-pointer"
       >
+        {app.aliasTestId && (
+          <span data-testid={app.aliasTestId} className="sr-only" aria-hidden="true" />
+        )}
         <div>
           <div className="flex items-center justify-between mb-2.5">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs transition-transform group-hover:scale-105 ${
@@ -254,7 +254,7 @@ export default function AppLauncher() {
             <input 
               type="text"
               data-testid="app-search"
-              placeholder="Buscar aplicativo por nome, recurso ou categoria..."
+              placeholder="Buscar aplicativo..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus

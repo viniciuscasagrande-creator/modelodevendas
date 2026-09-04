@@ -31,7 +31,7 @@ test.describe('Fase 27.1.2 — Páginas Comerciais dos Módulos', () => {
 
     await page.getByTestId('product-demo-cta').click();
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/solicitar demonstração/i)).toBeVisible();
+    await expect(page.getByRole('dialog').getByText(/solicitar demonstração/i)).toBeVisible();
   });
 
   test('produto inexistente possui fallback seguro', async ({ page }) => {

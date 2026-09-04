@@ -6,6 +6,15 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
+  getTenantId() {
+    try {
+      const sub = subscriptionService.getSubscription();
+      return sub.producerId || 'prod_pedreira_001';
+    } catch {
+      return 'prod_pedreira_001';
+    }
+  }
+
   getHeaders() {
     const sub = subscriptionService.getSubscription();
     const userId = userAccessService.getCurrentUserId();
@@ -13,7 +22,7 @@ class ApiClient {
 
     return {
       'Content-Type': 'application/json',
-      'X-Tenant-ID': sub.producerId || 'prod_001',
+      'X-Tenant-ID': this.getTenantId(),
       'X-User-ID': userId || 'usr_001',
       'X-Correlation-ID': correlationId,
       'Authorization': 'Bearer diskhub_session_token_valid'

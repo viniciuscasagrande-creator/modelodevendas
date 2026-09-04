@@ -7,7 +7,7 @@ test.describe('Fase 27.1.1 — Central de Apps Comercial', () => {
     await page.getByTestId('app-launcher-button').click();
 
     await expect(page.getByTestId('app-launcher')).toBeVisible();
-    await expect(page.getByText('DiskHub Business Cloud')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'DiskHub Business Cloud' })).toBeVisible();
   });
 
   test('abre CRM contratado (Ativo)', async ({ page }) => {

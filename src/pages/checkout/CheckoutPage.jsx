@@ -161,7 +161,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Stepper bar */}
-          <div data-testid="checkout-stepper" className="hidden sm:flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] shadow-xs">
+          <div data-testid="checkout-stepper" className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] shadow-xs overflow-x-auto">
             {stepsList.map((s, idx) => (
               <React.Fragment key={s.num}>
                 <div className="flex items-center space-x-2">

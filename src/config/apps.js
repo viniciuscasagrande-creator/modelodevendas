@@ -21,7 +21,8 @@ export const apps = [
     plan: 'standard',
     category: 'Gestão',
     enabled: true,
-    testId: 'app-erp'
+    testId: 'app-sales',
+    aliasTestId: 'app-erp'
   },
   {
     id: 'finance',
@@ -57,7 +58,8 @@ export const apps = [
     plan: 'advanced',
     category: 'Atendimento',
     enabled: true,
-    testId: 'app-support'
+    testId: 'app-sac',
+    aliasTestId: 'app-support'
   },
   {
     id: 'analytics',

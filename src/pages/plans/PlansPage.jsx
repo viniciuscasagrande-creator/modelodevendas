@@ -85,7 +85,7 @@ export default function PlansPage() {
             <Sparkles className="w-4 h-4 shrink-0" />
             <span>
               Você está comparando planos para liberar <strong>{products[highlightProduct]?.name || highlightProduct.toUpperCase()}</strong>.
-              Este módulo está disponível nos planos <strong>ADVANCED</strong> e <strong>EXPERT</strong>.
+              O módulo de Marketing está disponível nos planos <strong>ADVANCED</strong> e <strong>EXPERT</strong>.
             </span>
           </div>
           <button

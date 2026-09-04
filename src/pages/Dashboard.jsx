@@ -168,7 +168,7 @@ export default function Dashboard() {
 
         {/* Action Right Button */}
         <div className="flex items-center space-x-3">
-          <div className="hidden sm:flex items-center space-x-1 text-[11px] text-slate-400 font-medium">
+          <div className="flex items-center space-x-1 text-[11px] text-slate-400 font-medium">
             <span>Atualizado: {lastUpdated}</span>
           </div>
           <button

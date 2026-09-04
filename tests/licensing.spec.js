@@ -6,7 +6,7 @@ test.describe('Fase 27.1.5 — Licenciamento e AppAccessGuard', () => {
     await page.goto('/crm');
 
     await expect(page.getByTestId('access-blocked')).not.toBeVisible();
-    await expect(page.getByText(/crm/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /crm/i })).toBeVisible();
   });
 
   test('Plano Standard bloqueia Marketing com tela de upgrade e sem tela branca', async ({ page }) => {

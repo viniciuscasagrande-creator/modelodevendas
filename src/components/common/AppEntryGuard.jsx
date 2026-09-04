@@ -174,7 +174,7 @@ export default function AppEntryGuard({ appId, children }) {
   // 4. STATE: NO LICENSE (Company needs upgrade)
   return (
     <div data-testid="access-no-license" className="py-12 px-4 flex items-center justify-center animate-fadeIn font-sans">
-      <div className={`max-w-lg w-full ${bgCard} border ${borderCol} rounded-3xl p-8 text-center shadow-xl space-y-5`}>
+      <div data-testid="access-blocked" className={`max-w-lg w-full ${bgCard} border ${borderCol} rounded-3xl p-8 text-center shadow-xl space-y-5`}>
         
         <div className="w-16 h-16 rounded-2xl bg-orange-500/10 text-[#F97316] flex items-center justify-center mx-auto shadow-sm">
           <Lock className="w-8 h-8" />

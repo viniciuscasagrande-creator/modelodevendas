@@ -9,7 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "start": "node server.cjs",
-    "server": "node server.cjs"
+    "server": "node server.cjs",
+    "test:e2e": "playwright test",
+    "test:e2e:critical": "playwright test tests/menu-routes-sweep.spec.js tests/dashboard-executive.spec.js tests/licensing.spec.js"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
@@ -23,6 +25,7 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
