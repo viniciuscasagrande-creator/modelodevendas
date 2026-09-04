@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown, ArrowRight, Layers, Users } from 'lucide-react';
+import { Crown, ArrowRight } from 'lucide-react';
 import { useAppContext } from '../../hooks/useAppContext';
 
 export function CurrentPlanCard() {
@@ -14,59 +14,57 @@ export function CurrentPlanCard() {
   return (
     <div
       data-testid="current-plan-card"
-      className="p-5 rounded-2xl bg-[#111721] border border-white/[0.08] flex flex-col justify-between shadow-sm relative overflow-hidden group"
+      className="p-5 rounded-2xl bg-[#111721] border border-white/[0.08] flex flex-col justify-between shadow-sm relative overflow-hidden h-full"
     >
-      <div className="absolute top-0 right-0 w-28 h-28 bg-blue-600/10 rounded-full blur-2xl pointer-events-none" />
-
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
-              <Crown className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
-                Plano Atual
-              </span>
-              <span className="text-base font-black text-white tracking-tight">
-                DiskHub {planName}
-              </span>
-            </div>
+      <div className="space-y-3">
+        {/* Plan Header */}
+        <div className="flex items-start space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-purple-600/25">
+            <Crown className="w-5 h-5" />
           </div>
-          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-            ATIVO
-          </span>
+          <div>
+            <span className="text-xs text-slate-400 font-medium block">
+              Você está no plano
+            </span>
+            <span className="text-xl font-black text-white tracking-tight block">
+              <span className="sr-only">DiskHub </span>{planName}
+            </span>
+          </div>
         </div>
 
-        <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-          Recursos comerciais, BI e canais de atendimento habilitados para sua equipe.
+        {/* Stats line */}
+        <p className="text-xs text-slate-300 font-medium pt-1">
+          {activeAppsCount} apps ativos • {usersCount} usuários
         </p>
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center space-x-2">
-            <Layers className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <div>
-              <span className="text-xs font-bold text-white block">{activeAppsCount} Apps</span>
-              <span className="text-[10px] text-slate-400 block">Contratados</span>
-            </div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center space-x-2">
-            <Users className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <div>
-              <span className="text-xs font-bold text-white block">{usersCount} Usuários</span>
-              <span className="text-[10px] text-slate-400 block">Ativos</span>
-            </div>
-          </div>
+        {/* Usage Progress Bar */}
+        <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full"
+            style={{ width: '50%' }}
+          />
         </div>
       </div>
 
-      <button
-        onClick={() => navigate('/app/assinatura')}
-        className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-bold border border-white/10 flex items-center justify-between cursor-pointer transition-all"
-      >
-        <span>Ver minha assinatura</span>
-        <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-      </button>
+      {/* Footer: Next billing + CTA */}
+      <div className="pt-4 border-t border-white/[0.06] mt-4 flex items-center justify-between gap-2">
+        <div>
+          <span className="text-[10px] text-slate-400 font-medium block">
+            Próxima cobrança
+          </span>
+          <span className="text-xs font-bold text-slate-200 block">
+            15 de jan. de 2026
+          </span>
+        </div>
+
+        <button
+          onClick={() => navigate('/app/assinatura')}
+          className="px-3 py-2 rounded-xl bg-[#172338] hover:bg-[#1e2f4c] text-white text-xs font-bold border border-blue-500/20 flex items-center space-x-1.5 cursor-pointer transition-all shrink-0"
+        >
+          <span>Ver minha assinatura</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

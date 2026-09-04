@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { authService } from '../services/authService';
+import { useAppContext } from '../hooks/useAppContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 
@@ -35,12 +36,15 @@ export function LoginPage() {
     },
   });
 
+  const { refreshContext } = useAppContext();
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setServerError(null);
     try {
       const response = await authService.login(data as any);
       if (response.success) {
+        await refreshContext();
         navigate(from, { replace: true });
       } else {
         setServerError(response.error || 'Credenciais inválidas.');

@@ -1,4 +1,5 @@
 @import './tokens.css';
+@import './premium.css';
 @import "tailwindcss";
 
 *, *::before, *::after {

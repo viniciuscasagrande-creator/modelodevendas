@@ -48,7 +48,7 @@ export function KpiCard({
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <span className="text-xl sm:text-2xl font-black text-white tracking-tight block truncate">
+          <span className="text-base xl:text-lg font-black text-white tracking-tight block whitespace-nowrap">
             {value}
           </span>
           <span className="text-xs text-slate-400 font-semibold block -mt-0.5 truncate">

@@ -276,76 +276,27 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
-// GET /api/me/context - Fase 28.1 Frontend Context
-app.get('/api/me/context', (req, res) => {
-  const db = readDb();
-  const user = db.users[0] || {
-    id: 'usr-1',
-    name: 'Vinicius Casagrande',
-    email: 'vinicius@diskhub.com.br',
-    role: 'CEO & Fundador'
-  };
-
-  res.json({
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatarColor: '#2563EB'
-    },
-    tenant: {
-      id: 'tenant-diskhub-01',
-      name: 'Diskingressos & Produtores Associados',
-      document: '12.345.678/0001-90',
-      activeProducer: 'Produtor Exemplo',
-      activeCompany: 'Diskingressos',
-      plan: 'advanced'
-    },
-    subscription: {
-      id: 'sub-adv-2026',
-      plan: 'advanced',
-      planName: 'Advanced',
-      status: 'active',
-      monthlyPrice: 890,
-      billingCycle: 'monthly',
-      renewsAt: '2026-10-01',
-      usersCount: 12,
-      maxUsers: 25,
-      activeAppsCount: 6
-    },
-    apps: [
-      { id: 'crm', name: 'CRM Comercial', status: 'active', tier: 'standard' },
-      { id: 'erp', name: 'ERP Operacional', status: 'active', tier: 'standard' },
-      { id: 'financeiro', name: 'Financeiro & Conciliação', status: 'active', tier: 'standard' },
-      { id: 'marketing', name: 'Marketing & Audiência', status: 'active', tier: 'advanced' },
-      { id: 'sac', name: 'SAC & Atendimento', status: 'active', tier: 'advanced' },
-      { id: 'bi', name: 'BI & Analytics', status: 'active', tier: 'advanced' },
-      { id: 'contabilidade', name: 'Contabilidade', status: 'upgrade_required', tier: 'expert' },
-      { id: 'automacao', name: 'Automações Avançadas', status: 'upgrade_required', tier: 'expert' },
-      { id: 'ia', name: 'Inteligência Artificial', status: 'upgrade_required', tier: 'expert' },
-      { id: 'integracoes', name: 'Webhooks & APIs', status: 'upgrade_required', tier: 'expert' }
-    ],
-    permissions: [
-      'view_dashboard',
-      'manage_sales',
-      'view_financial_reports',
-      'manage_marketing_campaigns',
-      'manage_support_tickets',
-      'export_data'
-    ],
-    features: [
-      'advanced_analytics',
-      'multi_producer_context',
-      'realtime_alerts',
-      'custom_export'
-    ]
-  });
+// POST /api/auth/logout - Fase 28.2 Real Logout
+app.post('/api/auth/logout', (req, res) => {
+  res.json({ success: true, message: 'Sessão encerrada com sucesso no backend.' });
 });
 
-// GET /api/dashboard/summary - Fase 28.1 Executive Dashboard
-app.get('/api/dashboard/summary', (req, res) => {
-  res.json({
+// MULTI-TENANT CONFIGURATION DATABASE
+const tenantsDatabase = {
+  'tenant-diskhub-01': {
+    id: 'tenant-diskhub-01',
+    name: 'Diskingressos & Produtores Associados',
+    document: '12.345.678/0001-90',
+    activeProducer: 'Produtor Exemplo',
+    activeCompany: 'Diskingressos',
+    status: 'active',
+    plan: 'advanced',
+    planName: 'Advanced',
+    monthlyPrice: 890,
+    renewsAt: '2026-10-01',
+    usersCount: 12,
+    maxUsers: 25,
+    activeAppsCount: 6,
     kpis: {
       revenue: 184320,
       revenueGrowth: 12.4,
@@ -370,27 +321,236 @@ app.get('/api/dashboard/summary', (req, res) => {
       { id: 'act-1', event: 'Venda de 4 ingressos VIP', user: 'Sandra Costa (PDV)', time: '5 min atrás' },
       { id: 'act-2', event: 'Exportação do relatório financeiro D+2', user: 'Roberto Carlos', time: '22 min atrás' },
       { id: 'act-3', event: 'Campanha de WhatsApp disparada', user: 'Mariana Costa', time: '1h atrás' }
+    ]
+  },
+  'tenant-arena-02': {
+    id: 'tenant-arena-02',
+    name: 'Arena Music Curitiba',
+    document: '33.222.111/0001-44',
+    activeProducer: 'Arena Shows',
+    activeCompany: 'Arena Music',
+    status: 'active',
+    plan: 'expert',
+    planName: 'Expert',
+    monthlyPrice: 1890,
+    renewsAt: '2026-11-15',
+    usersCount: 28,
+    maxUsers: 100,
+    activeAppsCount: 10,
+    kpis: {
+      revenue: 420000,
+      revenueGrowth: 24.8,
+      orders: 4800,
+      ordersGrowth: 18.2,
+      conversion: 5.2,
+      conversionGrowth: 1.1,
+      ticketAverage: 87.50,
+      ticketAverageGrowth: 5.6
+    },
+    series: [
+      { date: '01/09', receita: 12500, pedidos: 140 },
+      { date: '02/09', receita: 18200, pedidos: 210 },
+      { date: '03/09', receita: 22000, pedidos: 250 },
+      { date: '04/09', receita: 28900, pedidos: 330 }
+    ],
+    alerts: [
+      { id: 'alt-arena-1', title: 'Rock Metal Arena', message: '98% capacidade máxima atingida.', type: 'warning', time: '5 min atrás' }
+    ],
+    recentActivity: [
+      { id: 'act-arena-1', event: 'Integração Contábil SAP concluída', user: 'Roberto Carlos', time: '12 min atrás' }
+    ]
+  },
+  'tenant-sunset-03': {
+    id: 'tenant-sunset-03',
+    name: 'Sunset Beach Club',
+    document: '98.765.432/0001-10',
+    activeProducer: 'Rodrigo Festas Som',
+    activeCompany: 'Sunset Club',
+    status: 'active',
+    plan: 'standard',
+    planName: 'Standard',
+    monthlyPrice: 450,
+    renewsAt: '2026-09-30',
+    usersCount: 4,
+    maxUsers: 5,
+    activeAppsCount: 3,
+    kpis: {
+      revenue: 94500,
+      revenueGrowth: 5.4,
+      orders: 1120,
+      ordersGrowth: 3.1,
+      conversion: 2.9,
+      conversionGrowth: 0.2,
+      ticketAverage: 84.37,
+      ticketAverageGrowth: 2.1
+    },
+    series: [
+      { date: '01/09', receita: 1800, pedidos: 22 },
+      { date: '02/09', receita: 2400, pedidos: 28 },
+      { date: '03/09', receita: 3100, pedidos: 37 },
+      { date: '04/09', receita: 4200, pedidos: 50 }
+    ],
+    alerts: [
+      { id: 'alt-sunset-1', title: 'Virada de Lote Sunset', message: 'Lote promocional esgotado.', type: 'info', time: '2h atrás' }
+    ],
+    recentActivity: [
+      { id: 'act-sunset-1', event: 'Abertura de caixa do quiosque', user: 'Sandra Costa', time: '40 min atrás' }
+    ]
+  }
+};
+
+// POST /api/me/switch-tenant - Fase 28.2 Switch Tenant
+app.post('/api/me/switch-tenant', (req, res) => {
+  const { tenantId } = req.body;
+  if (!tenantId || !tenantsDatabase[tenantId]) {
+    return res.status(403).json({ success: false, error: 'tenant_denied', message: 'Acesso não autorizado para o tenant solicitado.' });
+  }
+  res.json({ success: true, activeTenantId: tenantId, tenant: tenantsDatabase[tenantId] });
+});
+
+// GET /api/me/context - Fase 28.2 Frontend Context with Multitenant & Memberships
+app.get('/api/me/context', (req, res) => {
+  const requestedTenantId = req.headers['x-tenant-id'] || req.query.tenantId || 'tenant-diskhub-01';
+
+  // Security Check: IDOR & Membership Validation
+  if (!tenantsDatabase[requestedTenantId]) {
+    return res.status(403).json({
+      error: 'tenant_denied',
+      message: 'O usuário não possui associação ou permissão no tenant solicitado.',
+      requestedTenantId
+    });
+  }
+
+  const activeTenantData = tenantsDatabase[requestedTenantId];
+  const db = readDb();
+  const user = db.users[0] || {
+    id: 'usr-1',
+    name: 'Vinicius Casagrande',
+    email: 'vinicius@diskhub.com.br',
+    role: 'CEO & Fundador'
+  };
+
+  const isStandard = activeTenantData.plan === 'standard';
+  const isAdvanced = activeTenantData.plan === 'advanced';
+  const isExpert = activeTenantData.plan === 'expert';
+
+  const licenses = [
+    { app: 'crm', name: 'CRM Comercial', status: 'active', access: true, tier: 'standard' },
+    { app: 'erp', name: 'ERP Operacional', status: 'active', access: true, tier: 'standard' },
+    { app: 'financeiro', name: 'Financeiro & Conciliação', status: 'active', access: true, tier: 'standard' },
+    { app: 'marketing', name: 'Marketing & Audiência', status: isStandard ? 'upgrade_required' : 'active', access: !isStandard, tier: 'advanced' },
+    { app: 'sac', name: 'SAC & Atendimento', status: isStandard ? 'upgrade_required' : 'active', access: !isStandard, tier: 'advanced' },
+    { app: 'bi', name: 'BI & Analytics', status: isStandard ? 'upgrade_required' : 'active', access: !isStandard, tier: 'advanced' },
+    { app: 'contabilidade', name: 'Contabilidade & DRE', status: isExpert ? 'active' : 'upgrade_required', access: isExpert, tier: 'expert' },
+    { app: 'automacao', name: 'Automações Avançadas', status: isExpert ? 'active' : 'upgrade_required', access: isExpert, tier: 'expert' },
+    { app: 'ia', name: 'Inteligência Artificial', status: isExpert ? 'active' : 'upgrade_required', access: isExpert, tier: 'expert' },
+    { app: 'integracoes', name: 'Webhooks & APIs', status: isExpert ? 'active' : 'upgrade_required', access: isExpert, tier: 'expert' }
+  ];
+
+  res.json({
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatarColor: '#2563EB'
+    },
+    membership: {
+      role: requestedTenantId === 'tenant-diskhub-01' ? 'owner' : (requestedTenantId === 'tenant-arena-02' ? 'manager' : 'analyst'),
+      status: 'active',
+      tenantId: activeTenantData.id
+    },
+    tenant: {
+      id: activeTenantData.id,
+      name: activeTenantData.name,
+      document: activeTenantData.document,
+      activeProducer: activeTenantData.activeProducer,
+      activeCompany: activeTenantData.activeCompany,
+      status: activeTenantData.status,
+      plan: activeTenantData.plan
+    },
+    availableTenants: [
+      { id: 'tenant-diskhub-01', name: 'Diskingressos & Produtores Associados', role: 'Owner', plan: 'advanced' },
+      { id: 'tenant-arena-02', name: 'Arena Music Curitiba', role: 'Manager', plan: 'expert' },
+      { id: 'tenant-sunset-03', name: 'Sunset Beach Club', role: 'Analyst', plan: 'standard' }
     ],
     subscription: {
-      plan: 'advanced',
-      planName: 'Advanced',
-      status: 'active',
-      users: 12,
-      activeApps: 6
+      id: `sub-${activeTenantData.plan}-2026`,
+      plan: activeTenantData.plan,
+      planName: activeTenantData.planName,
+      status: activeTenantData.status,
+      monthlyPrice: activeTenantData.monthlyPrice,
+      billingCycle: 'monthly',
+      renewsAt: activeTenantData.renewsAt,
+      usersCount: activeTenantData.usersCount,
+      maxUsers: activeTenantData.maxUsers,
+      activeAppsCount: activeTenantData.activeAppsCount
+    },
+    licenses,
+    permissions: [
+      'crm.customer.read',
+      'crm.customer.create',
+      'crm.customer.update',
+      'crm.customer.delete',
+      'finance.payable.read',
+      'finance.payable.create',
+      'finance.receivable.read',
+      'marketing.campaign.read',
+      requestedTenantId !== 'tenant-sunset-03' ? 'marketing.campaign.create' : '',
+      'support.ticket.read',
+      'dashboard.view'
+    ].filter(Boolean),
+    features: [
+      'multi_producer_context',
+      'realtime_alerts',
+      isExpert ? 'ai_beta' : ''
+    ].filter(Boolean)
+  });
+});
+
+// GET /api/dashboard/summary - Fase 28.2 Executive Dashboard with Tenant Scope
+app.get('/api/dashboard/summary', (req, res) => {
+  const requestedTenantId = req.headers['x-tenant-id'] || req.query.tenantId || 'tenant-diskhub-01';
+
+  // Security Check: Cross-Tenant Isolation
+  if (!tenantsDatabase[requestedTenantId]) {
+    return res.status(403).json({
+      error: 'tenant_denied',
+      message: 'Acesso negado para dados do tenant solicitado.',
+      requestedTenantId
+    });
+  }
+
+  const tenantData = tenantsDatabase[requestedTenantId];
+
+  res.json({
+    kpis: tenantData.kpis,
+    series: tenantData.series,
+    alerts: tenantData.alerts,
+    recentActivity: tenantData.recentActivity,
+    subscription: {
+      plan: tenantData.plan,
+      planName: tenantData.planName,
+      status: tenantData.status,
+      users: tenantData.usersCount,
+      activeApps: tenantData.activeAppsCount
     }
   });
 });
 
 // GET /api/subscription/current
 app.get('/api/subscription/current', (req, res) => {
+  const requestedTenantId = req.headers['x-tenant-id'] || req.query.tenantId || 'tenant-diskhub-01';
+  const tenantData = tenantsDatabase[requestedTenantId] || tenantsDatabase['tenant-diskhub-01'];
+
   res.json({
-    plan: 'advanced',
-    planName: 'Advanced',
-    status: 'active',
-    monthlyPrice: 890,
-    renewsAt: '2026-10-01',
-    users: 12,
-    activeApps: 6
+    plan: tenantData.plan,
+    planName: tenantData.planName,
+    status: tenantData.status,
+    monthlyPrice: tenantData.monthlyPrice,
+    renewsAt: tenantData.renewsAt,
+    users: tenantData.usersCount,
+    activeApps: tenantData.activeAppsCount
   });
 });
 

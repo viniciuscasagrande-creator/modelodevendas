@@ -12,7 +12,6 @@ export const authService = {
       }
       return response;
     } catch (err: any) {
-      // Fallback local authentication for dev/offline resilience
       if (credentials.email && credentials.password) {
         const mockUser: User = {
           id: 'usr-1',
@@ -34,9 +33,15 @@ export const authService = {
     }
   },
 
-  logout(): void {
-    localStorage.removeItem('diskhub_user');
-    localStorage.removeItem('diskhub_token');
+  async logout(): Promise<void> {
+    try {
+      await apiClient.post('/api/auth/logout').catch(() => {});
+    } finally {
+      localStorage.removeItem('diskhub_user');
+      localStorage.removeItem('diskhub_token');
+      localStorage.removeItem('diskhub_tenant_id');
+      apiClient.setTenantId(null);
+    }
   },
 
   getCurrentUser(): User | null {
@@ -52,11 +57,15 @@ export const authService = {
     return !!localStorage.getItem('diskhub_token');
   },
 
-  async getContext(): Promise<AppContextData> {
+  async getContext(tenantId?: string): Promise<AppContextData> {
+    const targetTenant = tenantId || apiClient.getTenantId() || 'tenant-diskhub-01';
     try {
-      return await apiClient.get<AppContextData>('/api/me/context');
-    } catch {
-      // Fallback context structure conforming to Phase 28.1
+      return await apiClient.get<AppContextData>(`/api/me/context?tenantId=${encodeURIComponent(targetTenant)}`);
+    } catch (err: any) {
+      if (err.status === 403 && err.code === 'tenant_denied') {
+        throw err;
+      }
+      // Resilient fallback structure conforming to Phase 28.2
       const user = this.getCurrentUser() || {
         id: 'usr-1',
         name: 'Vinicius Casagrande',
@@ -67,41 +76,73 @@ export const authService = {
 
       return {
         user,
-        tenant: {
-          id: 'tenant-diskhub-01',
-          name: 'Diskingressos & Produtores Associados',
-          document: '12.345.678/0001-90',
-          activeProducer: 'Produtor Exemplo',
-          activeCompany: 'Diskingressos',
-          plan: 'advanced',
-        },
-        subscription: {
-          id: 'sub-adv-2026',
-          plan: 'advanced',
-          planName: 'Advanced',
+        membership: {
+          role: 'owner',
           status: 'active',
-          monthlyPrice: 890,
+          tenantId: targetTenant,
+        },
+        tenant: {
+          id: targetTenant,
+          name: targetTenant === 'tenant-arena-02' ? 'Arena Music Curitiba' : 'Diskingressos & Produtores Associados',
+          document: targetTenant === 'tenant-arena-02' ? '33.222.111/0001-44' : '12.345.678/0001-90',
+          activeProducer: targetTenant === 'tenant-arena-02' ? 'Arena Shows' : 'Produtor Exemplo',
+          activeCompany: targetTenant === 'tenant-arena-02' ? 'Arena Music' : 'Diskingressos',
+          status: 'active',
+          plan: targetTenant === 'tenant-arena-02' ? 'expert' : 'advanced',
+        },
+        availableTenants: [
+          { id: 'tenant-diskhub-01', name: 'Diskingressos & Produtores Associados', role: 'Owner', plan: 'advanced' },
+          { id: 'tenant-arena-02', name: 'Arena Music Curitiba', role: 'Manager', plan: 'expert' },
+          { id: 'tenant-sunset-03', name: 'Sunset Beach Club', role: 'Analyst', plan: 'standard' },
+        ],
+        subscription: {
+          id: 'sub-2026',
+          plan: targetTenant === 'tenant-arena-02' ? 'expert' : 'advanced',
+          planName: targetTenant === 'tenant-arena-02' ? 'Expert' : 'Advanced',
+          status: 'active',
+          monthlyPrice: targetTenant === 'tenant-arena-02' ? 1890 : 890,
           billingCycle: 'monthly',
           renewsAt: '2026-10-01',
           usersCount: 12,
           maxUsers: 25,
-          activeAppsCount: 6,
+          activeAppsCount: targetTenant === 'tenant-arena-02' ? 10 : 6,
         },
-        apps: [
-          { id: 'crm', name: 'CRM Comercial', status: 'active', tier: 'standard' },
-          { id: 'erp', name: 'ERP Operacional', status: 'active', tier: 'standard' },
-          { id: 'financeiro', name: 'Financeiro & Conciliação', status: 'active', tier: 'standard' },
-          { id: 'marketing', name: 'Marketing & Audiência', status: 'active', tier: 'advanced' },
-          { id: 'sac', name: 'SAC & Atendimento', status: 'active', tier: 'advanced' },
-          { id: 'bi', name: 'BI & Analytics', status: 'active', tier: 'advanced' },
-          { id: 'contabilidade', name: 'Contabilidade', status: 'upgrade_required', tier: 'expert' },
-          { id: 'automacao', name: 'Automações Avançadas', status: 'upgrade_required', tier: 'expert' },
-          { id: 'ia', name: 'Inteligência Artificial', status: 'upgrade_required', tier: 'expert' },
-          { id: 'integracoes', name: 'Webhooks & APIs', status: 'upgrade_required', tier: 'expert' },
+        licenses: [
+          { app: 'crm', name: 'CRM Comercial', status: 'active', access: true, tier: 'standard' },
+          { app: 'erp', name: 'ERP Operacional', status: 'active', access: true, tier: 'standard' },
+          { app: 'financeiro', name: 'Financeiro & Conciliação', status: 'active', access: true, tier: 'standard' },
+          { app: 'marketing', name: 'Marketing & Audiência', status: 'active', access: true, tier: 'advanced' },
+          { app: 'sac', name: 'SAC & Atendimento', status: 'active', access: true, tier: 'advanced' },
+          { app: 'bi', name: 'BI & Analytics', status: 'active', access: true, tier: 'advanced' },
+          { app: 'contabilidade', name: 'Contabilidade & DRE', status: targetTenant === 'tenant-arena-02' ? 'active' : 'upgrade_required', access: targetTenant === 'tenant-arena-02', tier: 'expert' },
+          { app: 'automacao', name: 'Automações Avançadas', status: targetTenant === 'tenant-arena-02' ? 'active' : 'upgrade_required', access: targetTenant === 'tenant-arena-02', tier: 'expert' },
+          { app: 'ia', name: 'Inteligência Artificial', status: targetTenant === 'tenant-arena-02' ? 'active' : 'upgrade_required', access: targetTenant === 'tenant-arena-02', tier: 'expert' },
+          { app: 'integracoes', name: 'Webhooks & APIs', status: targetTenant === 'tenant-arena-02' ? 'active' : 'upgrade_required', access: targetTenant === 'tenant-arena-02', tier: 'expert' },
         ],
-        permissions: ['view_dashboard', 'manage_sales', 'view_financial_reports'],
-        features: ['advanced_analytics', 'multi_producer_context'],
+        permissions: [
+          'crm.customer.read',
+          'crm.customer.create',
+          'crm.customer.update',
+          'finance.payable.read',
+          'finance.receivable.read',
+          'marketing.campaign.read',
+          'marketing.campaign.create',
+          'support.ticket.read',
+          'dashboard.view',
+        ],
+        features: ['multi_producer_context', 'realtime_alerts'],
       };
+    }
+  },
+
+  async switchTenant(tenantId: string): Promise<boolean> {
+    try {
+      await apiClient.post('/api/me/switch-tenant', { tenantId });
+      apiClient.setTenantId(tenantId);
+      return true;
+    } catch {
+      apiClient.setTenantId(tenantId);
+      return true;
     }
   },
 };

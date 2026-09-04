@@ -1,12 +1,16 @@
 export class ApiError extends Error {
   status: number;
   data: any;
+  code?: string;
+  requestId?: string;
 
-  constructor(status: number, message: string, data?: any) {
+  constructor(status: number, message: string, data?: any, code?: string, requestId?: string) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.data = data;
+    this.code = code;
+    this.requestId = requestId;
   }
 }
 
@@ -16,9 +20,15 @@ interface RequestOptions extends RequestInit {
 
 class ApiClient {
   private baseURL: string;
+  private tenantId: string | null = null;
 
   constructor() {
     this.baseURL = (import.meta.env.VITE_DISKHUB_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
+    try {
+      this.tenantId = localStorage.getItem('diskhub_tenant_id') || 'tenant-diskhub-01';
+    } catch {
+      this.tenantId = 'tenant-diskhub-01';
+    }
   }
 
   setBaseURL(url: string) {
@@ -27,6 +37,30 @@ class ApiClient {
 
   getBaseURL(): string {
     return this.baseURL;
+  }
+
+  setTenantId(id: string | null) {
+    this.tenantId = id;
+    if (id) {
+      try {
+        localStorage.setItem('diskhub_tenant_id', id);
+      } catch {}
+    } else {
+      try {
+        localStorage.removeItem('diskhub_tenant_id');
+      } catch {}
+    }
+  }
+
+  getTenantId(): string | null {
+    if (!this.tenantId) {
+      try {
+        this.tenantId = localStorage.getItem('diskhub_tenant_id') || 'tenant-diskhub-01';
+      } catch {
+        this.tenantId = 'tenant-diskhub-01';
+      }
+    }
+    return this.tenantId;
   }
 
   private getToken(): string | null {
@@ -38,12 +72,13 @@ class ApiClient {
   }
 
   async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const { timeoutMs = 15000, headers = {}, ...customConfig } = options;
+    const { timeoutMs = 2500, headers = {}, ...customConfig } = options;
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${this.baseURL}${cleanEndpoint}`;
 
     const requestId = `req-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const token = this.getToken();
+    const currentTenant = this.getTenantId();
 
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -56,6 +91,10 @@ class ApiClient {
 
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (currentTenant) {
+      defaultHeaders['X-Tenant-Id'] = currentTenant;
     }
 
     try {
@@ -72,17 +111,32 @@ class ApiClient {
 
       // Handle 401 Unauthorized
       if (response.status === 401) {
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          localStorage.removeItem('diskhub_token');
-          localStorage.removeItem('diskhub_user');
-          // Dispatch auth event or let RequireAuth handle
+        if (typeof window !== 'undefined') {
+          const currentPath = window.location.pathname;
+          if (!currentPath.startsWith('/login')) {
+            localStorage.removeItem('diskhub_token');
+            localStorage.removeItem('diskhub_user');
+            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+          }
         }
-        throw new ApiError(401, 'Sessão expirada ou não autorizada. Faça login novamente.');
+        throw new ApiError(401, 'Sessão expirada ou não autorizada. Faça login novamente.', null, 'session_expired', requestId);
       }
 
       // Handle 403 Forbidden
       if (response.status === 403) {
-        throw new ApiError(403, 'Acesso restrito ao plano atual ou permissões insuficientes.');
+        const errorBody = await response.json().catch(() => ({}));
+        throw new ApiError(
+          403,
+          errorBody.message || 'Acesso negado para a operação solicitada.',
+          errorBody,
+          errorBody.error || 'forbidden',
+          requestId
+        );
+      }
+
+      // Handle 429 Rate Limit
+      if (response.status === 429) {
+        throw new ApiError(429, 'Muitas solicitações simultâneas. Tente novamente em alguns instantes.', null, 'rate_limit', requestId);
       }
 
       if (!response.ok) {
@@ -90,7 +144,9 @@ class ApiClient {
         throw new ApiError(
           response.status,
           errorBody.error || errorBody.message || `Erro na requisição (${response.status})`,
-          errorBody
+          errorBody,
+          errorBody.code,
+          requestId
         );
       }
 
@@ -98,12 +154,12 @@ class ApiClient {
     } catch (err: any) {
       clearTimeout(id);
       if (err.name === 'AbortError') {
-        throw new ApiError(408, 'Tempo limite de resposta excedido (Timeout).');
+        throw new ApiError(408, 'Tempo limite de resposta excedido (Timeout).', null, 'timeout', requestId);
       }
       if (err instanceof ApiError) {
         throw err;
       }
-      throw new ApiError(500, err.message || 'Falha de conexão com a API do DiskHub.');
+      throw new ApiError(500, err.message || 'Falha de conexão com a API do DiskHub.', null, 'network_error', requestId);
     }
   }
 

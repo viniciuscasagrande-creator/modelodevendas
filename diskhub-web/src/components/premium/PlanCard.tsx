@@ -1,0 +1,44 @@
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Box, BarChart3, Crown, CheckCircle2 } from 'lucide-react'
+
+const iconMap = { standard: Box, advanced: BarChart3, expert: Crown }
+
+export function PlanCard({
+  kind,
+  title,
+  subtitle,
+  items,
+  recommended,
+}: {
+  kind: 'standard' | 'advanced' | 'expert'
+  title: string
+  subtitle: string
+  items: string[]
+  recommended?: boolean
+}) {
+  const navigate = useNavigate()
+  const Icon = iconMap[kind]
+
+  return (
+    <div className={`plan-card ${recommended ? 'recommended' : ''}`}>
+      {recommended && <div className="recommend-badge">MAIS RECOMENDADO</div>}
+      <div className={`plan-icon ${kind}`}><Icon /></div>
+      <div className="plan-name">{kind.toUpperCase()}</div>
+      <h3>{title}</h3>
+      <p>{subtitle}</p>
+      <ul>
+        {items.map((x) => (
+          <li key={x}>
+            <CheckCircle2 size={15} />
+            {x}
+          </li>
+        ))}
+      </ul>
+      <button onClick={() => navigate(`/app/planos?select=${kind}`)}>
+        {kind === 'advanced' ? 'Escolher Advanced' : `Conhecer ${kind[0].toUpperCase() + kind.slice(1)}`}{' '}
+        <span>→</span>
+      </button>
+    </div>
+  )
+}

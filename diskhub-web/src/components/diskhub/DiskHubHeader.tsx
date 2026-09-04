@@ -12,13 +12,14 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { GlobalSearch } from './GlobalSearch';
+import { TenantSwitcher } from './TenantSwitcher';
 
 interface DiskHubHeaderProps {
   onToggleSidebar: () => void;
 }
 
 export function DiskHubHeader({ onToggleSidebar }: DiskHubHeaderProps) {
-  const { user, tenant, logout } = useAppContext();
+  const { user, logout } = useAppContext();
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export function DiskHubHeader({ onToggleSidebar }: DiskHubHeaderProps) {
         data-testid="diskhub-header"
         className="sticky top-0 z-30 h-16 bg-[#0d1118]/90 backdrop-blur-md border-b border-white/[0.08] px-3 sm:px-6 flex items-center justify-between max-w-full overflow-hidden"
       >
-        {/* Left: Mobile Toggle & Context */}
+        {/* Left: Mobile Toggle & Tenant Switcher */}
         <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
           <button
             onClick={onToggleSidebar}
@@ -39,17 +40,8 @@ export function DiskHubHeader({ onToggleSidebar }: DiskHubHeaderProps) {
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Tenant Context Indicator (Desktop Only) */}
-          <div className="hidden lg:flex items-center space-x-2 text-xs">
-            <span className="text-[10px] font-black uppercase text-slate-400">Contexto:</span>
-            <span className="font-bold text-white truncate max-w-[140px]">
-              {tenant?.name || 'Diskingressos'}
-            </span>
-            <span className="text-slate-400">›</span>
-            <span className="font-bold text-slate-300 truncate max-w-[140px]">
-              {tenant?.activeProducer || 'Produtor Exemplo'}
-            </span>
-          </div>
+          {/* Interactive Tenant Switcher */}
+          <TenantSwitcher />
         </div>
 
         {/* Right: Search, Apps, Notifications, Profile */}
@@ -59,15 +51,28 @@ export function DiskHubHeader({ onToggleSidebar }: DiskHubHeaderProps) {
             type="button"
             data-testid="global-search-button"
             onClick={() => setSearchOpen(true)}
-            className="flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#111721] border border-white/10 text-slate-400 hover:border-white/20 text-xs cursor-pointer transition-all w-24 sm:w-56 md:w-64 justify-between"
+            className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-[#111721] border border-white/10 text-slate-400 hover:border-white/20 text-xs cursor-pointer transition-all w-32 sm:w-64 md:w-72 justify-between"
           >
-            <div className="flex items-center space-x-1.5 truncate">
+            <div className="flex items-center space-x-2 truncate">
               <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-              <span className="truncate text-[11px] text-slate-400">Buscar...</span>
+              <span className="truncate text-xs text-slate-400">Buscar no DiskHub...</span>
             </div>
             <kbd className="hidden md:inline-block text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded text-slate-300 shrink-0">
               Ctrl K
             </kbd>
+          </button>
+
+          {/* Notification Bell with Badge 1 */}
+          <button
+            type="button"
+            onClick={() => navigate('/app/dashboard')}
+            className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#111721] border border-white/10 cursor-pointer transition-all relative"
+            title="Notificações"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center shadow-xs">
+              1
+            </span>
           </button>
 
           {/* Apps Launcher */}
@@ -78,17 +83,6 @@ export function DiskHubHeader({ onToggleSidebar }: DiskHubHeaderProps) {
             title="Central de Apps"
           >
             <LayoutGrid className="w-4 h-4" />
-          </button>
-
-          {/* Notification Bell */}
-          <button
-            type="button"
-            onClick={() => navigate('/app/dashboard')}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#111721] border border-white/10 cursor-pointer transition-all relative"
-            title="Notificações"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500" />
           </button>
 
           {/* Profile Dropdown */}

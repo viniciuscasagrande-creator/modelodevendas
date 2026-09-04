@@ -33,13 +33,13 @@ test.describe('Fase 28.1 — Evidências Visuais e Screenshots do Novo Frontend'
 
     // 2. Dashboard 1440
     await page.goto('/app/dashboard');
-    await page.waitForTimeout(500);
+    await page.waitForSelector('[data-testid="kpi-revenue"]', { timeout: 10000 });
     await page.screenshot({ path: 'docs/evidencias/diskhub-web-dashboard-1440.png', fullPage: true });
 
     // 3. Dashboard Mobile 390
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/app/dashboard');
-    await page.waitForTimeout(500);
+    await page.waitForSelector('[data-testid="kpi-revenue"]', { timeout: 10000 });
     await page.screenshot({ path: 'docs/evidencias/diskhub-web-dashboard-390.png', fullPage: true });
 
     // 4. Central de Apps Desktop

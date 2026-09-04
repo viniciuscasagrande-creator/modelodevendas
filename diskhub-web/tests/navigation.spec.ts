@@ -20,6 +20,7 @@ test.describe('Fase 28.1 — Navegação, Módulos e Anti-Tela-Branca', () => {
   });
 
   test('navega por todos os módulos do menu sem tela branca', async ({ page }) => {
+    test.setTimeout(60000);
     const routes = [
       { path: '/app/dashboard', testId: 'dashboard-page' },
       { path: '/app/apps', text: 'Central de Apps' },

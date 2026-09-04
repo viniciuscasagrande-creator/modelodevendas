@@ -106,7 +106,7 @@ export function SubscriptionPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {apps.map((app: AppEntitlement) => (
             <div
-              key={app.id}
+              key={app.id || app.app}
               className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs"
             >
               <div className="flex items-center space-x-2.5">
