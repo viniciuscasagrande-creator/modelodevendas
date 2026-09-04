@@ -99,7 +99,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard-container space-y-5 pb-6 font-sans w-full max-w-[1600px] mx-auto animate-fadeIn">
+    <div className="dashboard-container space-y-5 font-sans w-full max-w-[1600px] mx-auto animate-fadeIn">
       
       {/* 1. CONTEXT CASCADE CONTROLLER BAR */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#111827] p-2.5 px-3.5 rounded-xl border border-slate-200 dark:border-[#1F2937] shadow-sm">
