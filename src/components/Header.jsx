@@ -3,8 +3,6 @@ import { useDiskHub, usersDatabase } from '../context/DiskHubContext';
 import { 
   Menu, 
   Search, 
-  Sun, 
-  Moon, 
   Bell, 
   HelpCircle, 
   Building, 
@@ -20,7 +18,6 @@ export default function Header() {
     currentUser,
     setCurrentUser,
     theme,
-    setTheme,
     setMobileSidebarOpen,
     setSpotlightOpen,
     selectedCompany,
@@ -107,14 +104,6 @@ export default function Header() {
           <LayoutGrid className="w-4 h-4" />
         </button>
 
-        {/* Theme Switcher */}
-        <button 
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#111625] border border-white/[0.08] cursor-pointer transition-all"
-          title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
-        >
-          {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-        </button>
 
         {/* Notifications Bell with Badge & Drawer (Fase 27.1.8.4) */}
         <NotificationBell />

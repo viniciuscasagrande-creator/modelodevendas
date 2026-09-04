@@ -13,7 +13,6 @@ export default function SpotlightSearch() {
     triggerToast,
     textTitle,
     events,
-    setTheme,
     setEventWizardStep
   } = useDiskHub();
 
@@ -101,13 +100,6 @@ export default function SpotlightSearch() {
                 desc: 'Cadastrar prospeccao no funil Kanban do CRM', 
                 action: () => {
                   setCurrentTab('crm');
-                }
-              },
-              { 
-                label: '🌗 Alternar Tema Visual', 
-                desc: 'Alternar entre Modo Claro e Escuro (DHDS)', 
-                action: () => {
-                  setTheme(prev => prev === 'dark' ? 'light' : 'dark');
                 }
               },
               { 

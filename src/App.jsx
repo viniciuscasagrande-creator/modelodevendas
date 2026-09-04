@@ -49,7 +49,6 @@ export function AppContent() {
     currentUser,
     currentTab,
     setCurrentTab,
-    setTheme,
     setMobileSidebarOpen,
     toast,
     triggerToast,
@@ -289,15 +288,6 @@ export function AppContent() {
           className="btn btn-xs bg-[#F59E0B]/10 hover:bg-[#F59E0B] text-[#F59E0B] hover:text-white border-0 px-3 py-1.5 rounded-full font-bold cursor-pointer transition-all flex items-center space-x-1"
         >
           <span>⚠️ Alerta</span>
-        </button>
-
-        <button 
-          type="button"
-          onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
-          className="btn btn-xs bg-slate-100 dark:bg-white/5 hover:bg-slate-200 text-slate-700 dark:text-slate-300 border-0 px-2.5 py-1.5 rounded-full font-bold cursor-pointer transition-all"
-          title="Alternar Tema"
-        >
-          🌗
         </button>
       </div>
 

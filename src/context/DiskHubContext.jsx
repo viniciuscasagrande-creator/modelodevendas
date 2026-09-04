@@ -158,7 +158,8 @@ export function DiskHubProvider({ children }) {
   ]);
 
   const [plan, setPlan] = useState('omnichannel');
-  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+  const theme = 'dark'; // Strictly DARK ONLY (Fase Modo Escuro Unificado)
+  const setTheme = () => { /* Modo claro desativado - sistema estritamente dark */ };
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
@@ -561,15 +562,15 @@ export function DiskHubProvider({ children }) {
     }
   }, [currentUser]);
 
-  // Sync theme class on HTML element for external scripts/components
+  // Enforce dark mode class and data-color-theme on HTML element
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
+    if (typeof window !== 'undefined') {
+      const root = window.document.documentElement;
       root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+      root.classList.remove('light');
+      root.setAttribute('data-color-theme', 'dark');
     }
-  }, [theme]);
+  }, []);
 
   // Toast trigger utility
   const triggerToast = (title, body, type = 'success') => {
@@ -710,8 +711,8 @@ export function DiskHubProvider({ children }) {
     triggerToast("Sucesso", "Cupom promocional gerado.");
   };
 
-  // Theme Design System Style Classes mapping
-  const bgMain = theme === 'light' ? 'bg-[#0B0E17] text-[#FFFFFF]' : 'bg-[#0B0E17] text-[#FFFFFF]';
+  // Theme Design System Style Classes mapping - Strictly DARK ONLY
+  const bgMain = 'bg-[#0B0E17] text-[#FFFFFF]';
   const sidebarClass = 'bg-[#0D111D] border-r border-white/[0.06]';
   const cardClass = 'bg-[#111625] border border-white/[0.06] shadow-sm rounded-2xl';
   const bgCard = 'bg-[#111625]';
