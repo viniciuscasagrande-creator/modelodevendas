@@ -1,0 +1,55 @@
+import { Plan } from '../types/plans';
+
+export const officialPlans: Plan[] = [
+  {
+    id: 'standard',
+    name: 'Standard',
+    tagline: 'Organize sua operação.',
+    price: 'Sob Consulta',
+    popular: false,
+    ctaText: 'Falar com Consultor',
+    description: 'Para quem está saindo do controle manual e precisa centralizar cadastros, vendas e controle financeiro.',
+    features: [
+      'CRM Comercial Essencial',
+      'ERP Operacional e Emissão de Ingressos',
+      'Financeiro & Conciliação Bancária',
+      'Painel de Controle Unificado',
+      'Suporte via Helpdesk Comercial',
+      'Até 5 usuários inclusos',
+    ],
+  },
+  {
+    id: 'advanced',
+    name: 'Advanced',
+    tagline: 'Venda mais e tenha mais controle.',
+    price: 'R$ 890/mês',
+    popular: true,
+    ctaText: 'Assinar Advanced',
+    description: 'Para negócios em expansão que precisam aumentar vendas, reter clientes e gerenciar múltiplos canais.',
+    features: [
+      'Tudo do plano Standard',
+      'Marketing & Gestão de Audiência',
+      'SAC Omnichannel & Helpdesk',
+      'BI Executivo com Métricas D+2',
+      'Gestão Multi-Produtor / Multi-Evento',
+      'Até 15 usuários inclusos',
+    ],
+  },
+  {
+    id: 'expert',
+    name: 'Expert',
+    tagline: 'Automatize e escale sua operação.',
+    price: 'R$ 1.890/mês',
+    popular: false,
+    ctaText: 'Conhecer Expert',
+    description: 'Para grandes eventos e redes que demandam automações avançadas, IA e integração contábil completa.',
+    features: [
+      'Tudo do plano Advanced',
+      'Módulo Contábil e DRE Automatizado',
+      'Automação e Disparadores de Fluxo',
+      'Inteligência Artificial Preditiva',
+      'Webhooks, API REST e Integrações',
+      'Usuários e eventos ilimitados',
+    ],
+  },
+];

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AppContextData, User, Tenant, Subscription, AppEntitlement } from '../types/context';
+import { AppContextData, Tenant, Subscription, AppEntitlement } from '../types/context';
+import { User } from '../types/auth';
 import { authService } from '../services/authService';
 
 interface AppContextValue {
