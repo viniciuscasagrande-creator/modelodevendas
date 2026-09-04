@@ -13,6 +13,7 @@ import {
   ChevronDown,
   LayoutGrid
 } from 'lucide-react';
+import NotificationBell from './notifications/NotificationBell';
 
 export default function Header() {
   const {
@@ -115,19 +116,8 @@ export default function Header() {
           {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
         </button>
 
-        {/* Notifications Bell with Badge */}
-        <div className="relative">
-          <button 
-            onClick={() => triggerToast("Notificações", "8 alertas operacionais e de vendas pendentes.")}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#1E293B]/60 border border-slate-200 dark:border-white/5 cursor-pointer transition-all relative"
-            title="Notificações"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center shadow-sm">
-              8
-            </span>
-          </button>
-        </div>
+        {/* Notifications Bell with Badge & Drawer (Fase 27.1.8.4) */}
+        <NotificationBell />
 
         {/* Help Circle */}
         <button 

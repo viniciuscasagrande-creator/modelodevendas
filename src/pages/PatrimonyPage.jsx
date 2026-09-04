@@ -8,6 +8,7 @@ export default function PatrimonyPage() {
     borderCol,
     textTitle,
     textSec,
+    textBody = '',
     triggerToast
   } = useDiskHub();
 

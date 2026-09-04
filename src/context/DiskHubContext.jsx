@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { notificationService } from '../services/notificationService';
+import { alertService } from '../services/alertService';
+import { activityService } from '../services/activityService';
 
 const DiskHubContext = createContext();
 
@@ -61,8 +64,9 @@ export function DiskHubProvider({ children }) {
     if (clean === 'automacao' || clean === 'automation') return 'automacao';
     if (clean === 'integracoes') return 'integracoes';
     if (clean === 'appstore' || clean === 'apps' || clean === 'central' || clean === 'central-de-apps' || clean === 'central-do-app' || clean === 'marketplace' || clean === 'loja') return 'appstore';
-    if (clean === 'usuarios' || clean === 'users' || clean === 'permissoes') return 'usuarios';
-    if (clean === 'configuracoes' || clean === 'roadmap') return 'roadmap';
+    if (clean === 'notificacoes' || clean === 'notifications' || clean === 'alerts' || clean === 'alertas' || clean === 'activity') return 'notificacoes';
+    if (clean === 'usuarios' || clean === 'users' || clean === 'permissoes' || clean.startsWith('configuracoes/usuarios') || clean.startsWith('configuracoes/papeis') || clean.startsWith('configuracoes/permissoes')) return 'usuarios';
+    if (clean.startsWith('configuracoes') || clean === 'roadmap') return 'roadmap';
     if (clean === 'logistica' || clean === 'ingressos') return 'logistica';
     if (clean === 'bar' || clean === 'estoque') return 'bar';
     if (clean === 'patrimonio') return 'patrimonio';
@@ -467,6 +471,12 @@ export function DiskHubProvider({ children }) {
   // Handle plan locks based on user profile
   useEffect(() => {
     if (!currentUser) return;
+
+    // Reset caches on profile / tenant change (Fase 27.1.8.4 - Etapa 38 & 39)
+    const tenantId = currentUser.email?.includes('diskhub') ? 'prod_001' : 'prod_002';
+    notificationService.resetForTenant(tenantId);
+    alertService.resetForTenant(tenantId);
+    activityService.resetForTenant(tenantId);
     
     if (currentUser.plan === 'omnichannel') {
       setInstalledApps({

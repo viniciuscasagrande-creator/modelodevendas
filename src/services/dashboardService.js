@@ -2,6 +2,9 @@ import { apiClient } from './apiClient';
 import { metricsService } from './metricsService';
 import { pdtIntegrationService } from './pdtIntegrationService';
 import { userAccessService } from './userAccessService';
+import { alertService } from './alertService';
+import { activityService } from './activityService';
+import { formatDistanceToNow } from '../utils/dateUtils';
 
 export const dashboardService = {
   /**
@@ -163,88 +166,35 @@ export const dashboardService = {
   },
 
   /**
-   * Central de Alertas Operacionais baseados em regras reais.
+   * Central de Alertas Operacionais baseados em regras reais (Fase 27.1.8.4).
    */
   async getAlerts(params = {}) {
     await apiClient.get('/dashboard/alerts', params);
-    return [
-      {
-        id: 'alt-1',
-        level: 'critical',
-        title: 'PDV 03 físico desconectado',
-        description: 'Terminal sem sincronização há 8 minutos.',
-        actionLabel: 'Ver PDVs',
-        tab: 'pdv'
-      },
-      {
-        id: 'alt-2',
-        level: 'warning',
-        title: '7 tickets SAC próximos do SLA',
-        description: 'Fila de suporte geral exige atendimento prioritário.',
-        actionLabel: 'Ver Tickets',
-        tab: 'sac'
-      },
-      {
-        id: 'alt-3',
-        level: 'warning',
-        title: 'Setor Pista atingiu 82% da capacidade',
-        description: 'Lote promocional prestes a esgotar no Metal Fest.',
-        actionLabel: 'Ver Lotes',
-        tab: 'eventos'
-      },
-      {
-        id: 'alt-4',
-        level: 'info',
-        title: 'Conciliação bancária pendente',
-        description: '3 repasses aguardando validação de fechamento.',
-        actionLabel: 'Ver Financeiro',
-        tab: 'financeiro'
-      }
-    ];
+    const alertsList = await alertService.getAlerts();
+    return alertsList.slice(0, 5).map(a => ({
+      id: a.id,
+      level: a.severity,
+      title: a.title,
+      description: a.message,
+      actionLabel: a.appId === 'support' ? 'Ver Tickets' : (a.appId === 'finance' ? 'Ver Financeiro' : (a.appId === 'eventos' ? 'Ver Lotes' : (a.appId === 'integrations' ? 'Ver PDVs' : 'Ver Módulo'))),
+      tab: a.route ? a.route.replace(/^\//, '') : 'dashboard',
+      status: a.status
+    }));
   },
 
   /**
-   * Atividade Recente: Histórico em tempo real.
+   * Atividade Recente: Histórico em tempo real (Fase 27.1.8.4).
    */
   async getActivity(params = {}) {
     await apiClient.get('/dashboard/activity', params);
-    return [
-      {
-        id: 'act-1',
-        time: 'Há 4 min',
-        type: 'venda',
-        description: 'Pedido #10493 confirmado via Pix (2x Metal Fest)',
-        amount: 'R$ 280,00'
-      },
-      {
-        id: 'act-2',
-        time: 'Há 18 min',
-        type: 'marketing',
-        description: 'Campanha "Primavera VIP" ativada no WhatsApp API',
-        amount: '1.200 disparos'
-      },
-      {
-        id: 'act-3',
-        time: 'Há 42 min',
-        type: 'financeiro',
-        description: 'Repasse operacional de lote aprovado para produtor',
-        amount: 'R$ 45.000,00'
-      },
-      {
-        id: 'act-4',
-        time: 'Há 1h',
-        type: 'usuario',
-        description: 'Novo operador adicionado à equipe da portaria',
-        amount: 'Mariana Souza'
-      },
-      {
-        id: 'act-5',
-        time: 'Há 2h',
-        type: 'sac',
-        description: 'Chamado #432 encerrado com avaliação 5 estrelas',
-        amount: 'Atendido'
-      }
-    ];
+    const activityList = await activityService.getActivity({ limit: 8 });
+    return activityList.map(a => ({
+      id: a.id,
+      time: formatDistanceToNow(a.createdAt),
+      type: a.appId,
+      description: `${a.title} • ${a.description}`,
+      amount: a.amount
+    }));
   },
 
   /**

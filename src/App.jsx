@@ -40,6 +40,9 @@ import CheckoutPage from './pages/checkout/CheckoutPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import UsersManagementPage from './pages/subscription/UsersManagementPage';
 import RoadmapPage from './pages/RoadmapPage';
+import NotificationsPage from './pages/NotificationsPage';
+import NotFoundPage from './pages/NotFoundPage';
+import AppErrorBoundary from './components/common/AppErrorBoundary';
 
 export function AppContent() {
   const {
@@ -76,114 +79,117 @@ export function AppContent() {
 
         {/* CONTENT AREA */}
         <div className="content dashboard-content p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-5">
-          {currentTab === 'dashboard' && <Dashboard />}
-          {currentTab === 'produtos' && <ProductDetails />}
-          {currentTab === 'planos' && <PlansPage />}
-          {currentTab === 'contratacao' && <CheckoutPage />}
-          {currentTab === 'assinatura' && <SubscriptionPage />}
-          
-          {currentTab === 'crm' && (
-            <AppEntryGuard appId="crm">
-              <ModuleShell appId="crm" title="CRM & Vendas" subtitle="Clientes e Leads">
-                <CrmPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+          <AppErrorBoundary key={currentTab} onNavigate={(path) => setCurrentTab(path.replace('/', ''))}>
+            {currentTab === 'dashboard' && <Dashboard />}
+            {currentTab === 'produtos' && <ProductDetails />}
+            {currentTab === 'planos' && <PlansPage />}
+            {currentTab === 'contratacao' && <CheckoutPage />}
+            {currentTab === 'assinatura' && <SubscriptionPage />}
+            
+            {currentTab === 'crm' && (
+              <AppEntryGuard appId="crm">
+                <ModuleShell appId="crm" title="CRM & Vendas" subtitle="Clientes e Leads">
+                  <CrmPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {(currentTab === 'vendas' || currentTab === 'pdv') && (
-            <AppEntryGuard appId="erp">
-              <ModuleShell appId="erp" title="ERP Empresarial" subtitle="Vendas & PDVs">
-                <SalesPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {(currentTab === 'vendas' || currentTab === 'pdv') && (
+              <AppEntryGuard appId="erp">
+                <ModuleShell appId="erp" title="ERP Empresarial" subtitle="Vendas & PDVs">
+                  <SalesPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'financeiro' && (
-            <AppEntryGuard appId="finance">
-              <ModuleShell appId="finance" title="Financeiro" subtitle="Fluxo de Caixa & Contas">
-                <FinancePage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'financeiro' && (
+              <AppEntryGuard appId="finance">
+                <ModuleShell appId="finance" title="Financeiro" subtitle="Fluxo de Caixa & Contas">
+                  <FinancePage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'marketing' && (
-            <AppEntryGuard appId="marketing">
-              <ModuleShell appId="marketing" title="Marketing Digital" subtitle="Campanhas & Disparos">
-                <MarketingPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'marketing' && (
+              <AppEntryGuard appId="marketing">
+                <ModuleShell appId="marketing" title="Marketing Digital" subtitle="Campanhas & Disparos">
+                  <MarketingPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'sac' && (
-            <AppEntryGuard appId="support">
-              <ModuleShell appId="support" title="SAC 360º" subtitle="Atendimento & Chamados">
-                <SacPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'sac' && (
+              <AppEntryGuard appId="support">
+                <ModuleShell appId="support" title="SAC 360º" subtitle="Atendimento & Chamados">
+                  <SacPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {(currentTab === 'ai' || currentTab === 'bi') && (
-            <AppEntryGuard appId="analytics">
-              <ModuleShell appId="analytics" title="BI & Analytics" subtitle="Inteligência Analítica">
-                <AiAnalyticsPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {(currentTab === 'ai' || currentTab === 'bi') && (
+              <AppEntryGuard appId="analytics">
+                <ModuleShell appId="analytics" title="BI & Analytics" subtitle="Inteligência Analítica">
+                  <AiAnalyticsPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'contabilidade' && (
-            <AppEntryGuard appId="accounting">
-              <ModuleShell appId="accounting" title="Contabilidade" subtitle="Fiscal & NF-e">
-                <AccountingPage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'contabilidade' && (
+              <AppEntryGuard appId="accounting">
+                <ModuleShell appId="accounting" title="Contabilidade" subtitle="Fiscal & NF-e">
+                  <AccountingPage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'automacao' && (
-            <AppEntryGuard appId="automation">
-              <ModuleShell appId="automation" title="Automação" subtitle="Workflows & Triggers">
-                <PreparationPage moduleName="Automação Comercial" />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'automacao' && (
+              <AppEntryGuard appId="automation">
+                <ModuleShell appId="automation" title="Automação" subtitle="Workflows & Triggers">
+                  <PreparationPage moduleName="Automação Comercial" />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'ia' && (
-            <AppEntryGuard appId="ai">
-              <ModuleShell appId="ai" title="Disk AI" subtitle="Copilot Operacional">
-                <PreparationPage moduleName="Disk AI (Copilot)" />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'ia' && (
+              <AppEntryGuard appId="ai">
+                <ModuleShell appId="ai" title="Disk AI" subtitle="Copilot Operacional">
+                  <PreparationPage moduleName="Disk AI (Copilot)" />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'integracoes' && (
-            <AppEntryGuard appId="integrations">
-              <ModuleShell appId="integrations" title="Integrações" subtitle="Hub de APIs">
-                <AppStorePage />
-              </ModuleShell>
-            </AppEntryGuard>
-          )}
+            {currentTab === 'integracoes' && (
+              <AppEntryGuard appId="integrations">
+                <ModuleShell appId="integrations" title="Integrações" subtitle="Hub de APIs">
+                  <AppStorePage />
+                </ModuleShell>
+              </AppEntryGuard>
+            )}
 
-          {currentTab === 'appstore' && <AppStorePage />}
-          {currentTab === 'marketplace' && <PlansPage />}
-          {currentTab === 'usuarios' && <UsersManagementPage />}
-          
-          {currentTab === 'eventos' && <EventsPage />}
-          {currentTab === 'logistica' && <LogisticsPage />}
-          {(currentTab === 'bar' || currentTab === 'estoque') && <BarInventoryPage />}
-          {currentTab === 'patrimonio' && <PatrimonyPage />}
-          {(currentTab === 'roadmap' || currentTab === 'configuracoes') && <RoadmapPage />}
-          {currentTab === 'relatorios' && <PreparationPage moduleName="Relatórios Consolidados" />}
-          
-          {![
-            'dashboard', 'produtos', 'planos', 'contratacao', 'assinatura', 'usuarios',
-            'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
-            'eventos', 'marketing', 'sac', 'logistica', 'bar', 'estoque',
-            'patrimonio', 'ai', 'bi', 'appstore', 'integracoes', 'marketplace',
-            'roadmap', 'configuracoes', 'automacao', 'relatorios'
-          ].includes(currentTab) && <PreparationPage moduleName="Módulo" />}
+            {currentTab === 'appstore' && <AppStorePage />}
+            {currentTab === 'marketplace' && <PlansPage />}
+            {currentTab === 'usuarios' && <UsersManagementPage />}
+            {currentTab === 'notificacoes' && <NotificationsPage />}
+            
+            {currentTab === 'eventos' && <EventsPage />}
+            {currentTab === 'logistica' && <LogisticsPage />}
+            {(currentTab === 'bar' || currentTab === 'estoque') && <BarInventoryPage />}
+            {currentTab === 'patrimonio' && <PatrimonyPage />}
+            {(currentTab === 'roadmap' || currentTab === 'configuracoes') && <RoadmapPage />}
+            {currentTab === 'relatorios' && <PreparationPage moduleName="Relatórios Consolidados" />}
+            
+            {![
+              'dashboard', 'produtos', 'planos', 'contratacao', 'assinatura', 'usuarios', 'notificacoes',
+              'vendas', 'pdv', 'financeiro', 'contabilidade', 'crm',
+              'eventos', 'marketing', 'sac', 'logistica', 'bar', 'estoque',
+              'patrimonio', 'ai', 'bi', 'appstore', 'integracoes', 'marketplace',
+              'roadmap', 'configuracoes', 'automacao', 'relatorios'
+            ].includes(currentTab) && <NotFoundPage />}
+          </AppErrorBoundary>
         </div>
 
         {/* NOTIFICATION TOAST */}
-        {toast.show && (
+        {toast?.show && (
           <div className={`fixed bottom-6 left-6 z-50 ${bgCard} border ${borderCol} ${textTitle} px-4 py-3 rounded shadow-2xl flex items-center space-x-3 transition-all duration-300 animate-slideUp`}>
             <div className="p-1 bg-[#3B82F6]/10 text-[#3B82F6] rounded shrink-0">
               <CheckCircle className="w-5 h-5" />
@@ -334,10 +340,12 @@ export function AppContent() {
 
 export default function App() {
   return (
-    <DiskHubProvider>
-      <AppBootstrap>
-        <AppContent />
-      </AppBootstrap>
-    </DiskHubProvider>
+    <AppErrorBoundary>
+      <DiskHubProvider>
+        <AppBootstrap>
+          <AppContent />
+        </AppBootstrap>
+      </DiskHubProvider>
+    </AppErrorBoundary>
   );
 }

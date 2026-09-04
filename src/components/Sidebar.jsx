@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Blocks,
   Compass,
-  Headphones
+  Headphones,
+  Bell
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -56,6 +57,7 @@ export default function Sidebar() {
       roadmap: '/configuracoes',
       marketplace: '/planos',
       planos: '/planos',
+      notificacoes: '/notificacoes',
       logistica: '/logistica',
       bar: '/estoque',
       patrimonio: '/patrimonio'
@@ -107,6 +109,7 @@ export default function Sidebar() {
       title: 'SISTEMA',
       items: [
         { id: 'appstore', label: 'Central de Apps', icon: ShoppingBag },
+        { id: 'notificacoes', label: 'Notificações', icon: Bell },
         { id: 'integracoes', label: 'Integrações', icon: Blocks },
         { id: 'usuarios', label: 'Usuários e Permissões', icon: ShieldCheck },
         { id: 'roadmap', label: 'Configurações', icon: Sliders }

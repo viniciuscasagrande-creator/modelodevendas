@@ -66,6 +66,20 @@ class UserAccessService {
     const res = await this.canUserAccess({ appId });
     return res.allowed;
   }
+
+  hasPermission(permission) {
+    try {
+      const stored = localStorage.getItem('diskhub_current_profile');
+      const roleKey = stored ? JSON.parse(stored).role : 'owner';
+      const roleDef = defaultRoles[roleKey] || defaultRoles.owner;
+      if (!roleDef || roleDef.permissions.includes('*')) return true;
+      if (roleDef.permissions.includes(permission)) return true;
+      const [mod] = permission.split('.');
+      return roleDef.permissions.includes(`${mod}.*`);
+    } catch {
+      return true;
+    }
+  }
 }
 
 export const userAccessService = new UserAccessService();

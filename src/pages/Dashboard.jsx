@@ -312,7 +312,7 @@ export default function Dashboard() {
         <div className="dashboard-kpis grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-testid="dashboard-kpis">
           
           {/* KPI 1: RECEITA */}
-          <div data-testid="kpi-revenue" className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div data-testid="kpi-revenue" className="kpi-card bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                 Receita Total
@@ -335,7 +335,7 @@ export default function Dashboard() {
           </div>
 
           {/* KPI 2: PEDIDOS */}
-          <div data-testid="kpi-orders" className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div data-testid="kpi-orders" className="kpi-card bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                 Pedidos Confirmados
@@ -358,7 +358,7 @@ export default function Dashboard() {
           </div>
 
           {/* KPI 3: CONVERSÃO */}
-          <div data-testid="kpi-conversion" className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div data-testid="kpi-conversion" className="kpi-card bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                 Taxa de Conversão
@@ -383,7 +383,7 @@ export default function Dashboard() {
           </div>
 
           {/* KPI 4: TICKET MÉDIO */}
-          <div data-testid="kpi-ticket-average" className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div data-testid="kpi-ticket-average" className="kpi-card bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1F2937] p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
                 Ticket Médio
@@ -867,10 +867,18 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-white/5 text-center mt-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-center mt-2">
                 <span className="text-[11px] text-slate-400">
-                  Gateway e rotinas de conciliação operando normalmente.
+                  Monitoramento contínuo ativo.
                 </span>
+                <button 
+                  type="button" 
+                  onClick={() => setCurrentTab('notificacoes')}
+                  className="text-xs font-bold text-[#F97316] hover:underline bg-transparent border-0 cursor-pointer inline-flex items-center space-x-1"
+                >
+                  <span>Central de Notificações</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </>
           )}
@@ -924,10 +932,10 @@ export default function Dashboard() {
               <div className="pt-3 border-t border-slate-100 dark:border-white/5 text-center mt-2">
                 <button 
                   type="button" 
-                  onClick={() => setCurrentTab('relatorios')}
+                  onClick={() => setCurrentTab('notificacoes')}
                   className="text-xs font-bold text-[#F97316] hover:underline bg-transparent border-0 cursor-pointer inline-flex items-center space-x-1"
                 >
-                  <span>Ver histórico completo</span>
+                  <span>Ver todas as atividades e alertas</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>

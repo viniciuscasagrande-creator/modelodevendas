@@ -52,6 +52,7 @@ export default function EventsPage() {
     setTurnstiles,
     stocks,
     setStocks,
+    financialStats = { receita: 0, ingressos: 0, saldo: 0 },
     eventWizardStep,
     setEventWizardStep,
     wizardInputs,
