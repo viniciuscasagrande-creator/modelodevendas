@@ -1,0 +1,2 @@
+import { Crown } from 'lucide-react'
+export function CurrentPlan(){return <div className="card current-plan"><div className="current-plan__top"><div className="crown-box"><Crown size={30}/></div><div><span>Você está no plano</span><strong>Advanced</strong><small>6 apps ativos&nbsp;&nbsp;•&nbsp;&nbsp;12 usuários</small></div></div><div className="progress"><i/></div><div className="billing"><div><span>Próxima cobrança</span><strong>15 de jan. de 2026</strong></div><button>Ver minha assinatura <b>→</b></button></div></div>}
